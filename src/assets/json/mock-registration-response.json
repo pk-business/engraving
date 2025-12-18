@@ -1,0 +1,15 @@
+{
+    "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY1OTQxNTM2LCJleHAiOjE3Njg1MzM1MzZ9.RkkTc-L-2etQ7tyoFvZNnjGOA8nlWehDn4OAAxcf-JA",
+    "user": {
+        "id": 1,
+        "documentId": "ntylh8wkplhqmnhcd0xpj0kh",
+        "username": "Prem Karki",
+        "email": "praym2005k@gmail.com",
+        "provider": "local",
+        "confirmed": true,
+        "blocked": false,
+        "createdAt": "2025-12-17T03:18:55.998Z",
+        "updatedAt": "2025-12-17T03:18:55.998Z",
+        "publishedAt": "2025-12-17T03:18:55.998Z"
+    }
+}

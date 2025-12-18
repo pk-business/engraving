@@ -1,0 +1,314 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Engraved Wooden Photo Frame",
+      "description": "Beautiful laser-engraved wooden frame perfect for displaying your cherished memories. Handcrafted from premium oak wood with intricate detailing.",
+      "price": 49.99,
+      "imageUrl": {
+        "main": "/images/png/wood%20engraved%20main.png",
+        "alt": "/images/png/wood%20engraved%20alt.png"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=500",
+        "https://images.unsplash.com/photo-1582139329536-e7284fece509?w=500",
+        "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=500"
+      ],
+      "material": "wood",
+      "occasions": ["wedding", "anniversary"],
+      "category": "Home Decor",
+      "categories": ["home-living", "personal-milestones"],
+      "customizable": true,
+      "sizes": ["8x10", "11x14", "16x20"],
+      "inStock": true,
+      "rating": 4.8,
+      "reviewCount": 127
+    },
+    {
+      "id": "2",
+      "name": "Personalized Metal Keychain",
+      "description": "Durable stainless steel keychain with custom engraving. Perfect gift for any occasion with scratch-resistant finish.",
+      "price": 24.99,
+      "imageUrl": {
+        "main": "/images/png/keychain%20main.png",
+        "alt": "/images/png/keychain%20alt.png"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1633514145783-27c5660dd9e4?w=500",
+        "https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=500"
+      ],
+      "material": "metal",
+      "occasions": ["birthday", "corporate"],
+      "category": "Accessories",
+      "categories": ["personal-milestones", "corporate-professional"],
+      "customizable": true,
+      "sizes": ["Standard"],
+      "inStock": true,
+      "rating": 4.5,
+      "reviewCount": 89
+    },
+    {
+      "id": "3",
+      "name": "Custom Leather Wallet",
+      "description": "Premium leather wallet with personalized initials. Features multiple card slots and a spacious bill compartment.",
+      "price": 79.99,
+      "imageUrl": {
+        "main": "/images/png/leather%20wallet%20main.png",
+        "alt": "/images/png/leather%20wallet%20alt.png"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1627123424574-724758594e93?w=500",
+        "https://images.unsplash.com/photo-1591561954557-26941169b49e?w=500"
+      ],
+      "material": "leather",
+      "occasions": ["birthday", "graduation", "corporate"],
+      "category": "Accessories",
+      "categories": ["personal-milestones", "corporate-professional"],
+      "customizable": true,
+      "sizes": ["Standard"],
+      "inStock": true,
+      "rating": 4.9,
+      "reviewCount": 234
+    },
+    {
+      "id": "4",
+      "name": "Acrylic Wedding Sign",
+      "description": "Elegant transparent acrylic sign with custom engraving. Perfect for wedding ceremonies and receptions.",
+      "price": 89.99,
+      "imageUrl": {
+        "main": "/images/png/wedding%20main.png",
+        "alt": "/images/png/wedding%20alt.png"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1519741497674-611481863552?w=500",
+        "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=500"
+      ],
+      "material": "acrylic",
+      "occasions": ["wedding"],
+      "category": "Wedding Decor",
+      "categories": ["love-relationships", "personal-milestones"],
+      "customizable": true,
+      "sizes": ["12x18", "16x24", "20x30"],
+      "inStock": true,
+      "rating": 5.0,
+      "reviewCount": 156
+    },
+    {
+      "id": "5",
+      "name": "Engraved Glass Tumbler Set",
+      "description": "Set of 4 premium glass tumblers with custom designs. Perfect for special occasions and daily use.",
+      "price": 59.99,
+      "imageUrl": {
+        "main": "/images/png/glass%20main.png",
+        "alt": "/images/png/glass%20alt.png"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500",
+        "https://images.unsplash.com/photo-1584308972272-9e4e7685e80f?w=500"
+      ],
+      "material": "glass",
+      "occasions": ["wedding", "anniversary", "christmas"],
+      "category": "Drinkware",
+      "categories": ["home-living", "personal-milestones", "celebrations-holidays"],
+      "customizable": true,
+      "sizes": ["16oz"],
+      "inStock": true,
+      "rating": 4.7,
+      "reviewCount": 98
+    },
+    {
+      "id": "6",
+      "name": "Wooden Cutting Board",
+      "description": "Handcrafted bamboo cutting board with personalized engraving. Food-safe and eco-friendly.",
+      "price": 44.99,
+      "imageUrl": {
+        "main": "/images/png/cuttingboard%20main.png",
+        "alt": "/images/png/cuttingboard%20alt.png"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1580870069867-74c579371a1c?w=500",
+        "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500"
+      ],
+      "material": "wood",
+      "occasions": ["wedding", "anniversary", "christmas"],
+      "category": "Kitchenware",
+      "categories": ["home-living", "personal-milestones", "celebrations-holidays"],
+      "customizable": true,
+      "sizes": ["Medium", "Large"],
+      "inStock": true,
+      "rating": 4.6,
+      "reviewCount": 145
+    },
+    {
+      "id": "7",
+      "name": "Metal Business Card Holder",
+      "description": "Professional stainless steel business card holder with company logo engraving. Perfect corporate gift.",
+      "price": 34.99,
+      "imageUrl": {
+        "main": "/images/png/businesscard%20main.png",
+        "alt": "/images/png/businesscard%20alt.png"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1611171711912-e0be89aefa67?w=500"
+      ],
+      "material": "metal",
+      "occasions": ["corporate", "graduation"],
+      "category": "Office",
+      "categories": ["corporate-professional"],
+      "customizable": true,
+      "sizes": ["Standard"],
+      "inStock": true,
+      "rating": 4.4,
+      "reviewCount": 67
+    },
+    {
+      "id": "8",
+      "name": "Leather Journal",
+      "description": "Premium leather-bound journal with custom embossing. Perfect for gifting to writers and professionals.",
+      "price": 69.99,
+      "imageUrl": {
+        "main": "/images/png/journal%20main.png",
+        "alt": "/images/png/journal%20alt.png"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=500",
+        "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=500"
+      ],
+      "material": "leather",
+      "occasions": ["birthday", "graduation", "corporate"],
+      "category": "Stationery",
+      "categories": ["hobbies-interests", "personal-milestones", "corporate-professional"],
+      "customizable": true,
+      "sizes": ["A5", "A4"],
+      "inStock": true,
+      "rating": 4.8,
+      "reviewCount": 178
+    },
+    {
+      "id": "9",
+      "name": "Acrylic Anniversary Plaque",
+      "description": "Elegant acrylic plaque with custom anniversary message. Modern and timeless design.",
+      "price": 54.99,
+      "imageUrl": {
+        "main": "https://images.unsplash.com/photo-1565372543878-0d7619f68b6f?w=500",
+        "alt": "https://images.unsplash.com/photo-1565372543878-0d7619f68b6f?w=500"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1565372543878-0d7619f68b6f?w=500"
+      ],
+      "material": "acrylic",
+      "occasions": ["anniversary"],
+      "category": "Home Decor",
+      "categories": ["home-living", "personal-milestones"],
+      "customizable": true,
+      "sizes": ["6x8", "8x10"],
+      "inStock": true,
+      "rating": 4.9,
+      "reviewCount": 92
+    },
+    {
+      "id": "10",
+      "name": "Engraved Glass Ornament",
+      "description": "Beautiful glass ornament with custom engraving. Perfect for Christmas tree or year-round display.",
+      "price": 29.99,
+      "imageUrl": {
+        "main": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=500",
+        "alt": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=500"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=500"
+      ],
+      "material": "glass",
+      "occasions": ["christmas"],
+      "category": "Ornaments",
+      "categories": ["celebrations-holidays"],
+      "customizable": true,
+      "sizes": ["3 inch", "4 inch"],
+      "inStock": true,
+      "rating": 4.7,
+      "reviewCount": 203
+    },
+    {
+      "id": "11",
+      "name": "Wooden Name Sign",
+      "description": "Custom wooden name sign for nursery or home decor. Precision cut with smooth edges.",
+      "price": 39.99,
+      "imageUrl": {
+        "main": "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?w=500",
+        "alt": "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?w=500"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?w=500"
+      ],
+      "material": "wood",
+      "occasions": ["birthday"],
+      "category": "Home Decor",
+      "categories": ["home-living", "personal-milestones"],
+      "customizable": true,
+      "sizes": ["Small", "Medium", "Large"],
+      "inStock": true,
+      "rating": 4.6,
+      "reviewCount": 112
+    },
+    {
+      "id": "12",
+      "name": "Metal Dog Tag Set",
+      "description": "Personalized metal dog tag set with custom text and design. Includes chain and silencer.",
+      "price": 19.99,
+      "imageUrl": {
+        "main": "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=500",
+        "alt": "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=500"
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=500"
+      ],
+      "material": "metal",
+      "occasions": ["birthday"],
+      "category": "Accessories",
+      "categories": ["personal-milestones"],
+      "customizable": true,
+      "sizes": ["Standard"],
+      "inStock": true,
+      "rating": 4.5,
+      "reviewCount": 87
+    }
+  ],
+  "blogs": [
+    {
+      "id": "1",
+      "title": "How to Choose the Perfect Material for Your Custom Gift",
+      "content": "When it comes to creating the perfect custom gift, choosing the right material is crucial. Each material has its unique characteristics and benefits...",
+      "excerpt": "Discover the best materials for different occasions and learn how to make your custom gifts truly special.",
+      "author": "Sarah Johnson",
+      "imageUrl": "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=800",
+      "createdAt": "2025-12-12T00:00:00.000Z",
+      "updatedAt": "2025-12-12T00:00:00.000Z",
+      "tags": ["tips", "materials", "guide"],
+      "commentCount": 15
+    },
+    {
+      "id": "2",
+      "title": "Top 10 Wedding Gift Ideas with Laser Engraving",
+      "content": "Weddings are special occasions that deserve unique and memorable gifts. Laser-engraved items offer a perfect blend of personalization and elegance...",
+      "excerpt": "Looking for unique wedding gift ideas? Check out our curated list of laser-engraved items that couples will love.",
+      "author": "Michael Chen",
+      "imageUrl": "https://images.unsplash.com/photo-1519741497674-611481863552?w=800",
+      "createdAt": "2025-12-05T00:00:00.000Z",
+      "updatedAt": "2025-12-05T00:00:00.000Z",
+      "tags": ["wedding", "gifts", "inspiration"],
+      "commentCount": 23
+    },
+    {
+      "id": "3",
+      "title": "The Art of CNC Cutting: From Design to Reality",
+      "content": "CNC cutting technology has revolutionized the way we create custom items. This precision manufacturing process allows for intricate designs...",
+      "excerpt": "Take a behind-the-scenes look at our CNC cutting process and see how your custom designs come to life.",
+      "author": "Emily Rodriguez",
+      "imageUrl": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800",
+      "createdAt": "2025-11-28T00:00:00.000Z",
+      "updatedAt": "2025-11-28T00:00:00.000Z",
+      "tags": ["cnc", "process", "technology"],
+      "commentCount": 18
+    }
+  ]
+}

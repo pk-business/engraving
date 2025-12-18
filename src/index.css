@@ -1,0 +1,78 @@
+:root {
+  /* Default: Manrope (sans) + Playfair Display (serif).
+     Inter and Merriweather are available as fallbacks/pairing options. */
+  --font-sans: 'Manrope', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Playfair Display', 'Merriweather', Georgia, 'Times New Roman', serif;
+  --font-weight-normal: 400;
+  --font-weight-medium: 600;
+  line-height: 1.5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #FAFAFA;
+  color: #1A1A1A;
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-normal);
+  min-width: 320px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  color: #1f2A44;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Accessibility helpers: visible focus, larger touch targets, and sr-only utility for live region */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Visible focus for keyboard users */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 3px solid #F2A541; /* brand accent */
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Increase touch target size for interactive controls */
+button,
+.action-btn,
+.place-order-btn,
+.continue-shopping-btn,
+.delete-btn,
+.qty-select,
+select,
+.size-select,
+.file-input {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.4rem 0.6rem;
+  touch-action: manipulation;
+}
+
+/* Slightly larger clickable thumbnails */
+.thumbnail {
+  min-width: 48px;
+  min-height: 48px;
+}
