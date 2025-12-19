@@ -2,6 +2,7 @@ import React from 'react';
 import { FiSearch, FiCalendar, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi';
 import { BiCategoryAlt } from 'react-icons/bi';
 import { MdEmail } from 'react-icons/md';
+import SearchBar from '../../components/Search/SearchBar';
 import './BlogPage.css';
 
 const BlogPage: React.FC = () => {
@@ -21,15 +22,17 @@ const BlogPage: React.FC = () => {
               <div className="blog-image-placeholder">Blog Image</div>
               <div className="blog-content">
                 <div className="blog-meta">
-                  <span className="blog-date"><FiCalendar /> Dec 12, 2025</span>
-                  <span className="blog-category"><BiCategoryAlt /> Tips & Tricks</span>
+                  <span className="blog-date">
+                    <FiCalendar /> Dec 12, 2025
+                  </span>
+                  <span className="blog-category">
+                    <BiCategoryAlt /> Tips & Tricks
+                  </span>
                 </div>
-                <h2 className="blog-title">
-                  How to Choose the Perfect Material for Your Custom Gift
-                </h2>
+                <h2 className="blog-title">How to Choose the Perfect Material for Your Custom Gift</h2>
                 <p className="blog-excerpt">
-                  Discover the best materials for different occasions and learn
-                  how to make your custom gifts truly special...
+                  Discover the best materials for different occasions and learn how to make your custom gifts truly
+                  special...
                 </p>
                 <a href="#" className="read-more">
                   Read More <FiArrowRight />
@@ -41,15 +44,17 @@ const BlogPage: React.FC = () => {
               <div className="blog-image-placeholder">Blog Image</div>
               <div className="blog-content">
                 <div className="blog-meta">
-                  <span className="blog-date"><FiCalendar /> Dec 5, 2025</span>
-                  <span className="blog-category"><BiCategoryAlt /> Inspiration</span>
+                  <span className="blog-date">
+                    <FiCalendar /> Dec 5, 2025
+                  </span>
+                  <span className="blog-category">
+                    <BiCategoryAlt /> Inspiration
+                  </span>
                 </div>
-                <h2 className="blog-title">
-                  Top 10 Wedding Gift Ideas with Laser Engraving
-                </h2>
+                <h2 className="blog-title">Top 10 Wedding Gift Ideas with Laser Engraving</h2>
                 <p className="blog-excerpt">
-                  Looking for unique wedding gift ideas? Check out our curated
-                  list of laser-engraved items that couples will love...
+                  Looking for unique wedding gift ideas? Check out our curated list of laser-engraved items that couples
+                  will love...
                 </p>
                 <a href="#" className="read-more">
                   Read More <FiArrowRight />
@@ -61,15 +66,17 @@ const BlogPage: React.FC = () => {
               <div className="blog-image-placeholder">Blog Image</div>
               <div className="blog-content">
                 <div className="blog-meta">
-                  <span className="blog-date"><FiCalendar /> Nov 28, 2025</span>
-                  <span className="blog-category"><BiCategoryAlt /> Behind the Scenes</span>
+                  <span className="blog-date">
+                    <FiCalendar /> Nov 28, 2025
+                  </span>
+                  <span className="blog-category">
+                    <BiCategoryAlt /> Behind the Scenes
+                  </span>
                 </div>
-                <h2 className="blog-title">
-                  The Art of CNC Cutting: From Design to Reality
-                </h2>
+                <h2 className="blog-title">The Art of CNC Cutting: From Design to Reality</h2>
                 <p className="blog-excerpt">
-                  Take a behind-the-scenes look at our CNC cutting process and
-                  see how your custom designs come to life...
+                  Take a behind-the-scenes look at our CNC cutting process and see how your custom designs come to
+                  life...
                 </p>
                 <a href="#" className="read-more">
                   Read More <FiArrowRight />
@@ -95,14 +102,7 @@ const BlogPage: React.FC = () => {
           {/* Search */}
           <div className="sidebar-section">
             <h3>Search</h3>
-            <div className="search-wrapper">
-              <FiSearch className="search-icon" />
-              <input
-                type="search"
-                placeholder="Search blog posts..."
-                className="blog-search"
-              />
-            </div>
+            <SearchBar value={''} onSearch={() => {}} placeholder="Search blog posts..." debounceMs={250} />
           </div>
 
           {/* Categories */}

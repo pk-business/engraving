@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { MaterialType, OccasionType, type Product } from '../../types/product.types';
 import ProductService from '../../services/product.service';
-import { FiSearch, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
-import { MdFilterList } from 'react-icons/md';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
+import FiltersSidebar from '../../components/Filters/FiltersSidebar';
 import './ProductsPage.css';
 
 const ProductsPage: React.FC = () => {
@@ -31,23 +31,42 @@ const ProductsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    const occasionParam = searchParams.get('occasion');
+    const qParam = searchParams.get('q');
+    const occasionParam = searchParams.getAll('occasions');
+    const occasionSingle = searchParams.get('occasion');
     const categoryParam = searchParams.get('category');
+    const categoriesParams = searchParams.getAll('categories');
+    const materialsParams = searchParams.getAll('materials');
 
-    if (occasionParam && Object.values(OccasionType).includes(occasionParam as OccasionType)) {
-      setSelectedOccasions([occasionParam as OccasionType]);
-      setSelectedCategory(null);
-      return;
+    if (qParam) {
+      setSearchQuery(qParam);
     }
 
-    if (categoryParam) {
-      const mapped = categoryMap[categoryParam];
-      setSelectedCategory(categoryParam);
-      if (mapped && mapped.length > 0) {
-        setSelectedOccasions(mapped);
-      } else {
-        setSelectedOccasions([]);
-      }
+    // handle occasions: support single 'occasion' or multiple 'occasions='
+    const occasionsToSet = occasionParam.length > 0 ? occasionParam : occasionSingle ? [occasionSingle] : [];
+    if (occasionsToSet.length > 0) {
+      const valid = occasionsToSet.filter((v) =>
+        Object.values(OccasionType).includes(v as OccasionType)
+      ) as OccasionType[];
+      setSelectedOccasions(valid);
+    }
+
+    // handle categories: support singular 'category' or plural 'categories'
+    const categoriesToUse = categoriesParams.length > 0 ? categoriesParams : categoryParam ? [categoryParam] : [];
+    if (categoriesToUse.length > 0) {
+      // if multiple categories provided, just pick the first for the radio-style category selection
+      const firstCat = categoriesToUse[0];
+      const mapped = categoryMap[firstCat];
+      setSelectedCategory(firstCat);
+      if (mapped && mapped.length > 0) setSelectedOccasions(mapped);
+    }
+
+    // materials (from drawer) -> map to MaterialType if possible
+    if (materialsParams.length > 0) {
+      // MaterialType is an enum of strings; coerce any matching values
+      const matValues = Object.values(MaterialType);
+      const mats = materialsParams.filter((m) => matValues.includes(m)) as MaterialType[];
+      setSelectedMaterials(mats);
     }
   }, [searchParams]);
 
@@ -68,16 +87,14 @@ const ProductsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedMaterials, selectedOccasions, minPrice, maxPrice]);
+  }, [selectedMaterials, selectedOccasions, selectedCategory, minPrice, maxPrice]);
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
   const filteredProducts = products
-    .filter((product) =>
-      searchQuery ? product.name.toLowerCase().includes(searchQuery.toLowerCase()) : true
-    )
+    .filter((product) => (searchQuery ? product.name.toLowerCase().includes(searchQuery.toLowerCase()) : true))
     .sort((a, b) => {
       switch (sortBy) {
         case 'price-low':
@@ -103,20 +120,15 @@ const ProductsPage: React.FC = () => {
     setSearchParams({});
   };
 
-
   const toggleMaterial = (material: MaterialType) => {
     setSelectedMaterials((prev) =>
-      prev.includes(material)
-        ? prev.filter((m) => m !== material)
-        : [...prev, material]
+      prev.includes(material) ? prev.filter((m) => m !== material) : [...prev, material]
     );
   };
 
   const toggleOccasion = (occasion: OccasionType) => {
     setSelectedOccasions((prev) =>
-      prev.includes(occasion)
-        ? prev.filter((o) => o !== occasion)
-        : [...prev, occasion]
+      prev.includes(occasion) ? prev.filter((o) => o !== occasion) : [...prev, occasion]
     );
   };
 
@@ -151,107 +163,32 @@ const ProductsPage: React.FC = () => {
     setSearchParams({ category: categoryKey });
   };
 
-  const selectedCategoryLabel = categoryOptions.find(c => c.key === selectedCategory)?.label || null;
+  const selectedCategoryLabel = categoryOptions.find((c) => c.key === selectedCategory)?.label || null;
 
   return (
     <div className="products-page">
-      {/* Filters Sidebar */}
-      <aside className="filters-sidebar">
-        <div className="filter-section">
-          <h3>Material Type</h3>
-          <div className="filter-options">
-            {Object.values(MaterialType).map((material) => (
-              <label key={material} className="filter-option">
-                <input
-                  type="checkbox"
-                  checked={selectedMaterials.includes(material)}
-                  onChange={() => toggleMaterial(material)}
-                />
-                <span>{material.charAt(0).toUpperCase() + material.slice(1)}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className="filter-section">
-          <h3>Occasion</h3>
-          <div className="filter-options">
-            {Object.values(OccasionType).map((occasion) => (
-              <label key={occasion} className="filter-option">
-                <input
-                  type="checkbox"
-                  checked={selectedOccasions.includes(occasion)}
-                  onChange={() => toggleOccasion(occasion)}
-                />
-                <span>{occasion.charAt(0).toUpperCase() + occasion.slice(1)}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className="filter-section">
-          <h3>Category</h3>
-          <div className="filter-options">
-            {categoryOptions.map((c) => (
-              <label key={c.key} className="filter-option">
-                <input
-                  type="radio"
-                  name="category"
-                  checked={selectedCategory === c.key}
-                  onChange={() => toggleCategory(c.key)}
-                />
-                <span>{c.label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className="filter-section">
-          <h3>Price Range</h3>
-          <div className="price-inputs">
-            <input
-              type="number"
-              placeholder="Min"
-              className="price-input"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-            />
-            <span>-</span>
-            <input
-              type="number"
-              placeholder="Max"
-              className="price-input"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <button className="clear-filters" onClick={clearFilters}>
-          <MdFilterList /> Clear All Filters
-        </button>
-      </aside>
+      {/* Filters Sidebar (re-usable) */}
+      <FiltersSidebar
+        selectedMaterials={selectedMaterials}
+        onToggleMaterial={toggleMaterial}
+        selectedOccasions={selectedOccasions}
+        onToggleOccasion={toggleOccasion}
+        selectedCategory={selectedCategory}
+        onToggleCategory={toggleCategory}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
+        setMinPrice={setMinPrice}
+        setMaxPrice={setMaxPrice}
+        clearFilters={clearFilters}
+        categoryOptions={categoryOptions}
+      />
 
       {/* Products Grid */}
       <main className="products-main">
         <div className="products-header">
           <h1>{selectedCategoryLabel || 'Our Products'}</h1>
           <div className="products-controls">
-            <div className="search-wrapper">
-              <FiSearch className="search-icon" />
-              <input
-                type="search"
-                placeholder="Search products..."
-                className="search-input"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <select
-              className="sort-select"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-            >
+            <select className="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
               <option value="featured">Sort by: Featured</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
@@ -266,14 +203,16 @@ const ProductsPage: React.FC = () => {
           <div className="products-grid">
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
-                <Link
-                  to={`/products/${product.id}`}
-                  key={product.id}
-                  className="product-card"
-                >
+                <Link to={`/products/${product.id}`} key={product.id} className="product-card">
                   <div className="product-image-container">
-                    <div className="product-image product-image-main" style={{ backgroundImage: `url(${product.imageUrl.main})` }} />
-                    <div className="product-image product-image-alt" style={{ backgroundImage: `url(${product.imageUrl.alt})` }} />
+                    <div
+                      className="product-image product-image-main"
+                      style={{ backgroundImage: `url(${product.imageUrl.main})` }}
+                    />
+                    <div
+                      className="product-image product-image-alt"
+                      style={{ backgroundImage: `url(${product.imageUrl.alt})` }}
+                    />
                   </div>
                   <div className="product-info">
                     <h3>{product.name}</h3>
@@ -288,9 +227,7 @@ const ProductsPage: React.FC = () => {
                 </Link>
               ))
             ) : (
-              <p className="no-products">
-                No products found matching your filters.
-              </p>
+              <p className="no-products">No products found matching your filters.</p>
             )}
           </div>
         )}

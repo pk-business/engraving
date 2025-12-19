@@ -14,6 +14,7 @@ import { useAnnouncement } from '../../contexts/AnnouncementContext';
 const CheckoutPage: React.FC = () => {
   const { cart, updateQuantity, removeFromCart } = useCart();
   const { announce } = useAnnouncement();
+  const [isSummaryVisible, setIsSummaryVisible] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
     PaymentMethod.CREDIT_CARD
   );
@@ -49,8 +50,26 @@ const CheckoutPage: React.FC = () => {
       <div className="checkout-container">
         {/* Shipping Information */}
         <div className="checkout-main">
+          {/* Mobile toggle to show/hide order summary */}
+          <button
+            type="button"
+            className="summary-toggle-main"
+            onClick={() => {
+              setIsSummaryVisible((v) => {
+                const next = !v;
+                announce(next ? 'Order summary shown' : 'Order summary hidden');
+                return next;
+              });
+            }}
+            aria-expanded={isSummaryVisible}
+            aria-controls="order-summary"
+          >
+            {isSummaryVisible ? 'Hide order summary' : `View order summary (${cart.items.length})`}
+          </button>
           <section className="checkout-section">
-            <h2><MdLocalShipping /> Shipping Information</h2>
+            <h2>
+              <MdLocalShipping /> Shipping Information
+            </h2>
             <form onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group full">
@@ -93,23 +112,11 @@ const CheckoutPage: React.FC = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label>City *</label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={shippingInfo.city}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="text" name="city" value={shippingInfo.city} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
                   <label>State *</label>
-                  <input
-                    type="text"
-                    name="state"
-                    value={shippingInfo.state}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="text" name="state" value={shippingInfo.state} onChange={handleInputChange} required />
                 </div>
               </div>
 
@@ -126,13 +133,7 @@ const CheckoutPage: React.FC = () => {
                 </div>
                 <div className="form-group">
                   <label>Phone *</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={shippingInfo.phone}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <input type="tel" name="phone" value={shippingInfo.phone} onChange={handleInputChange} required />
                 </div>
               </div>
             </form>
@@ -140,7 +141,9 @@ const CheckoutPage: React.FC = () => {
 
           {/* Payment Method */}
           <section className="checkout-section">
-            <h2><MdPayment /> Payment Method</h2>
+            <h2>
+              <MdPayment /> Payment Method
+            </h2>
             <div className="payment-methods">
               <label className="payment-option">
                 <input
@@ -201,8 +204,25 @@ const CheckoutPage: React.FC = () => {
         </div>
 
         {/* Order Summary */}
-        <aside className="order-summary">
-          <h2>Order Summary</h2>
+        <aside
+          id="order-summary"
+          className={`order-summary ${isSummaryVisible ? '' : 'collapsed'}`}
+          aria-hidden={!isSummaryVisible}
+        >
+          <div className="order-summary-header">
+            <h2>Order Summary</h2>
+            <button
+              type="button"
+              className="summary-toggle-aside"
+              onClick={() => {
+                setIsSummaryVisible(false);
+                announce('Order summary hidden');
+              }}
+              aria-label="Collapse order summary"
+            >
+              Hide
+            </button>
+          </div>
 
           <div className="summary-items">
             {cart.items.length === 0 ? (
@@ -234,7 +254,9 @@ const CheckoutPage: React.FC = () => {
                           aria-label={`Quantity for ${item.product.name}`}
                         >
                           {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
-                            <option key={n} value={n}>{n}</option>
+                            <option key={n} value={n}>
+                              {n}
+                            </option>
                           ))}
                         </select>
                       </span>
@@ -278,18 +300,10 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
-          <button
-            className="place-order-btn"
-            onClick={handleSubmit}
-            disabled={cart.items.length === 0}
-          >
+          <button className="place-order-btn" onClick={handleSubmit} disabled={cart.items.length === 0}>
             <BsCheckCircleFill /> Place Order
           </button>
-          <button
-            type="button"
-            className="continue-shopping-btn checkout"
-            onClick={() => navigate(ROUTES.PRODUCTS)}
-          >
+          <button type="button" className="continue-shopping-btn checkout" onClick={() => navigate(ROUTES.PRODUCTS)}>
             <FiArrowLeft /> Continue Shopping
           </button>
         </aside>

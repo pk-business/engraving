@@ -74,7 +74,7 @@ export default defineConfig([
 
 ## Fonts
 
-- Chosen pairing for this project: **Manrope** (body/UI) + **Playfair Display** (headings).
+- Chosen pairing for this project: **Manrope** (body/UI) + **Merriweather** (headings).
 - These fonts are loaded from Google Fonts in `index.html` and applied via CSS variables in `src/index.css`.
 - License: both families are available under the SIL Open Font License (OFL) and are free for commercial use. See the font pages on Google Fonts for the license text.
 

@@ -1,8 +1,8 @@
 :root {
-  /* Default: Manrope (sans) + Playfair Display (serif).
-     Inter and Merriweather are available as fallbacks/pairing options. */
-  --font-sans: 'Manrope', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-serif: 'Playfair Display', 'Merriweather', Georgia, 'Times New Roman', serif;
+      /* Default: Manrope (sans) + Merriweather (serif).
+              Inter is available as a fallback/pairing option. */
+        --font-sans: 'Manrope', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --font-serif: 'Merriweather', Georgia, 'Times New Roman', serif;
   --font-weight-normal: 400;
   --font-weight-medium: 600;
   line-height: 1.5;
@@ -65,9 +65,9 @@ button,
 select,
 .size-select,
 .file-input {
-  min-height: 44px;
-  min-width: 44px;
-  padding: 0.4rem 0.6rem;
+  min-height: 36px;
+    min-width: 36px;
+    padding: 0.2rem 0.4rem;
   touch-action: manipulation;
 }
 

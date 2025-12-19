@@ -4,18 +4,39 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  overflow-x: hidden;
 }
 
 .header-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 20px;
-  height: 70px;
+  min-height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+/* Ensure correct visual ordering on desktop: logo, search (center), then right actions */
+@media (min-width: 769px) {
+  .header-container>.logo {
+    order: 1;
+  }
+
+  .header-container>.header-center {
+    order: 2;
+    flex: 1 1 600px;
+  }
+
+  .header-container .header-right {
+    order: 3;
+  }
+}
+
+.header-top {
+  /* transparent wrapper on desktop; becomes a real row on small screens */
+  display: contents;
+}
 .logo {
   text-decoration: none;
 }
@@ -32,6 +53,28 @@
   gap: 30px;
 }
 
+.nav-desktop {
+  position: relative;
+  z-index: 1100;
+}
+
+.header-center {
+  flex: 1 1 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 16px 20px;
+}
+
+.header-search-desktop {
+  width: 100%;
+  max-width: 820px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .nav-link {
   text-decoration: none;
   color: #FAFAFA;
@@ -46,9 +89,9 @@
 }
 
 .nav-link.active {
-  font-weight: 600;
+  font-weight: 700;
   border-bottom: 2px solid #2FA4A9;
-  padding-bottom: 4px;
+  /* padding-bottom: 2px; */
 }
 
 .header-right {
@@ -193,6 +236,32 @@
   color: #FAFAFA;
 }
 
+.mobile-menu-btn--search {
+  /* smaller and aligned for the search row */
+  font-size: 1.2rem;
+  color: #1f2A44;
+  background: white;
+  border-radius: 6px;
+  padding: 6px;
+  border: 1px solid #e9ecef;
+  display: none;
+  /* visible only on mobile via media query */
+}
+
+.mobile-search-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #FAFAFA;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.mobile-search-container {
+  background: #1f2A44;
+  padding: 12px 20px;
+}
 .nav-mobile {
   display: none;
   flex-direction: column;
@@ -225,6 +294,21 @@
     display: none;
   }
 
+    /* stack header into two rows: header-top (logo/actions) and header-center (search/nav) */
+    .header-container {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      padding: 8px 12px;
+    }
+  
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 12px;
+    }
   .mobile-menu-btn {
     display: block;
   }
@@ -236,4 +320,25 @@
   .cart-label {
     display: none;
   }
+.header-search-desktop {
+  display: flex;
+  width: 100%;
+  max-width: none;
+  justify-content: center;
+  padding: 6px 0;
+}
+
+/* show the hamburger inside the search row on mobile */
+.mobile-menu-btn--search {
+  display: inline-flex;
+  margin-right: 8px;
+}
+
+/* reduce header center padding on small screens to avoid overflow */
+.header-center {
+  order: 2;
+  padding: 0;
+  width: 100%;
+  flex: 1 1 auto;
+}
 }

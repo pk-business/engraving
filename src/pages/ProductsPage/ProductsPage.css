@@ -281,8 +281,15 @@
     flex-direction: column;
   }
 
-  .filters-sidebar {
-    width: 100%;
-    position: static;
+    /* hide the sidebar only when it's part of the products page layout
+       but keep the same component visible when rendered inside the filter drawer (portal) */
+    .products-page .filters-sidebar {
+      display: none;
+    }
+  
+    /* Show two product cards per row on mobile */
+    .products-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
   }
 }
