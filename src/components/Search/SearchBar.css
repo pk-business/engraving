@@ -23,6 +23,26 @@
   font-size: 0.95rem;
 }
 
+/* Hide native browser clear/cancel buttons for input[type=search] so we use our custom clear button */
+.searchbar-input::-webkit-search-decoration,
+.searchbar-input::-webkit-search-cancel-button,
+.searchbar-input::-webkit-search-results-button,
+.searchbar-input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+.searchbar-input::-ms-clear,
+.searchbar-input::-ms-expand {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.searchbar-input {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .searchbar-clear {
   background: transparent;
   border: none;
