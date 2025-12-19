@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './FilterDrawer.css';
 import FiltersSidebar from '../Filters/FiltersSidebar';
+import { MaterialType, OccasionType } from '../../types/product.types';
 
 interface Props {
   isOpen: boolean;
@@ -17,8 +18,8 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const previousActiveRef = useRef<Element | null>(null);
-  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
-  const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
+  const [selectedMaterials, setSelectedMaterials] = useState<MaterialType[]>([]);
+  const [selectedOccasions, setSelectedOccasions] = useState<OccasionType[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
@@ -104,21 +105,16 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
       >
         <div className="filter-drawer-header">
           <h2 id="filter-title">Peek your Item...</h2>
-          <button
-            ref={closeBtnRef}
-            className="drawer-close-btn"
-            onClick={onClose}
-            aria-label="Close filters"
-          >
+          <button ref={closeBtnRef} className="drawer-close-btn" onClick={onClose} aria-label="Close filters">
             ×
           </button>
         </div>
 
         <div className="filter-drawer-body">
           <FiltersSidebar
-            selectedMaterials={selectedMaterials as any}
+            selectedMaterials={selectedMaterials}
             onToggleMaterial={(m) => toggleMaterial(m)}
-            selectedOccasions={selectedOccasions as any}
+            selectedOccasions={selectedOccasions}
             onToggleOccasion={(o) => toggleOccasion(o)}
             selectedCategory={selectedCategories[0] || null}
             onToggleCategory={(c) => toggleCategory(c)}

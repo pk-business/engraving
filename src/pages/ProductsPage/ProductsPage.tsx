@@ -7,6 +7,16 @@ import { FaStar } from 'react-icons/fa';
 import FiltersSidebar from '../../components/Filters/FiltersSidebar';
 import './ProductsPage.css';
 
+// Category => OccasionType mapping used both for URL params and UI selection
+const categoryMap: Record<string, OccasionType[]> = {
+  'personal-milestones': [OccasionType.BIRTHDAY, OccasionType.ANNIVERSARY, OccasionType.GRADUATION],
+  'celebrations-holidays': [OccasionType.CHRISTMAS],
+  'love-relationships': [OccasionType.WEDDING, OccasionType.ANNIVERSARY],
+  'corporate-professional': [OccasionType.CORPORATE],
+  'hobbies-interests': [],
+  'home-living': [],
+};
+
 const ProductsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
@@ -18,17 +28,6 @@ const ProductsPage: React.FC = () => {
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sortBy, setSortBy] = useState('featured');
-
-  // Apply URL query parameters on mount
-  // Category => OccasionType mapping used both for URL params and UI selection
-  const categoryMap: Record<string, OccasionType[]> = {
-    'personal-milestones': [OccasionType.BIRTHDAY, OccasionType.ANNIVERSARY, OccasionType.GRADUATION],
-    'celebrations-holidays': [OccasionType.CHRISTMAS],
-    'love-relationships': [OccasionType.WEDDING, OccasionType.ANNIVERSARY],
-    'corporate-professional': [OccasionType.CORPORATE],
-    'hobbies-interests': [],
-    'home-living': [],
-  };
 
   useEffect(() => {
     const qParam = searchParams.get('q');

@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
 import { UserProvider } from './contexts/UserContext';
-import { AnnouncementProvider, useAnnouncement } from './contexts/AnnouncementContext';
+import { AnnouncementProvider } from './contexts/AnnouncementContext';
+import { useAnnouncement } from './contexts/announcement.core';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import HomePage from './pages/HomePage/HomePage';

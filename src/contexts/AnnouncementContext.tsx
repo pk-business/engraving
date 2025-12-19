@@ -1,14 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-
-type AnnouncementContextType = {
-  message: string;
-  announce: (msg: string) => void;
-};
-
-const AnnouncementContext = createContext<AnnouncementContextType>({
-  message: '',
-  announce: () => {},
-});
+import React, { useState } from 'react';
+import { AnnouncementContext } from './announcement.core';
 
 export const AnnouncementProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [message, setMessage] = useState('');
@@ -19,13 +10,5 @@ export const AnnouncementProvider: React.FC<{ children: React.ReactNode }> = ({ 
     window.setTimeout(() => setMessage(msg), 100);
   };
 
-  return (
-    <AnnouncementContext.Provider value={{ message, announce }}>
-      {children}
-    </AnnouncementContext.Provider>
-  );
+  return <AnnouncementContext.Provider value={{ message, announce }}>{children}</AnnouncementContext.Provider>;
 };
-
-export const useAnnouncement = () => useContext(AnnouncementContext);
-
-export default AnnouncementContext;

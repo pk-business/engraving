@@ -9,7 +9,7 @@ import { FiArrowLeft } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants';
 import './CheckoutPage.css';
-import { useAnnouncement } from '../../contexts/AnnouncementContext';
+import { useAnnouncement } from '../../contexts/announcement.core';
 
 const CheckoutPage: React.FC = () => {
   const { cart, updateQuantity, removeFromCart } = useCart();

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiSearch, FiCalendar, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi';
+import { FiCalendar, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi';
 import { BiCategoryAlt } from 'react-icons/bi';
 import { MdEmail } from 'react-icons/md';
 import SearchBar from '../../components/Search/SearchBar';

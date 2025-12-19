@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants';
 import ProductService from '../../services/product.service';
 import { useCart } from '../../hooks/useCart';
-import { useAnnouncement } from '../../contexts/AnnouncementContext';
+import { useAnnouncement } from '../../contexts/announcement.core';
 import type { Product } from '../../types/product.types';
 import './ProductDetailPage.css';
 

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { FaCut, FaCogs, FaPalette, FaShippingFast, FaRing, FaHeart, FaTree, FaGraduationCap, FaBuilding, FaGift, FaCalendarAlt, FaUsers, FaBriefcase, FaGamepad, FaHome } from 'react-icons/fa';
-import { MdCake } from 'react-icons/md';
+import { FaCut, FaCogs, FaPalette, FaShippingFast, FaRing, FaGift, FaCalendarAlt, FaUsers, FaBriefcase, FaGamepad, FaHome } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import ProductService from '../../services/product.service';
 import type { Product } from '../../types/product.types';
-import { OccasionType } from '../../types/product.types';
 import './HomePage.css';
 
 const HomePage: React.FC = () => {

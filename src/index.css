@@ -76,3 +76,37 @@ select,
   min-width: 48px;
   min-height: 48px;
 }
+
+/* Mobile typography tweaks: reduce base font-size and heading scales for small screens */
+@media (max-width: 600px) {
+
+  /* reduce the root font-size so rem-based sizing scales down naturally */
+  html {
+    font-size: 14px;
+  }
+
+  /* slightly smaller headings on mobile for denser layouts */
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+  }
+
+  /* slightly tighten letter-spacing for headings on small screens */
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.01em;
+  }
+
+  /* ensure body text remains very readable */
+  body {
+    line-height: 1.4;
+  }
+}
