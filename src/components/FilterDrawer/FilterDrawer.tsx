@@ -9,8 +9,6 @@ interface Props {
   onClose: () => void;
 }
 
-const DEFAULT_CATEGORIES = ['home-living', 'jewelry', 'gifts', 'office'];
-
 const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
