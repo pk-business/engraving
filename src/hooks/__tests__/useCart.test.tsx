@@ -4,7 +4,11 @@ import { CartProvider } from '../../contexts/CartContext';
 import { useCart } from '../useCart';
 import type { Product } from '../../types/product.types';
 
-const wrapper = ({ children }: any) => <CartProvider>{children}</CartProvider>;
+type WrapperProps = {
+  children?: React.ReactNode;
+};
+
+const wrapper = ({ children }: WrapperProps) => <CartProvider>{children}</CartProvider>;
 
 describe('useCart', () => {
   const sampleProduct = {

@@ -10,8 +10,11 @@ describe('api-client basic helpers', () => {
   it('withAuth returns Authorization header when token provided', () => {
     const out = withAuth('abc123');
     expect(out).toHaveProperty('headers');
-    // @ts-ignore
-    expect(out.headers.Authorization).toBe('Bearer abc123');
+    if ('headers' in out) {
+      expect(out.headers.Authorization).toBe('Bearer abc123');
+    } else {
+      throw new Error('Expected headers to be defined when token is provided');
+    }
   });
 
   it('api instance has baseURL set', () => {

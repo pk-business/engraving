@@ -102,8 +102,9 @@
 
 .filter-drawer-footer {
   display: flex;
+  flex-direction: column;
   gap: 8px;
-  justify-content: flex-end;
+  align-items: stretch;
   padding-top: 8px;
   border-top: 1px solid #eee;
 }
@@ -135,5 +136,26 @@
 @media (min-width: 769px) {
   .filter-drawer-root {
     display: none;
+  }
+}
+
+.drawer-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top: 2px solid #fff;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: drawer-spin 0.9s linear infinite;
+}
+
+@keyframes drawer-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }

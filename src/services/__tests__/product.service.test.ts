@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { mapStrapiToProduct } from '../product.service';
 
+type StrapiPayload = Record<string, unknown>;
+
 describe('mapStrapiToProduct', () => {
   it('maps flattened shape correctly', () => {
     const flat = {
@@ -14,7 +16,7 @@ describe('mapStrapiToProduct', () => {
       categories: ['gifts'],
       sizes: ['S', 'M'],
       inStock: true,
-    } as any;
+    } as StrapiPayload;
 
     const p = mapStrapiToProduct(flat);
     expect(p.id).toBe('123');
@@ -36,7 +38,7 @@ describe('mapStrapiToProduct', () => {
         material: { data: { attributes: { name: 'metal' } } },
         occasions: { data: [{ attributes: { name: 'wedding' } }] },
       },
-    } as any;
+    } as StrapiPayload;
 
     const p = mapStrapiToProduct(nested);
     expect(p.id).toBe('456');

@@ -1,0 +1,5 @@
+{
+  "/products": "/data",
+  "/products/:id": "/data/:id",
+  "/meta": "/meta"
+}

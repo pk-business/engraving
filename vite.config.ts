@@ -2,9 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
-export default defineConfig({
-  // Use a relative base for built assets so the site works from any path
-  // (useful for GitHub Pages, subfolders, and local file previews).
-  base: './',
-  plugins: [react()],
+export default defineConfig(({ mode }) => {
+  const isPreview = mode === 'preview' || process.env.VITE_FORCE_BASE === 'true';
+  return {
+    base: isPreview ? '/engraving/' : '/',
+    plugins: [react()],
+  };
 });

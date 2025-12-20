@@ -1,10 +1,25 @@
 import api from './api-client';
+import { isMockDataEnabled } from '../utils/runtimeFlags';
 
 const USE_PROXY = (import.meta.env.VITE_USE_PROXY as string) === 'true';
+const rawApiPrefix = (import.meta.env.VITE_API_PREFIX as string) ?? '/api';
+const API_PREFIX =
+  !rawApiPrefix || rawApiPrefix === '/' ? '' : rawApiPrefix.startsWith('/') ? rawApiPrefix : `/${rawApiPrefix}`;
+const USE_MOCK_DATA = isMockDataEnabled();
+const IS_STRAPI_API = !USE_MOCK_DATA && API_PREFIX !== '';
+
+type UnknownRecord = Record<string, unknown>;
+
+function normalizePath(path: string) {
+  return path.startsWith('/') ? path : `/${path}`;
+}
 
 function apiPath(path: string) {
-  if (USE_PROXY) return `/proxy${path}`;
-  return `/api${path}`;
+  if (USE_MOCK_DATA) return normalizePath(path);
+  const normalizedPath = normalizePath(path);
+  if (USE_PROXY) return `/proxy${normalizedPath}`;
+  if (!IS_STRAPI_API) return normalizedPath;
+  return `${API_PREFIX}${normalizedPath}`;
 }
 
 export type TaxonomyItem = {
@@ -13,14 +28,17 @@ export type TaxonomyItem = {
   slug?: string | null;
 };
 
-function mapStrapiTaxonomy(item: any): TaxonomyItem {
-  // Support both Strapi nested attributes and flattened items
-  const attrs = item?.attributes || item || {};
-  const id = item?.id ?? attrs?.id ?? null;
+function mapStrapiTaxonomy(item: unknown): TaxonomyItem {
+  const record = (item ?? {}) as UnknownRecord;
+  const attrs = (record.attributes as UnknownRecord) ?? record;
+  const idValue = record.id ?? attrs.id;
+  const normalizedId = typeof idValue === 'number' || typeof idValue === 'string' ? idValue : String(idValue ?? '');
+  const nameValue = attrs.name ?? attrs.title ?? '';
+  const slugValue = attrs.slug ?? null;
   return {
-    id,
-    name: attrs.name || attrs.title || '',
-    slug: attrs.slug ?? null,
+    id: normalizedId,
+    name: typeof nameValue === 'string' ? nameValue : '',
+    slug: typeof slugValue === 'string' ? slugValue : null,
   };
 }
 
@@ -28,10 +46,13 @@ async function fetchTaxonomy(collection: string): Promise<TaxonomyItem[]> {
   try {
     const res = await api.get(apiPath(`/${collection}`));
     const payload = res.data;
-    const raw = payload?.data || [];
-    return raw.map((r: any) => mapStrapiTaxonomy(r));
-  } catch (err: any) {
-    console.error(`Error fetching ${collection}:`, err?.response?.status, err?.response?.data || err?.message);
+    const raw = Array.isArray(payload) ? payload : payload?.data || [];
+    return raw.map((r) => mapStrapiTaxonomy(r));
+  } catch (err) {
+    const status = (err as { response?: { status?: number } })?.response?.status;
+    const data = (err as { response?: { data?: unknown } })?.response?.data;
+    const message = err instanceof Error ? err.message : undefined;
+    console.error(`Error fetching ${collection}:`, status, data || message);
     return [];
   }
 }
@@ -92,7 +113,7 @@ export async function getAllTaxonomies(): Promise<{
         return { materials: _cachedMaterials, occasions: _cachedOccasions, categories: _cachedCategories };
       }
     }
-  } catch (e) {
+  } catch {
     // ignore localStorage errors
   }
 
@@ -112,7 +133,7 @@ export async function getAllTaxonomies(): Promise<{
     const key = 'taxonomies:v1';
     const payload = { ts: Date.now(), materials, occasions, categories };
     localStorage.setItem(key, JSON.stringify(payload));
-  } catch (e) {
+  } catch {
     // ignore storage failures
   }
 
@@ -131,7 +152,7 @@ export function invalidatePersistedTaxonomyCache() {
   invalidateTaxonomyCache();
   try {
     localStorage.removeItem('taxonomies:v1');
-  } catch (e) {
+  } catch {
     // ignore
   }
 }

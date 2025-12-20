@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useIsFetching } from '@tanstack/react-query';
 import './FilterDrawer.css';
 import FiltersSidebar from '../Filters/FiltersSidebar';
 
@@ -20,6 +21,8 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
+  const pendingProducts = useIsFetching({ queryKey: ['products'] });
+  const isApplying = pendingProducts > 0;
 
   useEffect(() => {
     if (isOpen) {
@@ -70,12 +73,19 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
     params.delete('materials');
     params.delete('occasions');
     params.delete('categories');
+    params.delete('page');
     selectedMaterials.forEach((m) => params.append('materials', m));
     selectedOccasions.forEach((o) => params.append('occasions', o));
     selectedCategories.forEach((c) => params.append('categories', c));
     if (minPrice) params.set('minPrice', minPrice);
     if (maxPrice) params.set('maxPrice', maxPrice);
-    navigate({ pathname: location.pathname, search: params.toString() });
+    const nextSearch = params.toString();
+    const normalizedCurrent = location.search.startsWith('?') ? location.search.slice(1) : location.search;
+    if (nextSearch === normalizedCurrent) {
+      onClose();
+      return;
+    }
+    navigate({ pathname: location.pathname, search: nextSearch });
     onClose();
   };
 
@@ -120,15 +130,22 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
             setMinPrice={setMinPrice}
             setMaxPrice={setMaxPrice}
             clearFilters={clearFilters}
+            showApply={false}
           />
         </div>
 
         <div className="filter-drawer-footer">
+          <button className="btn btn-primary" onClick={applyFilters} disabled={isApplying}>
+            {isApplying ? (
+              <>
+                <span className="drawer-spinner" aria-hidden="true" /> Applying...
+              </>
+            ) : (
+              'Apply'
+            )}
+          </button>
           <button className="btn btn-secondary" onClick={clearFilters}>
             Clear
-          </button>
-          <button className="btn btn-primary" onClick={applyFilters}>
-            Apply
           </button>
         </div>
       </aside>

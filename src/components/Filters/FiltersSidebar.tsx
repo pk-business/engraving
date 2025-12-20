@@ -1,5 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useIsFetching } from '@tanstack/react-query';
 import { getAllTaxonomies, type TaxonomyItem } from '../../services/taxonomy.service';
+
+const normalizeList = (values: string[]) => Array.from(new Set(values)).sort();
+const arraysEqual = (a: string[], b: string[]) => a.length === b.length && a.every((val, idx) => val === b[idx]);
 
 interface Props {
   selectedMaterials: string[];
@@ -13,6 +18,8 @@ interface Props {
   setMinPrice: (v: string) => void;
   setMaxPrice: (v: string) => void;
   clearFilters: () => void;
+  onApply?: () => void;
+  showApply?: boolean;
   // no longer accept categoryOptions prop; categories are loaded live
 }
 
@@ -28,11 +35,36 @@ const FiltersSidebar: React.FC<Props> = ({
   setMinPrice,
   setMaxPrice,
   clearFilters,
+  onApply,
+  showApply = true,
 }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [materials, setMaterials] = useState<TaxonomyItem[]>([]);
   const [occasions, setOccasions] = useState<TaxonomyItem[]>([]);
   const [categories, setCategories] = useState<TaxonomyItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const pendingProducts = useIsFetching({ queryKey: ['products'] });
+  const isApplying = pendingProducts > 0;
+  const appliedFilters = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return {
+      materials: normalizeList(params.getAll('materials')),
+      occasions: normalizeList(params.getAll('occasions')),
+      category: params.getAll('categories')[0] || null,
+      minPrice: params.get('minPrice') || '',
+      maxPrice: params.get('maxPrice') || '',
+    };
+  }, [location.search]);
+  const hasPendingChanges = useMemo(() => {
+    if (!showApply) return false;
+    const materialsMatch = arraysEqual(normalizeList(selectedMaterials), appliedFilters.materials);
+    const occasionsMatch = arraysEqual(normalizeList(selectedOccasions), appliedFilters.occasions);
+    const categoryMatch = (selectedCategory || null) === appliedFilters.category;
+    const minMatch = (minPrice || '') === appliedFilters.minPrice;
+    const maxMatch = (maxPrice || '') === appliedFilters.maxPrice;
+    return !(materialsMatch && occasionsMatch && categoryMatch && minMatch && maxMatch);
+  }, [appliedFilters, minPrice, maxPrice, selectedCategory, selectedMaterials, selectedOccasions, showApply]);
 
   useEffect(() => {
     let mounted = true;
@@ -146,9 +178,46 @@ const FiltersSidebar: React.FC<Props> = ({
         </div>
       </div>
 
-      <button className="clear-filters" onClick={clearFilters}>
-        Clear All Filters
-      </button>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+        {showApply && (
+          <button
+            className={`apply-filters${hasPendingChanges ? ' dirty' : ''}`}
+            onClick={() => {
+              if (onApply) return onApply();
+              // default behaviour: update URL
+              const params = new URLSearchParams(location.search);
+              params.delete('materials');
+              params.delete('occasions');
+              params.delete('categories');
+              params.delete('page');
+              // append current selections
+              selectedMaterials.forEach((m) => params.append('materials', m));
+              selectedOccasions.forEach((o) => params.append('occasions', o));
+              if (selectedCategory) params.append('categories', selectedCategory);
+              if (minPrice) params.set('minPrice', minPrice);
+              if (maxPrice) params.set('maxPrice', maxPrice);
+              const nextSearch = params.toString();
+              const normalizedCurrent = location.search.startsWith('?') ? location.search.slice(1) : location.search;
+              if (nextSearch === normalizedCurrent) {
+                return;
+              }
+              navigate({ pathname: location.pathname, search: nextSearch });
+            }}
+            disabled={isApplying}
+          >
+            {isApplying ? (
+              <>
+                <span className="drawer-spinner" aria-hidden="true" /> Applying...
+              </>
+            ) : (
+              'Apply'
+            )}
+          </button>
+        )}
+        <button className="clear-filters" onClick={clearFilters}>
+          Clear All Filters
+        </button>
+      </div>
     </aside>
   );
 };

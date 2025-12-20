@@ -55,6 +55,16 @@ export interface ProductFilter {
   minPrice?: number;
   maxPrice?: number;
   searchQuery?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface ProductListResponse {
+  items: Product[];
+  page: number;
+  pageSize: number;
+  total: number;
+  pageCount: number;
 }
 
 export interface CustomizationOption {
