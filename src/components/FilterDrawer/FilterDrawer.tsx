@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './FilterDrawer.css';
 import FiltersSidebar from '../Filters/FiltersSidebar';
-import { MaterialType, OccasionType } from '../../types/product.types';
 
 interface Props {
   isOpen: boolean;
@@ -18,8 +17,8 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const previousActiveRef = useRef<Element | null>(null);
-  const [selectedMaterials, setSelectedMaterials] = useState<MaterialType[]>([]);
-  const [selectedOccasions, setSelectedOccasions] = useState<OccasionType[]>([]);
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
+  const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
@@ -123,7 +122,6 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
             setMinPrice={setMinPrice}
             setMaxPrice={setMaxPrice}
             clearFilters={clearFilters}
-            categoryOptions={DEFAULT_CATEGORIES.map((c) => ({ key: c, label: c }))}
           />
         </div>
 

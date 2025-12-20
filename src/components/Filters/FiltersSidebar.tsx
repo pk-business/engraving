@@ -1,11 +1,11 @@
-import React from 'react';
-import { MaterialType, OccasionType } from '../../types/product.types';
+import React, { useEffect, useState } from 'react';
+import { getAllTaxonomies, type TaxonomyItem } from '../../services/taxonomy.service';
 
 interface Props {
-  selectedMaterials: MaterialType[];
-  onToggleMaterial: (m: MaterialType) => void;
-  selectedOccasions: OccasionType[];
-  onToggleOccasion: (o: OccasionType) => void;
+  selectedMaterials: string[];
+  onToggleMaterial: (m: string) => void;
+  selectedOccasions: string[];
+  onToggleOccasion: (o: string) => void;
   selectedCategory: string | null;
   onToggleCategory: (k: string) => void;
   minPrice: string;
@@ -13,7 +13,7 @@ interface Props {
   setMinPrice: (v: string) => void;
   setMaxPrice: (v: string) => void;
   clearFilters: () => void;
-  categoryOptions: { key: string; label: string }[];
+  // no longer accept categoryOptions prop; categories are loaded live
 }
 
 const FiltersSidebar: React.FC<Props> = ({
@@ -28,56 +28,100 @@ const FiltersSidebar: React.FC<Props> = ({
   setMinPrice,
   setMaxPrice,
   clearFilters,
-  categoryOptions,
 }) => {
+  const [materials, setMaterials] = useState<TaxonomyItem[]>([]);
+  const [occasions, setOccasions] = useState<TaxonomyItem[]>([]);
+  const [categories, setCategories] = useState<TaxonomyItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      setLoading(true);
+      const { materials: mats, occasions: occs, categories: cats } = await getAllTaxonomies();
+      if (!mounted) return;
+      setMaterials(mats);
+      setOccasions(occs);
+      setCategories(cats);
+      setLoading(false);
+    }
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <aside className="filters-sidebar">
       <div className="filter-section">
         <h3>Material Type</h3>
         <div className="filter-options">
-          {Object.values(MaterialType).map((material) => (
-            <label key={material} className="filter-option">
-              <input
-                type="checkbox"
-                checked={selectedMaterials.includes(material)}
-                onChange={() => onToggleMaterial(material)}
-              />
-              <span>{material.charAt(0).toUpperCase() + material.slice(1)}</span>
-            </label>
-          ))}
+          {loading ? (
+            <div>Loading…</div>
+          ) : (
+            materials.map((m) => (
+              <label key={m.id} className="filter-option">
+                <input
+                  type="checkbox"
+                  checked={selectedMaterials.includes(m.name)}
+                  onChange={() => onToggleMaterial(m.name)}
+                />
+                <span>{m.name}</span>
+              </label>
+            ))
+          )}
         </div>
       </div>
 
       <div className="filter-section">
         <h3>Occasion</h3>
         <div className="filter-options">
-          {Object.values(OccasionType).map((occasion) => (
-            <label key={occasion} className="filter-option">
-              <input
-                type="checkbox"
-                checked={selectedOccasions.includes(occasion)}
-                onChange={() => onToggleOccasion(occasion)}
-              />
-              <span>{occasion.charAt(0).toUpperCase() + occasion.slice(1)}</span>
-            </label>
-          ))}
+          {loading ? (
+            <div>Loading…</div>
+          ) : (
+            occasions.map((o) => (
+              <label key={o.id} className="filter-option">
+                <input
+                  type="checkbox"
+                  checked={selectedOccasions.includes(o.name)}
+                  onChange={() => onToggleOccasion(o.name)}
+                />
+                <span>{o.name}</span>
+              </label>
+            ))
+          )}
         </div>
       </div>
 
       <div className="filter-section">
         <h3>Category</h3>
         <div className="filter-options">
-          {categoryOptions.map((c) => (
-            <label key={c.key} className="filter-option">
-              <input
-                type="radio"
-                name="category"
-                checked={selectedCategory === c.key}
-                onChange={() => onToggleCategory(c.key)}
-              />
-              <span>{c.label}</span>
-            </label>
-          ))}
+          {loading ? (
+            <div>Loading…</div>
+          ) : (
+            categories.map((c) => {
+              const key = c.slug || c.name;
+              return (
+                <label key={key} className="filter-option">
+                  <input
+                    type="radio"
+                    name="category"
+                    checked={selectedCategory === key}
+                    // onClick handles the case of clicking the already-selected radio
+                    // (HTML radio inputs don't fire onChange when clicking the checked item).
+                    onClick={() => {
+                      if (selectedCategory === key) {
+                        onToggleCategory(String(key));
+                      }
+                    }}
+                    // onChange handles normal selection of a different radio option
+                    onChange={() => onToggleCategory(String(key))}
+                  />
+                  <span>{c.name}</span>
+                </label>
+              );
+            })
+          )}
         </div>
       </div>
 

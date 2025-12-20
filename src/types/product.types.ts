@@ -6,7 +6,7 @@ export const MaterialType = {
   GLASS: 'glass',
 } as const;
 
-export type MaterialType = typeof MaterialType[keyof typeof MaterialType];
+export type MaterialType = (typeof MaterialType)[keyof typeof MaterialType] | string;
 
 export const OccasionType = {
   WEDDING: 'wedding',
@@ -20,7 +20,7 @@ export const OccasionType = {
   HOME: 'home',
 } as const;
 
-export type OccasionType = typeof OccasionType[keyof typeof OccasionType];
+export type OccasionType = (typeof OccasionType)[keyof typeof OccasionType] | string;
 
 export interface Product {
   id: string;
@@ -32,8 +32,8 @@ export interface Product {
     alt: string;
   };
   images: string[];
-  material: MaterialType;
-  occasions: OccasionType[];
+  material: MaterialType | string;
+  occasions: OccasionType[] | string[];
   /** Optional categories/tags for higher-level browsing (e.g. 'personal-milestones', 'home-living') */
   categories?: string[];
   category: string;
@@ -45,8 +45,8 @@ export interface Product {
 }
 
 export interface ProductFilter {
-  materials?: MaterialType[];
-  occasions?: OccasionType[];
+  materials?: string[];
+  occasions?: string[];
   categories?: string[];
   priceRange?: {
     min: number;

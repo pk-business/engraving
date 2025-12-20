@@ -89,7 +89,24 @@ const ProductDetailPage: React.FC = () => {
   }
 
   if (!product) {
-    return <div className="product-detail-page"><div className="loading-state">Product not found</div></div>;
+    // Announce to assistive technologies that the product was not found
+    if (announce) announce('Product not found');
+    return (
+      <div className="product-detail-page">
+        <div className="product-not-found">
+          <h2>Product not found</h2>
+          <p>We couldn't find the product you requested. It may have been removed or the link is incorrect.</p>
+          <div className="not-found-actions">
+            <button className="action-btn" onClick={() => navigate(ROUTES.PRODUCTS)}>
+              Browse Products
+            </button>
+            <button className="action-btn" onClick={() => navigate(-1)}>
+              Go Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
