@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Mock } from 'vitest';
 import * as taxonomy from '../taxonomy.service';
 import api from '../api-client';
 
@@ -8,19 +9,23 @@ vi.mock('../api-client', () => ({
   },
 }));
 
+const mockedApiGet = api.get as unknown as Mock;
+
 beforeEach(() => {
   // clear caches and localStorage
   taxonomy.invalidateTaxonomyCache();
   try {
     localStorage.removeItem('taxonomies:v1');
-  } catch (e) {}
-  (api.get as any).mockReset();
+  } catch {
+    // ignore
+  }
+  mockedApiGet.mockReset();
 });
 
 describe('getAllTaxonomies', () => {
   it('fetches and persists taxonomies, and uses cache on subsequent calls', async () => {
     // mock API responses for materials/occasions/categories
-    (api.get as any)
+    mockedApiGet
       .mockResolvedValueOnce({ data: { data: [{ id: 1, attributes: { name: 'Wood' } }] } })
       .mockResolvedValueOnce({ data: { data: [{ id: 2, attributes: { name: 'Birthday' } }] } })
       .mockResolvedValueOnce({ data: { data: [{ id: 3, attributes: { name: 'Gifts' } }] } });
@@ -31,12 +36,12 @@ describe('getAllTaxonomies', () => {
     expect(first.categories[0].name).toBe('Gifts');
 
     // API should have been called three times
-    expect((api.get as any).mock.calls.length).toBe(3);
+    expect(mockedApiGet.mock.calls.length).toBe(3);
 
     // subsequent call should use in-memory cache and not call API
-    (api.get as any).mockReset();
+    mockedApiGet.mockReset();
     const second = await taxonomy.getAllTaxonomies();
-    expect((api.get as any).mock.calls.length).toBe(0);
+    expect(mockedApiGet.mock.calls.length).toBe(0);
     expect(second.materials[0].name).toBe('Wood');
 
     // persisted value exists

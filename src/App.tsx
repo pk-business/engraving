@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
 import { UserProvider } from './contexts/UserContext';
 import { AnnouncementProvider } from './contexts/AnnouncementContext';
@@ -20,13 +20,14 @@ function App() {
     <CartProvider>
       <UserProvider>
         <AnnouncementProvider>
-          <Router>
+          <Router basename={import.meta.env.BASE_URL}>
             <div className="app">
               <LiveRegion />
               <Header />
               <main className="main-content">
                 <Routes>
                   <Route path={ROUTES.HOME} element={<HomePage />} />
+                  <Route path="/product" element={<Navigate to={ROUTES.PRODUCTS} replace />} />
                   <Route path={ROUTES.PRODUCTS} element={<ProductsPage />} />
                   <Route path={ROUTES.PRODUCT_DETAIL} element={<ProductDetailPage />} />
                   <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />
@@ -47,12 +48,7 @@ function App() {
 function LiveRegion() {
   const { message } = useAnnouncement();
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-      className="sr-only live-region"
-    >
+    <div role="status" aria-live="polite" aria-atomic="true" className="sr-only live-region">
       {message}
     </div>
   );

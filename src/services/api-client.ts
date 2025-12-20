@@ -16,7 +16,7 @@ api.interceptors.request.use((cfg) => {
   try {
     const url = `${cfg.baseURL || ''}${cfg.url}`;
     console.info('[API] Request:', url, cfg.method, cfg.params ?? {});
-  } catch (e) {
+  } catch {
     // ignore logging errors
   }
   return cfg;
@@ -29,7 +29,7 @@ api.interceptors.response.use(
       const body = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
       const truncated = body.length > 2000 ? body.slice(0, 2000) + '...[truncated]' : body;
       console.info('[API] Response:', res.status, url, truncated);
-    } catch (e) {
+    } catch {
       // ignore
     }
     return res;
@@ -41,7 +41,7 @@ api.interceptors.response.use(
       const status = err?.response?.status;
       const data = err?.response?.data;
       console.warn('[API] Error:', status, url, data);
-    } catch (e) {
+    } catch {
       // ignore
     }
     return Promise.reject(err);
