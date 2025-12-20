@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { BsStarFill, BsStarHalf } from 'react-icons/bs';
 import { FiUpload } from 'react-icons/fi';
@@ -15,12 +15,14 @@ import './ProductDetailPage.css';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const { addToCart, cart } = useCart();
   const navigate = useNavigate();
   const { announce } = useAnnouncement();
-  
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const cachedProduct = (location.state as { product?: Product } | null)?.product ?? null;
+
+  const [product, setProduct] = useState<Product | null>(cachedProduct);
+  const [loading, setLoading] = useState(!cachedProduct);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [customText, setCustomText] = useState('');
   const [customImage, setCustomImage] = useState<File | null>(null);
@@ -43,10 +45,30 @@ const ProductDetailPage: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    if (id) {
-      fetchProduct();
+    if (!id) return;
+    const hasMatchingCache = cachedProduct && cachedProduct.id === id;
+    if (hasMatchingCache) {
+      setProduct(cachedProduct);
+      if (cachedProduct?.sizes && cachedProduct.sizes.length > 0) {
+        setSelectedSize(cachedProduct.sizes[0]);
+      }
+      setSelectedImageIndex(0);
+      setLoading(false);
+      return;
     }
-  }, [id, fetchProduct]);
+    fetchProduct();
+  }, [id, fetchProduct, cachedProduct]);
+
+  const galleryImages = useMemo(() => {
+    if (!product) return [] as string[];
+    const entries = [product.imageUrl.main, product.imageUrl.alt, ...(product.images || [])];
+    const unique = Array.from(new Set(entries.filter(Boolean)));
+    return unique;
+  }, [product]);
+
+  useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [product?.id]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -115,10 +137,10 @@ const ProductDetailPage: React.FC = () => {
         {/* Image Gallery */}
         <div className="image-section">
           <div className="main-image">
-            <img src={[product.imageUrl.main, product.imageUrl.alt, ...product.images][selectedImageIndex]} alt={product.name} />
+            <img src={galleryImages[selectedImageIndex]} alt={product.name} />
           </div>
           <div className="thumbnail-strip">
-            {[product.imageUrl.main, product.imageUrl.alt, ...product.images].map((img, index) => (
+            {galleryImages.map((img, index) => (
               <div
                 key={index}
                 className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
