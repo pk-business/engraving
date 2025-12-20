@@ -100,6 +100,22 @@ const normalizeGalleryList = (gallery: unknown): Array<string | UnknownRecord> =
   return result;
 };
 
+const extractMaterialName = (material: unknown): string => {
+  if (!material) return '';
+  if (typeof material === 'string') return material;
+  if (typeof material === 'object') {
+    const record = material as {
+      name?: unknown;
+      data?: { attributes?: { name?: unknown } | null } | null;
+    };
+    const direct = record.name;
+    if (typeof direct === 'string') return direct;
+    const related = record.data?.attributes?.name;
+    if (typeof related === 'string') return related;
+  }
+  return '';
+};
+
 export function mapStrapiToProduct(item: UnknownRecord): Product {
   const attrs = (item.attributes as UnknownRecord) ?? item;
   const rawId = item.id ?? attrs.id ?? '';
@@ -181,16 +197,7 @@ export function mapStrapiToProduct(item: UnknownRecord): Product {
         '',
     },
     images,
-    material:
-      (
-        attrs.material as
-          | { data?: { attributes?: { name?: string } | null } | null; name?: string }
-          | string
-          | undefined
-      )?.data?.attributes?.name ??
-      (attrs.material as { name?: string } | undefined)?.name ??
-      (typeof attrs.material === 'string' ? attrs.material : '') ??
-      '',
+    material: extractMaterialName(attrs.material),
     occasions: normalizedOccasions,
     categories: categoryList,
     category: categoryList[0] ?? '',
@@ -218,8 +225,8 @@ class ProductService {
       try {
         const res = await api.get(apiPath(PRODUCTS_RESOURCE));
         const payload = res.data;
-        const raw = Array.isArray(payload) ? payload : payload?.data || [];
-        let products: Product[] = raw.map((p) => mapStrapiToProduct(p as UnknownRecord));
+        const raw = (Array.isArray(payload) ? payload : payload?.data || []) as UnknownRecord[];
+        let products: Product[] = raw.map((p) => mapStrapiToProduct(p));
         products = applyLocalFilters(products, filters);
 
         const total = products.length;
@@ -307,8 +314,8 @@ class ProductService {
       }
 
       const payload = res.data;
-      const raw = Array.isArray(payload) ? payload : payload?.data || [];
-      let products: Product[] = raw.map((p) => mapStrapiToProduct(p as UnknownRecord));
+      const raw = (Array.isArray(payload) ? payload : payload?.data || []) as UnknownRecord[];
+      let products: Product[] = raw.map((p) => mapStrapiToProduct(p));
       let usedFallbackMerge = false;
 
       try {
@@ -327,12 +334,14 @@ class ProductService {
                   p[
                     'filters[$or]'
                   ] = `name:contains:${filters.searchQuery},description:contains:${filters.searchQuery}`;
-                return api.get(apiPath(PRODUCTS_RESOURCE), { params: p }).then((r) => r.data?.data || []);
+                return api
+                  .get(apiPath(PRODUCTS_RESOURCE), { params: p })
+                  .then((r) => ((r.data?.data || r.data || []) as UnknownRecord[]));
               })
             );
             const mergedRaw: UnknownRecord[] = [];
             const seen = new Set<string>();
-            perRequests.flat().forEach((item) => {
+            perRequests.flat().forEach((item: UnknownRecord) => {
               const record = (item ?? {}) as UnknownRecord;
               const attrsRecord = record.attributes as UnknownRecord | undefined;
               const idValue = record.id ?? attrsRecord?.id ?? '';
@@ -366,12 +375,14 @@ class ProductService {
                   p[
                     'filters[$or]'
                   ] = `name:contains:${filters.searchQuery},description:contains:${filters.searchQuery}`;
-                return api.get(apiPath(PRODUCTS_RESOURCE), { params: p }).then((r) => r.data?.data || []);
+                return api
+                  .get(apiPath(PRODUCTS_RESOURCE), { params: p })
+                  .then((r) => ((r.data?.data || r.data || []) as UnknownRecord[]));
               })
             );
             const mergedRaw: UnknownRecord[] = [];
             const seen = new Set<string>();
-            perRequests.flat().forEach((item) => {
+            perRequests.flat().forEach((item: UnknownRecord) => {
               const record = (item ?? {}) as UnknownRecord;
               const attrsRecord = record.attributes as UnknownRecord | undefined;
               const idValue = record.id ?? attrsRecord?.id ?? '';
@@ -488,8 +499,8 @@ class ProductService {
       const res = await api.get(apiPath(PRODUCTS_RESOURCE), { params });
 
       const payload = res.data;
-      const raw = Array.isArray(payload) ? payload : payload?.data || [];
-      return (Array.isArray(raw) ? raw : []).map((p) => mapStrapiToProduct(p as UnknownRecord));
+      const raw = (Array.isArray(payload) ? payload : payload?.data || []) as UnknownRecord[];
+      return raw.map((p) => mapStrapiToProduct(p));
     } catch (err) {
       console.error('Error fetching featured products:', err);
       return [];

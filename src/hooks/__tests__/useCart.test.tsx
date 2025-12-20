@@ -14,6 +14,7 @@ describe('useCart', () => {
   const sampleProduct = {
     id: 'p1',
     name: 'Test Product',
+    description: 'Sample product description',
     price: 10,
     imageUrl: { main: '', alt: '' },
     images: [],

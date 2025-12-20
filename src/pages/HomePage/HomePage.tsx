@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FaCut,
   FaCogs,
@@ -23,7 +23,7 @@ const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]); // fallback for SSR or initial
 
   const {
-    data: featured = [],
+    data,
     isLoading: loading,
     isError,
     error,
@@ -32,10 +32,16 @@ const HomePage: React.FC = () => {
     queryKey: ['featured', 8],
     queryFn: () => ProductService.getFeaturedProducts(8),
     staleTime: 1000 * 60 * 5, // 5 minutes
-    onSuccess(data) {
-      setFeaturedProducts(data || []);
-    },
   });
+
+  useEffect(() => {
+    if (data) {
+      setFeaturedProducts(data);
+    }
+  }, [data]);
+
+  const fetchedFeatured: Product[] = data ?? [];
+  const displayFeatured: Product[] = featuredProducts.length > 0 ? featuredProducts : fetchedFeatured;
 
   return (
     <div className="home-page">
@@ -61,10 +67,10 @@ const HomePage: React.FC = () => {
             </div>
           ) : isError ? (
             <p className="placeholder-text">Error loading featured products: {error?.message ?? 'Unknown error'}</p>
-          ) : featuredProducts.length === 0 && featured.length === 0 ? (
+          ) : featuredProducts.length === 0 && fetchedFeatured.length === 0 ? (
             <p className="placeholder-text">No products available. Start the API server with: npm run api</p>
           ) : (
-            (featuredProducts.length ? featuredProducts : featured).map((product) => (
+            displayFeatured.map((product) => (
               <Link key={product.id} to={`/products/${product.id}`} state={{ product }} className="product-card">
                 <div className="product-image-container">
                   <div

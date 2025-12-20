@@ -46,7 +46,7 @@ async function fetchTaxonomy(collection: string): Promise<TaxonomyItem[]> {
   try {
     const res = await api.get(apiPath(`/${collection}`));
     const payload = res.data;
-    const raw = Array.isArray(payload) ? payload : payload?.data || [];
+    const raw = (Array.isArray(payload) ? payload : payload?.data || []) as UnknownRecord[];
     return raw.map((r) => mapStrapiTaxonomy(r));
   } catch (err) {
     const status = (err as { response?: { status?: number } })?.response?.status;

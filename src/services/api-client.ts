@@ -48,11 +48,17 @@ api.interceptors.response.use(
   }
 );
 
+type AuthHeaders = {
+  headers?: {
+    Authorization: string;
+  };
+};
+
 /**
  * Return authorization headers for server-side or proxy calls.
  * NOTE: Do not put a Strapi token into a VITE_ variable for client-side use.
  */
-export function withAuth(token?: string | null) {
+export function withAuth(token?: string | null): AuthHeaders {
   if (!token) return {};
   return {
     headers: {
