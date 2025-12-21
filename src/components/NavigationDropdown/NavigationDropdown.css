@@ -1,0 +1,125 @@
+.navigation-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #FAFAFA;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 300px;
+  max-width: 400px;
+  margin-top: 8px;
+  z-index: 1100;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.navigation-dropdown-content {
+  padding: 12px 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.navigation-dropdown-loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}
+
+.nav-dropdown-section {
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.nav-dropdown-section:last-child {
+  border-bottom: none;
+}
+
+.nav-dropdown-section-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  color: #1f2A44;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.nav-dropdown-section-header:hover {
+  background: #F5F5F5;
+}
+
+.nav-dropdown-section-header svg {
+  flex-shrink: 0;
+  color: #666;
+}
+
+.nav-dropdown-section-items {
+  display: flex;
+  flex-direction: column;
+  background: #F9F9F9;
+  animation: sectionSlideDown 0.2s ease-out;
+}
+
+@keyframes sectionSlideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+.nav-dropdown-item {
+  width: 100%;
+  padding: 10px 20px 10px 40px;
+  background: none;
+  border: none;
+  color: #1f2A44;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.nav-dropdown-item:hover {
+  background: #EEEEEE;
+  color: #2FA4A9;
+  padding-left: 45px;
+}
+
+/* Scrollbar styling */
+.navigation-dropdown-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.navigation-dropdown-content::-webkit-scrollbar-track {
+  background: #F5F5F5;
+}
+
+.navigation-dropdown-content::-webkit-scrollbar-thumb {
+  background: #CCC;
+  border-radius: 3px;
+}
+
+.navigation-dropdown-content::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}

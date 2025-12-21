@@ -8,12 +8,14 @@ import { VscAccount } from 'react-icons/vsc';
 import './Header.css';
 import SearchBar from '../Search/SearchBar';
 import NavigationDrawer from '../NavigationDrawer/NavigationDrawer';
+import NavigationDropdown from '../NavigationDropdown/NavigationDropdown';
 
 const Header: React.FC = () => {
   const { cart } = useCart();
   const { user, logout } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,7 +47,7 @@ const Header: React.FC = () => {
     <header className="header">
       <div className="header-container">
         <div className="header-top">
-          {/* Mobile hamburger on the left */}
+          {/* Hamburger first for mobile */}
           <button
             className="mobile-menu-btn mobile-menu-btn--search"
             onClick={() => setIsNavOpen((s) => !s)}
@@ -61,7 +63,7 @@ const Header: React.FC = () => {
             <span className="logo-text">Custom</span>
           </Link>
 
-          {/* Right Section (moved into top wrapper for mobile row) */}
+          {/* Right Section */}
           <div className="header-right">
             <div
               className="account-dropdown"
@@ -109,47 +111,58 @@ const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: search above menu on desktop */}
-        <div className="header-center">
-          <div className="header-search-desktop">
-            <SearchBar
-              value={new URLSearchParams(location.search).get('q') || ''}
-              onSearch={(q) => {
-                // Only navigate if the search input is focused (prevents debounced search
-                // from firing when the user clicks other header links)
-                if (!isSearchInputFocused()) return;
-                // If not on products, navigate to products page with q
-                if (!location.pathname.startsWith(ROUTES.PRODUCTS)) {
-                  navigate(`${ROUTES.PRODUCTS}?q=${encodeURIComponent(q)}`);
-                } else {
-                  // update URL while staying on products
-                  navigate(
-                    `${location.pathname}?${new URLSearchParams({
-                      ...Object.fromEntries(new URLSearchParams(location.search)),
-                      q,
-                    }).toString()}`
-                  );
-                }
-              }}
-              placeholder="Search products..."
-              debounceMs={250}
-              minChars={0}
-            />
-          </div>
+        {/* Search Bar - inline on desktop, separate row on mobile */}
+        <div className="header-search-desktop">
+          <SearchBar
+            value={new URLSearchParams(location.search).get('q') || ''}
+            onSearch={(q) => {
+              // Only navigate if the search input is focused (prevents debounced search
+              // from firing when the user clicks other header links)
+              if (!isSearchInputFocused()) return;
+              // If not on products, navigate to products page with q
+              if (!location.pathname.startsWith(ROUTES.PRODUCTS)) {
+                navigate(`${ROUTES.PRODUCTS}?q=${encodeURIComponent(q)}`);
+              } else {
+                // update URL while staying on products
+                navigate(
+                  `${location.pathname}?${new URLSearchParams({
+                    ...Object.fromEntries(new URLSearchParams(location.search)),
+                    q,
+                  }).toString()}`
+                );
+              }
+            }}
+            placeholder="Search products..."
+            debounceMs={250}
+            minChars={0}
+          />
+        </div>
 
-          {/* Desktop Navigation (below search) */}
-          <nav className="nav-desktop">
+        {/* Desktop Navigation (below header-top) */}
+        <nav className="nav-desktop">
             <Link to={ROUTES.HOME} className={`nav-link ${isActive(ROUTES.HOME) ? 'active' : ''}`}>
               Home
             </Link>
-            <Link to={ROUTES.PRODUCTS} className={`nav-link ${isActive(ROUTES.PRODUCTS) ? 'active' : ''}`}>
-              Products
-            </Link>
+            <div 
+              className="nav-products-dropdown"
+              onMouseEnter={() => setIsProductsDropdownOpen(true)}
+              onMouseLeave={() => setIsProductsDropdownOpen(false)}
+            >
+              <Link 
+                to={ROUTES.PRODUCTS} 
+                className={`nav-link ${isActive(ROUTES.PRODUCTS) ? 'active' : ''}`}
+              >
+                Products
+              </Link>
+              <NavigationDropdown 
+                isOpen={isProductsDropdownOpen} 
+                onClose={() => setIsProductsDropdownOpen(false)} 
+              />
+            </div>
             <Link to={ROUTES.BLOG} className={`nav-link ${isActive(ROUTES.BLOG) ? 'active' : ''}`}>
               Blog
             </Link>
           </nav>
-        </div>
 
         {/* Right Section is moved into header-top for mobile/row layout */}
       </div>

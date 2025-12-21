@@ -226,10 +226,3 @@
   min-height: 44px;
   /* iOS touch target size */
 }
-
-
-@media (min-width: 769px) {
-  .filter-drawer-root {
-    display: none;
-  }
-}
