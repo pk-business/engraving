@@ -6,6 +6,7 @@ import ProductService, { applyLocalFilters } from '../../services/product.servic
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
 import FiltersSidebar from '../../components/Filters/FiltersSidebar';
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
 import { getCategories, type TaxonomyItem } from '../../services/taxonomy.service';
 import { PAGINATION } from '../../constants';
 import './ProductsPage.css';
@@ -411,6 +412,8 @@ const ProductsPage: React.FC = () => {
 
       {/* Products Grid */}
       <main className="products-main">
+        <Breadcrumbs items={[{ label: 'Products' }]} />
+        
         <div className="products-header">
           <h1>{selectedCategoryLabel || 'Our Products'}</h1>
           <div className="products-controls">

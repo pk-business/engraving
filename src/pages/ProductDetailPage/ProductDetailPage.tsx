@@ -10,6 +10,7 @@ import { ROUTES } from '../../constants';
 import ProductService from '../../services/product.service';
 import { useCart } from '../../hooks/useCart';
 import { useAnnouncement } from '../../contexts/announcement.core';
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
 import type { Product } from '../../types/product.types';
 import './ProductDetailPage.css';
 
@@ -133,6 +134,13 @@ const ProductDetailPage: React.FC = () => {
 
   return (
     <div className="product-detail-page">
+      <Breadcrumbs 
+        items={[
+          { label: 'Products', path: ROUTES.PRODUCTS },
+          { label: product.name }
+        ]} 
+      />
+      
       <div className="product-container">
         {/* Image Gallery */}
         <div className="image-section">

@@ -37,6 +37,7 @@
   /* transparent wrapper on desktop; becomes a real row on small screens */
   display: contents;
 }
+
 .logo {
   text-decoration: none;
 }
@@ -75,6 +76,7 @@
   align-items: center;
   justify-content: center;
 }
+
 .nav-link {
   text-decoration: none;
   color: #FAFAFA;
@@ -108,13 +110,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 2px solid #3E4C6D;
+  width: 44px;
+  height: 44px;
+  border: none;
   border-radius: 50%;
-  /* color: #FAFAFA; */
+  color: #FAFAFA;
   text-decoration: none;
   transition: all 0.2s;
+  background: none;
 }
 
 .account-icon:hover {
@@ -192,10 +195,11 @@
   text-decoration: none;
   color: #FAFAFA;
   font-weight: 500;
-  padding: 8px 16px;
+  padding: 8px 12px;
   /* border: 2px solid #F2A541; */
   border-radius: 5px;
   transition: all 0.2s;
+  min-height: 44px;
 }
 
 .cart-icon svg {
@@ -234,16 +238,25 @@
   font-size: 1.8rem;
   cursor: pointer;
   color: #FAFAFA;
+  padding: 8px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+
+.mobile-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .mobile-menu-btn--search {
   /* smaller and aligned for the search row */
   font-size: 1.2rem;
-  color: #1f2A44;
-  background: white;
-  border-radius: 6px;
+  color: #FAFAFA;
+  /* background: white; */
+  /* border-radius: 6px; */
   padding: 6px;
-  border: 1px solid #e9ecef;
+  /* border: 1px solid #e9ecef; */
   display: none;
   /* visible only on mobile via media query */
 }
@@ -262,20 +275,31 @@
   background: #1f2A44;
   padding: 12px 20px;
 }
+
 .nav-mobile {
   display: none;
   flex-direction: column;
   background: white;
   border-top: 1px solid #e9ecef;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.nav-mobile.open {
+  max-height: 500px;
 }
 
 .nav-link-mobile {
   text-decoration: none;
   color: #333;
   font-weight: 500;
-  padding: 15px 20px;
+  padding: 16px 20px;
   border-bottom: 1px solid #e9ecef;
   transition: background 0.2s;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
 }
 
 .nav-link-mobile:hover,
@@ -290,25 +314,61 @@
 }
 
 @media (max-width: 768px) {
+  .header-container {
+    padding: 10px 12px;
+  }
+
+  .logo-text {
+    font-size: 1.5rem;
+  }
+
   .nav-desktop {
     display: none;
   }
 
-    /* stack header into two rows: header-top (logo/actions) and header-center (search/nav) */
-    .header-container {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 6px;
-      padding: 8px 12px;
-    }
-  
-    .header-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      gap: 12px;
-    }
+  /* stack header into two rows: header-top (logo/actions) and header-center (search/nav) */
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1px;
+    padding: 10px 12px;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .header-right {
+    gap: 8px;
+  }
+
+  .account-icon {
+    width: 32px;
+    height: 32px;
+    max-width: 32px;
+    max-height: 32px;
+  }
+
+  .account-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .cart-icon {
+    min-height: 32px;
+    max-height: 32px;
+    padding: 6px 10px;
+  }
+
+  .cart-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
   .mobile-menu-btn {
     display: block;
   }
@@ -320,25 +380,32 @@
   .cart-label {
     display: none;
   }
-.header-search-desktop {
-  display: flex;
-  width: 100%;
-  max-width: none;
-  justify-content: center;
-  padding: 6px 0;
-}
 
-/* show the hamburger inside the search row on mobile */
-.mobile-menu-btn--search {
-  display: inline-flex;
-  margin-right: 8px;
-}
+  .header-search-desktop {
+    display: flex;
+    width: 100%;
+    max-width: none;
+    justify-content: center;
+    padding: 6px 0;
+  }
 
-/* reduce header center padding on small screens to avoid overflow */
-.header-center {
-  order: 2;
-  padding: 0;
-  width: 100%;
-  flex: 1 1 auto;
-}
+  /* show the hamburger inside the search row on mobile */
+  .mobile-menu-btn--search {
+    /* display: inline-flex; */
+    margin-right: 8px;
+  }
+
+  /* reduce header center padding on small screens to avoid overflow */
+  .header-center {
+    order: 2;
+    padding: 0;
+    width: 100%;
+    flex: 1 1 auto;
+
+    .cart-badge {
+      width: 20px;
+      height: 20px;
+      font-size: 0.7rem;
+    }
+  }
 }
