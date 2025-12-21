@@ -18,6 +18,24 @@ import type { Product } from '../../types/product.types';
 import { useQuery } from '@tanstack/react-query';
 import './HomePage.css';
 
+const OCCASION_FILTERS: Record<string, string[]> = {
+  'personal-milestones': ['birthday', 'anniversary', 'graduation'],
+  'celebrations-holidays': ['christmas'],
+  'love-relationships': ['wedding', 'anniversary'],
+  'corporate-professional': ['corporate'],
+  'hobbies-interests': ['hobbies'],
+  'home-living': ['home'],
+};
+
+const buildOccasionUrl = (key: string): string => {
+  const occasions = OCCASION_FILTERS[key] ?? [];
+  if (occasions.length === 0) return '/products';
+  const params = new URLSearchParams();
+  occasions.forEach((occasion) => params.append('occasions', occasion));
+  params.set('category', key);
+  return `/products?${params.toString()}`;
+};
+
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]); // fallback for SSR or initial
@@ -101,32 +119,32 @@ const HomePage: React.FC = () => {
       <section className="occasions-section">
         <h2>Shop by Occasion</h2>
         <div className="occasions-grid">
-          <Link to={`/products?category=personal-milestones`} className="occasion-card personal">
+          <Link to={buildOccasionUrl('personal-milestones')} className="occasion-card personal">
             <FaGift className="occasion-icon" />
             <span>Personal Milestones</span>
           </Link>
 
-          <Link to={`/products?category=celebrations-holidays`} className="occasion-card celebrations">
+          <Link to={buildOccasionUrl('celebrations-holidays')} className="occasion-card celebrations">
             <FaCalendarAlt className="occasion-icon" />
             <span>Celebrations & Holidays</span>
           </Link>
 
-          <Link to={`/products?category=love-relationships`} className="occasion-card love">
+          <Link to={buildOccasionUrl('love-relationships')} className="occasion-card love">
             <FaUsers className="occasion-icon" />
             <span>Love & Relationships</span>
           </Link>
 
-          <Link to={`/products?category=corporate-professional`} className="occasion-card corporate">
+          <Link to={buildOccasionUrl('corporate-professional')} className="occasion-card corporate">
             <FaBriefcase className="occasion-icon" />
             <span>Corporate & Professional</span>
           </Link>
 
-          <Link to={`/products?category=hobbies-interests`} className="occasion-card hobbies">
+          <Link to={buildOccasionUrl('hobbies-interests')} className="occasion-card hobbies">
             <FaGamepad className="occasion-icon" />
             <span>Hobbies & Interests</span>
           </Link>
 
-          <Link to={`/products?category=home-living`} className="occasion-card home">
+          <Link to={buildOccasionUrl('home-living')} className="occasion-card home">
             <FaHome className="occasion-icon" />
             <span>Home & Living</span>
           </Link>

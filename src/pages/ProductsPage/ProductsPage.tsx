@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { Product, ProductFilter, ProductListResponse } from '../../types/product.types';
-import ProductService from '../../services/product.service';
+import ProductService, { applyLocalFilters } from '../../services/product.service';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
 import FiltersSidebar from '../../components/Filters/FiltersSidebar';
@@ -20,6 +20,39 @@ const categoryMap: Record<string, string[]> = {
   'home-living': [],
 };
 
+const occasionCategoryMap: Record<string, string[]> = Object.entries(categoryMap).reduce(
+  (acc, [categoryKey, occasionList]) => {
+    occasionList.forEach((occasion) => {
+      if (!acc[occasion]) {
+        acc[occasion] = [];
+      }
+      if (!acc[occasion].includes(categoryKey)) {
+        acc[occasion].push(categoryKey);
+      }
+    });
+    return acc;
+  },
+  {} as Record<string, string[]>
+);
+
+const deriveCategoriesFromOccasions = (occasionSlugs: string[], limit = 1): string[] => {
+  if (!occasionSlugs || occasionSlugs.length === 0) return [];
+  const derived: string[] = [];
+  for (const slug of occasionSlugs) {
+    const match = occasionCategoryMap[slug];
+    if (!match || match.length === 0) continue;
+    for (const category of match) {
+      if (!derived.includes(category)) {
+        derived.push(category);
+      }
+      if (limit > 0 && derived.length >= limit) {
+        return derived.slice(0, limit);
+      }
+    }
+  }
+  return limit > 0 ? derived.slice(0, limit) : derived;
+};
+
 const ProductsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [appliedFilters, setAppliedFilters] = useState<ProductFilter | null>(null);
@@ -34,6 +67,8 @@ const ProductsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const pageSize = PAGINATION.PRODUCTS_PER_PAGE;
   const queryClient = useQueryClient();
+  const searchEffectInitializedRef = useRef(false);
+  const lastSearchQueryRef = useRef<string>('');
 
   const syncPageParam = (value: number) => {
     setSearchParams((prevParams) => {
@@ -57,24 +92,38 @@ const ProductsPage: React.FC = () => {
 
     if (qParam) {
       setSearchQuery(qParam);
+    } else {
+      setSearchQuery('');
     }
 
     const occasionsToSet = occasionParam.length > 0 ? occasionParam : occasionSingle ? [occasionSingle] : [];
-    if (occasionsToSet.length > 0) {
+    
+    const explicitCategories = categoriesParams.length > 0 ? categoriesParams : categoryParam ? [categoryParam] : [];
+    const derivedCategories =
+      explicitCategories.length === 0 ? deriveCategoriesFromOccasions(occasionsToSet, 1) : [];
+    const categoriesToUse = explicitCategories.length > 0 ? explicitCategories : derivedCategories;
+    
+    if (categoriesToUse.length > 0) {
+      const firstCat = categoriesToUse[0];
+      setSelectedCategory(firstCat);
+      
+      // Only override occasions if URL doesn't have explicit occasions
+      if (explicitCategories.length > 0 && occasionsToSet.length === 0) {
+        const mapped = categoryMap[firstCat];
+        if (mapped && mapped.length > 0) {
+          setSelectedOccasions(mapped);
+        } else {
+          setSelectedOccasions([]);
+        }
+      } else {
+        setSelectedOccasions(occasionsToSet);
+      }
+    } else {
+      setSelectedCategory(null);
       setSelectedOccasions(occasionsToSet);
     }
 
-    const categoriesToUse = categoriesParams.length > 0 ? categoriesParams : categoryParam ? [categoryParam] : [];
-    if (categoriesToUse.length > 0) {
-      const firstCat = categoriesToUse[0];
-      const mapped = categoryMap[firstCat];
-      setSelectedCategory(firstCat);
-      if (mapped && mapped.length > 0) setSelectedOccasions(mapped);
-    }
-
-    if (materialsParams.length > 0) {
-      setSelectedMaterials(materialsParams);
-    }
+    setSelectedMaterials(materialsParams.length > 0 ? materialsParams : []);
   }, [searchParams]);
 
   // When URL search params change, apply those filters immediately by
@@ -90,8 +139,24 @@ const ProductsPage: React.FC = () => {
     if (mats && mats.length > 0) filters.materials = mats;
     const occs = params.getAll('occasions');
     if (occs && occs.length > 0) filters.occasions = occs;
-    const cats = params.getAll('categories') || (params.get('category') ? [params.get('category') as string] : []);
-    if (cats && cats.length > 0) filters.categories = cats;
+    const categoriesParams = params.getAll('categories');
+    const singleCategory = params.get('category');
+    let cats = categoriesParams.length > 0 ? categoriesParams : singleCategory ? [singleCategory] : [];
+    if ((!cats || cats.length === 0) && occs && occs.length > 0) {
+      const derivedCats = deriveCategoriesFromOccasions(occs, 1);
+      if (derivedCats.length > 0) {
+        cats = derivedCats;
+      }
+    }
+    if (cats && cats.length > 0) {
+      filters.categories = cats;
+      if ((!filters.occasions || filters.occasions.length === 0) && cats[0]) {
+        const mappedOccasions = categoryMap[cats[0]];
+        if (mappedOccasions && mappedOccasions.length > 0) {
+          filters.occasions = mappedOccasions;
+        }
+      }
+    }
     const minP = params.get('minPrice');
     const maxP = params.get('maxPrice');
     if (minP) filters.minPrice = parseFloat(minP);
@@ -178,15 +243,22 @@ const ProductsPage: React.FC = () => {
     }
   }
 
-  // initial load: fetch an unfiltered list
-  useEffect(() => {
-    applyFilters({}, { resetPage: true, syncPageParam: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // Debounced search: when `searchQuery` changes, wait before applying the
   // filters so we don't flood the server while the user types.
   useEffect(() => {
+    if (!searchEffectInitializedRef.current) {
+      searchEffectInitializedRef.current = true;
+      lastSearchQueryRef.current = searchQuery;
+      return undefined;
+    }
+
+    // Only apply filters if searchQuery actually changed in value
+    if (lastSearchQueryRef.current === searchQuery) {
+      return undefined;
+    }
+
+    lastSearchQueryRef.current = searchQuery;
+
     const id = window.setTimeout(() => {
       applyFilters(undefined, { resetPage: true });
     }, 400);
@@ -210,7 +282,22 @@ const ProductsPage: React.FC = () => {
   const productsResponse = productsResponseRaw as ProductListResponse | undefined;
 
   const items: Product[] = productsResponse?.items ?? [];
-  const filteredProducts: Product[] = items
+  const appliedFilterSnapshot = appliedFilters ?? undefined;
+  
+  // Always apply client-side filtering when we have filters to ensure consistency
+  const hasFiltersToApply = Boolean(
+    appliedFilterSnapshot &&
+      (appliedFilterSnapshot.occasions?.length ||
+        appliedFilterSnapshot.categories?.length ||
+        appliedFilterSnapshot.materials?.length ||
+        appliedFilterSnapshot.minPrice ||
+        appliedFilterSnapshot.maxPrice)
+  );
+  
+  const locallyFilteredItems = hasFiltersToApply ? applyLocalFilters(items, appliedFilterSnapshot) : items;
+  const usedClientFilterFallback = hasFiltersToApply && locallyFilteredItems.length !== items.length;
+
+  const filteredProducts: Product[] = locallyFilteredItems
     .filter((product) => (searchQuery ? product.name.toLowerCase().includes(searchQuery.toLowerCase()) : true))
     .sort((a, b) => {
       switch (sortBy) {
@@ -225,10 +312,14 @@ const ProductsPage: React.FC = () => {
       }
     });
 
-  const currentPage = productsResponse?.page ?? page;
-  const pageCount = productsResponse?.pageCount ?? Math.max(1, Math.ceil(filteredProducts.length / pageSize));
-  const totalItems = productsResponse?.total ?? filteredProducts.length;
-  const effectivePageSize = productsResponse?.pageSize ?? pageSize;
+  const currentPage = usedClientFilterFallback ? 1 : productsResponse?.page ?? page;
+  const pageCount = usedClientFilterFallback
+    ? 1
+    : productsResponse?.pageCount ?? Math.max(1, Math.ceil(filteredProducts.length / pageSize));
+  const totalItems = usedClientFilterFallback ? filteredProducts.length : productsResponse?.total ?? filteredProducts.length;
+  const effectivePageSize = usedClientFilterFallback
+    ? filteredProducts.length || pageSize
+    : productsResponse?.pageSize ?? pageSize;
   const firstItemIndex = totalItems === 0 ? 0 : (currentPage - 1) * effectivePageSize + 1;
   const lastItemIndex = totalItems === 0 ? 0 : Math.min(firstItemIndex + effectivePageSize - 1, totalItems);
   const canGoPrev = currentPage > 1 && !isLoading && !isFetching;
@@ -259,10 +350,8 @@ const ProductsPage: React.FC = () => {
     setMaxPrice('');
     setSearchQuery('');
     setSortBy('featured');
-    // clear URL params
+    // clear URL params - this will trigger the URL sync effect which handles the fetch
     setSearchParams({});
-    // fetch full list after clearing filters
-    applyFilters({}, { resetPage: true, syncPageParam: false });
   };
 
   const toggleMaterial = (material: string) => {

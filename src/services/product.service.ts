@@ -510,11 +510,19 @@ class ProductService {
 
 export default new ProductService();
 
+const slugify = (value: string): string =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+
 function applyLocalFilters(products: Product[], filters?: ProductFilter): Product[] {
   if (!filters) return products;
 
   const normalizeList = (values?: string[]) =>
-    values?.map((value) => (value || '').toString().trim().toLowerCase()).filter(Boolean);
+    values?.map((value) => slugify((value || '').toString())).filter((v) => v && v.length > 0);
 
   const materialFilters = normalizeList(filters.materials);
   const occasionFilters = normalizeList(filters.occasions);
@@ -525,22 +533,26 @@ function applyLocalFilters(products: Product[], filters?: ProductFilter): Produc
 
   return products.filter((product) => {
     if (materialFilters && materialFilters.length > 0) {
-      const productMaterial = (product.material || '').toString().toLowerCase();
+      const productMaterial = slugify((product.material || '').toString());
       if (!productMaterial || !materialFilters.includes(productMaterial)) {
         return false;
       }
     }
 
     if (occasionFilters && occasionFilters.length > 0) {
-      const productOccasions = (product.occasions || []).map((occ) => (occ || '').toString().toLowerCase());
+      const productOccasions = (product.occasions || [])
+        .map((occ) => slugify((occ || '').toString()))
+        .filter(Boolean);
       if (!productOccasions.some((occ) => occasionFilters.includes(occ))) {
         return false;
       }
     }
 
     if (categoryFilters && categoryFilters.length > 0) {
-      const productCategories = (product.categories || []).map((cat) => (cat || '').toString().toLowerCase());
-      const primaryCategory = (product.category || '').toString().toLowerCase();
+      const productCategories = (product.categories || [])
+        .map((cat) => slugify((cat || '').toString()))
+        .filter(Boolean);
+      const primaryCategory = slugify((product.category || '').toString());
       const matches =
         productCategories.some((cat) => categoryFilters.includes(cat)) ||
         (!!primaryCategory && categoryFilters.includes(primaryCategory));
@@ -568,3 +580,5 @@ function applyLocalFilters(products: Product[], filters?: ProductFilter): Produc
     return true;
   });
 }
+
+export { applyLocalFilters };
