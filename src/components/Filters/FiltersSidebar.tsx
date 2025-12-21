@@ -13,14 +13,12 @@ interface Props {
   onToggleOccasion: (o: string) => void;
   selectedCategory: string | null;
   onToggleCategory: (k: string) => void;
-  minPrice: string;
-  maxPrice: string;
-  setMinPrice: (v: string) => void;
-  setMaxPrice: (v: string) => void;
+  priceRange: string;
+  setPriceRange: (v: string) => void;
   clearFilters: () => void;
   onApply?: () => void;
   showApply?: boolean;
-  // no longer accept categoryOptions prop; categories are loaded live
+  showClearButton?: boolean;
 }
 
 const FiltersSidebar: React.FC<Props> = ({
@@ -30,13 +28,12 @@ const FiltersSidebar: React.FC<Props> = ({
   onToggleOccasion,
   selectedCategory,
   onToggleCategory,
-  minPrice,
-  maxPrice,
-  setMinPrice,
-  setMaxPrice,
+  priceRange,
+  setPriceRange,
   clearFilters,
   onApply,
   showApply = true,
+  showClearButton = true,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,8 +49,7 @@ const FiltersSidebar: React.FC<Props> = ({
       materials: normalizeList(params.getAll('materials')),
       occasions: normalizeList(params.getAll('occasions')),
       category: params.getAll('categories')[0] || null,
-      minPrice: params.get('minPrice') || '',
-      maxPrice: params.get('maxPrice') || '',
+      priceRange: params.get('priceRange') || '',
     };
   }, [location.search]);
   const hasPendingChanges = useMemo(() => {
@@ -61,10 +57,9 @@ const FiltersSidebar: React.FC<Props> = ({
     const materialsMatch = arraysEqual(normalizeList(selectedMaterials), appliedFilters.materials);
     const occasionsMatch = arraysEqual(normalizeList(selectedOccasions), appliedFilters.occasions);
     const categoryMatch = (selectedCategory || null) === appliedFilters.category;
-    const minMatch = (minPrice || '') === appliedFilters.minPrice;
-    const maxMatch = (maxPrice || '') === appliedFilters.maxPrice;
-    return !(materialsMatch && occasionsMatch && categoryMatch && minMatch && maxMatch);
-  }, [appliedFilters, minPrice, maxPrice, selectedCategory, selectedMaterials, selectedOccasions, showApply]);
+    const priceMatch = (priceRange || '') === appliedFilters.priceRange;
+    return !(materialsMatch && occasionsMatch && categoryMatch && priceMatch);
+  }, [appliedFilters, priceRange, selectedCategory, selectedMaterials, selectedOccasions, showApply]);
 
   useEffect(() => {
     let mounted = true;
@@ -158,66 +153,100 @@ const FiltersSidebar: React.FC<Props> = ({
       </div>
 
       <div className="filter-section">
-        <h3>Price Range</h3>
-        <div className="price-inputs">
-          <input
-            type="number"
-            placeholder="Min"
-            className="price-input"
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-          />
-          <span>-</span>
-          <input
-            type="number"
-            placeholder="Max"
-            className="price-input"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-          />
+        <h3>Price</h3>
+        <div className="filter-options">
+          <label className="filter-option">
+            <input
+              type="radio"
+              name="priceRange"
+              checked={priceRange === 'under-20'}
+              onChange={() => setPriceRange('under-20')}
+            />
+            <span>Under $20</span>
+          </label>
+          <label className="filter-option">
+            <input
+              type="radio"
+              name="priceRange"
+              checked={priceRange === '20-50'}
+              onChange={() => setPriceRange('20-50')}
+            />
+            <span>$20 - $50</span>
+          </label>
+          <label className="filter-option">
+            <input
+              type="radio"
+              name="priceRange"
+              checked={priceRange === '50-100'}
+              onChange={() => setPriceRange('50-100')}
+            />
+            <span>$50 - $100</span>
+          </label>
+          <label className="filter-option">
+            <input
+              type="radio"
+              name="priceRange"
+              checked={priceRange === '100-500'}
+              onChange={() => setPriceRange('100-500')}
+            />
+            <span>$100 - $500</span>
+          </label>
+          <label className="filter-option">
+            <input
+              type="radio"
+              name="priceRange"
+              checked={priceRange === 'over-500'}
+              onChange={() => setPriceRange('over-500')}
+            />
+            <span>Over $500</span>
+          </label>
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 12 }}>
-        {showApply && (
-          <button
-            className={`btn btn-primary apply-filters${hasPendingChanges ? ' dirty' : ''}`}
-            onClick={() => {
-              if (onApply) return onApply();
-              // default behaviour: update URL
-              const params = new URLSearchParams(location.search);
-              params.delete('materials');
-              params.delete('occasions');
-              params.delete('categories');
-              params.delete('page');
-              // append current selections
-              selectedMaterials.forEach((m) => params.append('materials', m));
-              selectedOccasions.forEach((o) => params.append('occasions', o));
-              if (selectedCategory) params.append('categories', selectedCategory);
-              if (minPrice) params.set('minPrice', minPrice);
-              if (maxPrice) params.set('maxPrice', maxPrice);
-              const nextSearch = params.toString();
-              const normalizedCurrent = location.search.startsWith('?') ? location.search.slice(1) : location.search;
-              if (nextSearch === normalizedCurrent) {
-                return;
-              }
-              navigate({ pathname: location.pathname, search: nextSearch });
-            }}
-            disabled={isApplying}
-          >
-            {isApplying ? (
-              <>
-                <span className="drawer-spinner" aria-hidden="true" /> Applying...
-              </>
-            ) : (
-              'Apply'
-            )}
-          </button>
-        )}
-        <button className="btn btn-secondary clear-filters" onClick={clearFilters}>
-          Clear All Filters
-        </button>
-      </div>
+      {(showApply || showClearButton) && (
+        <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 12 }}>
+          {showApply && (
+            <button
+              className={`btn btn-primary apply-filters${hasPendingChanges ? ' dirty' : ''}`}
+              onClick={() => {
+                if (onApply) return onApply();
+                // default behaviour: update URL
+                const params = new URLSearchParams(location.search);
+                params.delete('materials');
+                params.delete('occasions');
+                params.delete('categories');
+                params.delete('page');
+                params.delete('priceRange');
+                // append current selections
+                selectedMaterials.forEach((m) => params.append('materials', m));
+                selectedOccasions.forEach((o) => params.append('occasions', o));
+                if (selectedCategory) params.append('categories', selectedCategory);
+                if (priceRange) params.set('priceRange', priceRange);
+                const nextSearch = params.toString();
+                const normalizedCurrent = location.search.startsWith('?') ? location.search.slice(1) : location.search;
+                if (nextSearch === normalizedCurrent) {
+                  return;
+                }
+                navigate({ pathname: location.pathname, search: nextSearch });
+              }}
+              disabled={isApplying}
+            >
+              {isApplying ? (
+                <>
+                  <span className="drawer-spinner" aria-hidden="true" /> Applying...
+                </>
+              ) : (
+                'Apply'
+              )}
+            </button>
+          )}
+          {showClearButton && (
+            <button className="btn btn-secondary clear-filters" onClick={clearFilters}>
+              Clear All Filters
+            </button>
+          )}
+        </div>
+      )}
     </aside>
   );
 };

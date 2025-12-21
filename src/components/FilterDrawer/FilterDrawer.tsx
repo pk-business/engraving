@@ -8,18 +8,49 @@ import FiltersSidebar from '../Filters/FiltersSidebar';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  // Optional external state control (for ProductsPage)
+  selectedMaterials?: string[];
+  onToggleMaterial?: (m: string) => void;
+  selectedOccasions?: string[];
+  onToggleOccasion?: (o: string) => void;
+  selectedCategory?: string | null;
+  onToggleCategory?: (c: string) => void;
+  priceRange?: string;
+  setPriceRange?: (v: string) => void;
+  onApply?: () => void;
+  onClear?: () => void;
 }
 
-const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
+const FilterDrawer: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  selectedMaterials: externalMaterials,
+  onToggleMaterial: externalToggleMaterial,
+  selectedOccasions: externalOccasions,
+  onToggleOccasion: externalToggleOccasion,
+  selectedCategory: externalCategory,
+  onToggleCategory: externalToggleCategory,
+  priceRange: externalPriceRange,
+  setPriceRange: externalSetPriceRange,
+  onApply: externalOnApply,
+  onClear: externalOnClear,
+}) => {
   const navigate = useNavigate();
   const panelRef = useRef<HTMLDivElement | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const previousActiveRef = useRef<Element | null>(null);
-  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
-  const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [minPrice, setMinPrice] = useState<string>('');
-  const [maxPrice, setMaxPrice] = useState<string>('');
+
+  // Internal state (used when external props not provided)
+  const [internalMaterials, setInternalMaterials] = useState<string[]>([]);
+  const [internalOccasions, setInternalOccasions] = useState<string[]>([]);
+  const [internalCategories, setInternalCategories] = useState<string[]>([]);
+  const [internalPriceRange, setInternalPriceRange] = useState<string>('');
+
+  // Use external state if provided, otherwise use internal
+  const selectedMaterials = externalMaterials ?? internalMaterials;
+  const selectedOccasions = externalOccasions ?? internalOccasions;
+  const selectedCategories = externalCategory ? [externalCategory] : internalCategories;
+  const priceRange = externalPriceRange ?? internalPriceRange;
 
   useEffect(() => {
     if (isOpen) {
@@ -58,39 +89,64 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
     return () => document.removeEventListener('keydown', onKey);
   }, [isOpen, onClose]);
 
-  const toggleMaterial = (m: string) =>
-    setSelectedMaterials((prev) => (prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]));
-  const toggleOccasion = (o: string) =>
-    setSelectedOccasions((prev) => (prev.includes(o) ? prev.filter((x) => x !== o) : [...prev, o]));
-  const toggleCategory = (c: string) =>
-    setSelectedCategories((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [c]));
+  const toggleMaterial = (m: string) => {
+    if (externalToggleMaterial) {
+      externalToggleMaterial(m);
+    } else {
+      setInternalMaterials((prev) => (prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]));
+    }
+  };
+
+  const toggleOccasion = (o: string) => {
+    if (externalToggleOccasion) {
+      externalToggleOccasion(o);
+    } else {
+      setInternalOccasions((prev) => (prev.includes(o) ? prev.filter((x) => x !== o) : [...prev, o]));
+    }
+  };
+
+  const toggleCategory = (c: string) => {
+    if (externalToggleCategory) {
+      externalToggleCategory(c);
+    } else {
+      setInternalCategories((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [c]));
+    }
+  };
 
   const applyFilters = () => {
-    const params = new URLSearchParams();
-    selectedMaterials.forEach((m) => params.append('materials', m));
-    selectedOccasions.forEach((o) => params.append('occasions', o));
-    selectedCategories.forEach((c) => params.append('categories', c));
-    if (minPrice) params.set('minPrice', minPrice);
-    if (maxPrice) params.set('maxPrice', maxPrice);
-    navigate({ pathname: ROUTES.PRODUCTS, search: params.toString() });
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
-    });
-    onClose();
+    if (externalOnApply) {
+      externalOnApply();
+      onClose();
+    } else {
+      const params = new URLSearchParams();
+      selectedMaterials.forEach((m) => params.append('materials', m));
+      selectedOccasions.forEach((o) => params.append('occasions', o));
+      selectedCategories.forEach((c) => params.append('categories', c));
+      if (priceRange) params.set('priceRange', priceRange);
+      navigate({ pathname: ROUTES.PRODUCTS, search: params.toString() });
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+      });
+      onClose();
+    }
   };
 
   const clearFilters = () => {
-    setSelectedMaterials([]);
-    setSelectedOccasions([]);
-    setSelectedCategories([]);
-    setMinPrice('');
-    setMaxPrice('');
-    // Navigate to products page with no filters
-    navigate(ROUTES.PRODUCTS);
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
-    });
-    onClose();
+    if (externalOnClear) {
+      externalOnClear();
+      onClose();
+    } else {
+      setInternalMaterials([]);
+      setInternalOccasions([]);
+      setInternalCategories([]);
+      setInternalPriceRange('');
+      // Navigate to products page with no filters
+      navigate(ROUTES.PRODUCTS);
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+      });
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
@@ -121,12 +177,11 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
             onToggleOccasion={(o) => toggleOccasion(o)}
             selectedCategory={selectedCategories[0] || null}
             onToggleCategory={(c) => toggleCategory(c)}
-            minPrice={minPrice}
-            maxPrice={maxPrice}
-            setMinPrice={setMinPrice}
-            setMaxPrice={setMaxPrice}
+            priceRange={priceRange}
+            setPriceRange={externalSetPriceRange || setInternalPriceRange}
             clearFilters={clearFilters}
             showApply={false}
+            showClearButton={false}
           />
         </div>
 

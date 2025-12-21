@@ -9,11 +9,32 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
+  animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+  
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+  
+    to {
+      transform: translateY(0);
+    }
 }
 
 .filter-drawer {
   position: fixed;
-  left: 0;
+  right: 0;
   top: 0;
   height: 100vh;
   height: 100dvh;
@@ -21,14 +42,14 @@
   width: 85%;
   max-width: 420px;
   background: #fff;
-  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.2);
+  box-shadow: -2px 0 16px rgba(0, 0, 0, 0.2);
   padding: 0;
   display: flex;
   flex-direction: column;
-  transform: translateX(0);
+  transform: translateY(0);
   will-change: transform;
   overflow: hidden;
-  /* Prevent body scroll */
+  animation: slideUp 0.3s ease;
 }
 
 .filter-drawer-header {
@@ -80,7 +101,7 @@
     max-width: 100%;
     /* ensure the panel starts at the very top of the viewport on mobile */
     top: 0;
-    left: 0;
+    right: 0;
     height: 100vh;
     height: 100dvh;
   }

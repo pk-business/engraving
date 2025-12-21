@@ -7,13 +7,13 @@ import { FiShoppingCart, FiMenu, FiX, FiLogOut } from 'react-icons/fi';
 import { VscAccount } from 'react-icons/vsc';
 import './Header.css';
 import SearchBar from '../Search/SearchBar';
-import FilterDrawer from '../FilterDrawer/FilterDrawer';
+import NavigationDrawer from '../NavigationDrawer/NavigationDrawer';
 
 const Header: React.FC = () => {
   const { cart } = useCart();
   const { user, logout } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,6 +45,17 @@ const Header: React.FC = () => {
     <header className="header">
       <div className="header-container">
         <div className="header-top">
+          {/* Mobile hamburger on the left */}
+          <button
+            className="mobile-menu-btn mobile-menu-btn--search"
+            onClick={() => setIsNavOpen((s) => !s)}
+            aria-expanded={isNavOpen}
+            aria-controls="mobile-navigation-drawer"
+            aria-label={isNavOpen ? 'Close menu' : 'Open menu'}
+          >
+            {isNavOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+          </button>
+
           {/* Logo */}
           <Link to={ROUTES.HOME} className="logo">
             <span className="logo-text">Custom</span>
@@ -101,17 +112,6 @@ const Header: React.FC = () => {
         {/* Center: search above menu on desktop */}
         <div className="header-center">
           <div className="header-search-desktop">
-            {/* Mobile hamburger placed to the left of the search on small screens */}
-            <button
-              className="mobile-menu-btn mobile-menu-btn--search"
-              onClick={() => setIsFilterOpen((s) => !s)}
-              aria-expanded={isFilterOpen}
-              aria-controls="mobile-filter-drawer"
-              aria-label={isFilterOpen ? 'Close filters' : 'Open filters'}
-            >
-              {isFilterOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-            </button>
-
             <SearchBar
               value={new URLSearchParams(location.search).get('q') || ''}
               onSearch={(q) => {
@@ -181,8 +181,8 @@ const Header: React.FC = () => {
         </nav>
       )}
 
-      {/* Filter Drawer (mobile only) */}
-      <FilterDrawer isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+      {/* Navigation Drawer (mobile only) */}
+      <NavigationDrawer isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       {/* mobile search removed; search is part of header center and visible on small screens */}
     </header>

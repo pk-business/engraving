@@ -38,10 +38,24 @@
   display: contents;
 }
 
+@media (max-width: 768px) {
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    order: 1;
+  }
+}
 .logo {
   text-decoration: none;
 }
 
+@media (max-width: 768px) {
+  .logo {
+    flex: 1;
+  }
+}
 .logo-text {
   font-size: 1.8rem;
   font-weight: 700;
@@ -250,15 +264,20 @@
 }
 
 .mobile-menu-btn--search {
-  /* smaller and aligned for the search row */
-  font-size: 1.2rem;
+  /* hamburger button in header-top on mobile */
+    font-size: 1.4rem;
   color: #FAFAFA;
-  /* background: white; */
-  /* border-radius: 6px; */
   padding: 6px;
-  /* border: 1px solid #e9ecef; */
   display: none;
-  /* visible only on mobile via media query */
+  /* visible only on mobile */
+  }
+  
+  @media (max-width: 768px) {
+    .mobile-menu-btn--search {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
 }
 
 .mobile-search-btn {
@@ -389,16 +408,10 @@
     padding: 6px 0;
   }
 
-  /* show the hamburger inside the search row on mobile */
-  .mobile-menu-btn--search {
-    /* display: inline-flex; */
-    margin-right: 8px;
-  }
-
   /* reduce header center padding on small screens to avoid overflow */
   .header-center {
     order: 2;
-    padding: 0;
+    padding: 8px 0 0 0;
     width: 100%;
     flex: 1 1 auto;
 
