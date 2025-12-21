@@ -63,8 +63,7 @@ const ProductsPage: React.FC = () => {
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<TaxonomyItem[]>([]);
-  const [minPrice, setMinPrice] = useState<string>('');
-  const [maxPrice, setMaxPrice] = useState<string>('');
+  const [priceRange, setPriceRange] = useState<string>('');
   const [sortBy, setSortBy] = useState('featured');
   const [page, setPage] = useState(1);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -100,16 +99,15 @@ const ProductsPage: React.FC = () => {
     }
 
     const occasionsToSet = occasionParam.length > 0 ? occasionParam : occasionSingle ? [occasionSingle] : [];
-    
+
     const explicitCategories = categoriesParams.length > 0 ? categoriesParams : categoryParam ? [categoryParam] : [];
-    const derivedCategories =
-      explicitCategories.length === 0 ? deriveCategoriesFromOccasions(occasionsToSet, 1) : [];
+    const derivedCategories = explicitCategories.length === 0 ? deriveCategoriesFromOccasions(occasionsToSet, 1) : [];
     const categoriesToUse = explicitCategories.length > 0 ? explicitCategories : derivedCategories;
-    
+
     if (categoriesToUse.length > 0) {
       const firstCat = categoriesToUse[0];
       setSelectedCategory(firstCat);
-      
+
       // Only override occasions if URL doesn't have explicit occasions
       if (explicitCategories.length > 0 && occasionsToSet.length === 0) {
         const mapped = categoryMap[firstCat];
@@ -194,14 +192,27 @@ const ProductsPage: React.FC = () => {
     };
   }, []);
 
-  const buildFiltersFromState = (): ProductFilter => ({
-    materials: selectedMaterials.length > 0 ? selectedMaterials : undefined,
-    occasions: selectedOccasions.length > 0 ? selectedOccasions : undefined,
-    categories: selectedCategory ? [selectedCategory] : undefined,
-    minPrice: minPrice ? parseFloat(minPrice) : undefined,
-    maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
-    searchQuery: searchQuery ? searchQuery : undefined,
-  });
+  const parsePriceRange = (range: string): { min?: number; max?: number } => {
+    if (!range) return {};
+    if (range === 'under-20') return { max: 20 };
+    if (range === '20-50') return { min: 20, max: 50 };
+    if (range === '50-100') return { min: 50, max: 100 };
+    if (range === '100-500') return { min: 100, max: 500 };
+    if (range === 'over-500') return { min: 500 };
+    return {};
+  };
+
+  const buildFiltersFromState = (): ProductFilter => {
+    const priceValues = parsePriceRange(priceRange);
+    return {
+      materials: selectedMaterials.length > 0 ? selectedMaterials : undefined,
+      occasions: selectedOccasions.length > 0 ? selectedOccasions : undefined,
+      categories: selectedCategory ? [selectedCategory] : undefined,
+      minPrice: priceValues.min,
+      maxPrice: priceValues.max,
+      searchQuery: searchQuery ? searchQuery : undefined,
+    };
+  };
 
   // Helper to apply filters from UI or URL. We store the filters in
   // `appliedFilters` so that the React Query below will manage fetching
@@ -244,7 +255,7 @@ const ProductsPage: React.FC = () => {
     if (shouldSyncPageParam) {
       syncPageParam(desiredPage);
     }
-    
+
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
     });
@@ -290,7 +301,7 @@ const ProductsPage: React.FC = () => {
 
   const items: Product[] = productsResponse?.items ?? [];
   const appliedFilterSnapshot = appliedFilters ?? undefined;
-  
+
   // Always apply client-side filtering when we have filters to ensure consistency
   const hasFiltersToApply = Boolean(
     appliedFilterSnapshot &&
@@ -300,7 +311,7 @@ const ProductsPage: React.FC = () => {
         appliedFilterSnapshot.minPrice ||
         appliedFilterSnapshot.maxPrice)
   );
-  
+
   const locallyFilteredItems = hasFiltersToApply ? applyLocalFilters(items, appliedFilterSnapshot) : items;
   const usedClientFilterFallback = hasFiltersToApply && locallyFilteredItems.length !== items.length;
 
@@ -323,7 +334,9 @@ const ProductsPage: React.FC = () => {
   const pageCount = usedClientFilterFallback
     ? 1
     : productsResponse?.pageCount ?? Math.max(1, Math.ceil(filteredProducts.length / pageSize));
-  const totalItems = usedClientFilterFallback ? filteredProducts.length : productsResponse?.total ?? filteredProducts.length;
+  const totalItems = usedClientFilterFallback
+    ? filteredProducts.length
+    : productsResponse?.total ?? filteredProducts.length;
   const effectivePageSize = usedClientFilterFallback
     ? filteredProducts.length || pageSize
     : productsResponse?.pageSize ?? pageSize;
@@ -353,8 +366,7 @@ const ProductsPage: React.FC = () => {
     setSelectedMaterials([]);
     setSelectedOccasions([]);
     setSelectedCategory(null);
-    setMinPrice('');
-    setMaxPrice('');
+    setPriceRange('');
     setSearchQuery('');
     setSortBy('featured');
     // clear URL params - this will trigger the URL sync effect which handles the fetch
@@ -409,33 +421,27 @@ const ProductsPage: React.FC = () => {
         onToggleOccasion={toggleOccasion}
         selectedCategory={selectedCategory}
         onToggleCategory={toggleCategory}
-        minPrice={minPrice}
-        maxPrice={maxPrice}
-        setMinPrice={setMinPrice}
-        setMaxPrice={setMaxPrice}
+        priceRange={priceRange}
+        setPriceRange={setPriceRange}
         clearFilters={clearFilters}
       />
 
       {/* Products Grid */}
       <main className="products-main">
         <Breadcrumbs items={[{ label: 'Products' }]} />
-        
+
         <div className="products-header">
           <h1>{selectedCategoryLabel || 'Our Products'}</h1>
           <div className="products-controls">
-            <button 
-              className="filter-button"
-              onClick={() => setIsFilterModalOpen(true)}
-              aria-label="Open filters"
-            >
-              <FiFilter /> Filters
-            </button>
             <select className="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
               <option value="featured">Sort by: Featured</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
               <option value="newest">Newest</option>
             </select>
+            <button className="filter-button" onClick={() => setIsFilterModalOpen(true)} aria-label="Open filters">
+              <FiFilter /> Filters
+            </button>
           </div>
           <div className="results-summary" aria-live="polite">
             {totalItems > 0
@@ -480,13 +486,23 @@ const ProductsPage: React.FC = () => {
         )}
 
         <div className="pagination">
-          <button className="pagination-btn btn-primary" onClick={handlePrevPage} disabled={!canGoPrev} aria-label="Previous page">
+          <button
+            className="pagination-btn btn-primary"
+            onClick={handlePrevPage}
+            disabled={!canGoPrev}
+            aria-label="Previous page"
+          >
             <FiChevronLeft /> Previous
           </button>
           <span className="pagination-info">
             Page {currentPage} of {pageCount} | {totalItems} items
           </span>
-          <button className="pagination-btn btn-primary" onClick={handleNextPage} disabled={!canGoNext} aria-label="Next page">
+          <button
+            className="pagination-btn btn-primary"
+            onClick={handleNextPage}
+            disabled={!canGoNext}
+            aria-label="Next page"
+          >
             Next <FiChevronRight />
           </button>
         </div>
@@ -502,10 +518,8 @@ const ProductsPage: React.FC = () => {
         onToggleOccasion={toggleOccasion}
         selectedCategory={selectedCategory}
         onToggleCategory={toggleCategory}
-        minPrice={minPrice}
-        maxPrice={maxPrice}
-        setMinPrice={setMinPrice}
-        setMaxPrice={setMaxPrice}
+        priceRange={priceRange}
+        setPriceRange={setPriceRange}
         onApply={applyFilters}
         onClear={clearFilters}
       />

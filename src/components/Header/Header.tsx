@@ -45,6 +45,17 @@ const Header: React.FC = () => {
     <header className="header">
       <div className="header-container">
         <div className="header-top">
+          {/* Mobile hamburger on the left */}
+          <button
+            className="mobile-menu-btn mobile-menu-btn--search"
+            onClick={() => setIsNavOpen((s) => !s)}
+            aria-expanded={isNavOpen}
+            aria-controls="mobile-navigation-drawer"
+            aria-label={isNavOpen ? 'Close menu' : 'Open menu'}
+          >
+            {isNavOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+          </button>
+
           {/* Logo */}
           <Link to={ROUTES.HOME} className="logo">
             <span className="logo-text">Custom</span>
@@ -101,17 +112,6 @@ const Header: React.FC = () => {
         {/* Center: search above menu on desktop */}
         <div className="header-center">
           <div className="header-search-desktop">
-            {/* Mobile hamburger placed to the left of the search on small screens */}
-            <button
-              className="mobile-menu-btn mobile-menu-btn--search"
-              onClick={() => setIsNavOpen((s) => !s)}
-              aria-expanded={isNavOpen}
-              aria-controls="mobile-navigation-drawer"
-              aria-label={isNavOpen ? 'Close menu' : 'Open menu'}
-            >
-              {isNavOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-            </button>
-
             <SearchBar
               value={new URLSearchParams(location.search).get('q') || ''}
               onSearch={(q) => {
