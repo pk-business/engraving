@@ -3,7 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../hooks/useCart';
 import { useUser } from '../../hooks/useUser';
 import { ROUTES } from '../../constants';
-import { FiShoppingCart, FiMenu, FiX, FiUser, FiLogOut } from 'react-icons/fi';
+import { FiShoppingCart, FiMenu, FiX, FiLogOut } from 'react-icons/fi';
+import { VscAccount } from 'react-icons/vsc';
 import './Header.css';
 import SearchBar from '../Search/SearchBar';
 import FilterDrawer from '../FilterDrawer/FilterDrawer';
@@ -63,7 +64,7 @@ const Header: React.FC = () => {
                 aria-expanded={isAccountDropdownOpen}
                 onClick={() => setIsAccountDropdownOpen((s) => !s)}
               >
-                <FiUser size={22} />
+                <VscAccount size={22} />
               </button>
 
               {isAccountDropdownOpen && (

@@ -20,6 +20,8 @@ body {
   font-family: var(--font-sans);
   font-weight: var(--font-weight-normal);
   min-width: 320px;
+  overflow-x: hidden;
+    /* Prevent horizontal scroll on mobile */
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -31,6 +33,13 @@ h1, h2, h3, h4, h5, h6 {
   box-sizing: border-box;
 }
 
+/* Prevent images and media from causing horizontal scroll */
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+}
 /* Accessibility helpers: visible focus, larger touch targets, and sr-only utility for live region */
 .sr-only {
   position: absolute;
@@ -55,58 +64,111 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 6px;
 }
 
-/* Increase touch target size for interactive controls */
-button,
-.action-btn,
-.place-order-btn,
-.continue-shopping-btn,
-.delete-btn,
-.qty-select,
-select,
-.size-select,
-.file-input {
-  min-height: 36px;
-    min-width: 36px;
-    padding: 0.2rem 0.4rem;
-  touch-action: manipulation;
+/* Exception for inline text links */
+a:not([class]) {
+  min-height: auto;
+  min-width: auto;
 }
 
+/* Ensure form inputs don't zoom on iOS */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="number"],
+textarea,
+select {
+  font-size: 16px;
+}
 /* Slightly larger clickable thumbnails */
 .thumbnail {
   min-width: 48px;
   min-height: 48px;
 }
 
-/* Mobile typography tweaks: reduce base font-size and heading scales for small screens */
-@media (max-width: 600px) {
+/* Improve tap highlight for mobile browsers */
+* {
+  -webkit-tap-highlight-color: rgba(47, 164, 169, 0.2);
+}
 
-  /* reduce the root font-size so rem-based sizing scales down naturally */
-  html {
-    font-size: 14px;
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+}
+/* Mobile typography tweaks: reduce base font-size and heading scales for small screens */
+@media (max-width: 768px) {
+
+  /* Increase touch target size for interactive controls on mobile only */
+  button,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
   }
 
-  /* slightly smaller headings on mobile for denser layouts */
+  /* Keep checkboxes and radio buttons at reasonable size for filter controls */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 16px;
+    min-width: 16px;
+    touch-action: manipulation;
+  }
+
+    /* Improve text readability on mobile */
+    body {
+      line-height: 1.6;
+      font-size: 15px;
+  }
+
+    /* Adjust heading sizes for mobile */
   h1 {
-    font-size: 1.6rem;
+    font-size: 1.75rem;
+      line-height: 1.3;
   }
 
   h2 {
-    font-size: 1.25rem;
+    font-size: 1.4rem;
+      line-height: 1.3;
   }
 
   h3 {
+    font-size: 1.15rem;
+      line-height: 1.4;
+    }
+    
+    h4 {
     font-size: 1.05rem;
   }
 
-  /* slightly tighten letter-spacing for headings on small screens */
+        /* Slightly tighten letter-spacing for headings on small screens */
   h1,
   h2,
   h3 {
     letter-spacing: -0.01em;
   }
 
-  /* ensure body text remains very readable */
+        /* Better spacing for paragraphs */
+        p {
+          margin-bottom: 1rem;
+        }
+        }
+    
+        /* Very small devices optimization */
+        @media (max-width: 375px) {
   body {
-    line-height: 1.4;
+    font-size: 14px;
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+    }
+    
+    h2 {
+      font-size: 1.25rem;
+    }
+    
+    h3 {
+      font-size: 1.05rem;
   }
 }
