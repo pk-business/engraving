@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIsFetching } from '@tanstack/react-query';
+import { ROUTES } from '../../constants';
 import './FilterDrawer.css';
 import FiltersSidebar from '../Filters/FiltersSidebar';
 
@@ -69,23 +70,16 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
     setSelectedCategories((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [c]));
 
   const applyFilters = () => {
-    const params = new URLSearchParams(location.search);
-    params.delete('materials');
-    params.delete('occasions');
-    params.delete('categories');
-    params.delete('page');
+    const params = new URLSearchParams();
     selectedMaterials.forEach((m) => params.append('materials', m));
     selectedOccasions.forEach((o) => params.append('occasions', o));
     selectedCategories.forEach((c) => params.append('categories', c));
     if (minPrice) params.set('minPrice', minPrice);
     if (maxPrice) params.set('maxPrice', maxPrice);
-    const nextSearch = params.toString();
-    const normalizedCurrent = location.search.startsWith('?') ? location.search.slice(1) : location.search;
-    if (nextSearch === normalizedCurrent) {
-      onClose();
-      return;
-    }
-    navigate({ pathname: location.pathname, search: nextSearch });
+    navigate({ pathname: ROUTES.PRODUCTS, search: params.toString() });
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    });
     onClose();
   };
 
@@ -95,6 +89,12 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
     setSelectedCategories([]);
     setMinPrice('');
     setMaxPrice('');
+    // Navigate to products page with no filters
+    navigate(ROUTES.PRODUCTS);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    });
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -130,23 +130,9 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
             setMinPrice={setMinPrice}
             setMaxPrice={setMaxPrice}
             clearFilters={clearFilters}
-            showApply={false}
+            onApply={applyFilters}
+            showApply={true}
           />
-        </div>
-
-        <div className="filter-drawer-footer">
-          <button className="btn btn-primary" onClick={applyFilters} disabled={isApplying}>
-            {isApplying ? (
-              <>
-                <span className="drawer-spinner" aria-hidden="true" /> Applying...
-              </>
-            ) : (
-              'Apply'
-            )}
-          </button>
-          <button className="btn btn-secondary" onClick={clearFilters}>
-            Clear
-          </button>
         </div>
       </aside>
     </div>,

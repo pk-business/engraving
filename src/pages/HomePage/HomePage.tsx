@@ -100,11 +100,11 @@ const HomePage: React.FC = () => {
                     style={{ backgroundImage: `url(${product.imageUrl.alt})` }}
                   />
                 </div>
-                <div className="product-info-card">
+                <div className="product-info">
                   <h3>{product.name}</h3>
-                  <p className="product-price-card">${product.price.toFixed(2)}</p>
+                  <p className="product-price">${product.price.toFixed(2)}</p>
                   {product.rating && (
-                    <div className="product-rating-card">
+                    <div className="product-rating">
                       ⭐ {product.rating} ({product.reviewCount})
                     </div>
                   )}

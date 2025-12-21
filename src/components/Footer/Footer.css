@@ -72,22 +72,11 @@
   display: flex;
   gap: 10px;
   margin-top: 15px;
-  position: relative;
-}
-
-.newsletter-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #999;
-  font-size: 1.2rem;
-  pointer-events: none;
 }
 
 .newsletter-form input {
   flex: 1;
-  padding: 10px 10px 10px 40px;
+  padding: 10px;
   border: none;
   border-radius: 5px;
   font-size: 1rem;
@@ -116,8 +105,12 @@
       margin-top: 60px;
     }
   .footer-container {
-    grid-template-columns: 1fr;
-    gap: 30px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px 16px;
+    }
+    
+    .newsletter-section {
+      grid-column: 1 / -1;
     }
     
     .footer-section h3 {
@@ -145,7 +138,7 @@
     
     .newsletter-form input {
       width: 100%;
-      padding: 12px 12px 12px 40px;
+      padding: 12px;
       font-size: 16px;
       /* Prevent iOS zoom */
       min-height: 44px;

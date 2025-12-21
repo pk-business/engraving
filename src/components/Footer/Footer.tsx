@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants';
 import { FaFacebook, FaInstagram, FaTwitter, FaPinterest } from 'react-icons/fa';
-import { MdEmail } from 'react-icons/md';
 import './Footer.css';
 
 const Footer: React.FC = () => {
@@ -66,11 +65,10 @@ const Footer: React.FC = () => {
           </ul>
         </div>
 
-        <div className="footer-section">
+        <div className="footer-section newsletter-section">
           <h4>Newsletter</h4>
           <p>Subscribe to get special offers and updates</p>
           <div className="newsletter-form">
-            <MdEmail className="newsletter-icon" />
             <input type="email" placeholder="Your email" />
             <button>Subscribe</button>
           </div>
