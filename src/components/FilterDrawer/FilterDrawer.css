@@ -15,7 +15,9 @@
   position: fixed;
   left: 0;
   top: 0;
-  bottom: 0;
+  height: 100vh;
+    height: 100dvh;
+    /* Dynamic viewport height for mobile browsers */
   width: 85%;
   max-width: 420px;
   background: #fff;
@@ -25,6 +27,8 @@
   flex-direction: column;
   transform: translateX(0);
   will-change: transform;
+  overflow: hidden;
+    /* Prevent body scroll */
 }
 
 .filter-drawer-header {
@@ -39,10 +43,12 @@
 .filter-drawer-body {
   padding: 12px 0;
   overflow-y: auto;
-  flex: 1 1 auto;
-  align-self: flex-start;
-  /* Ensure it doesn't get hidden by mobile toolbar */
-    max-height: calc(100vh - 60px);
+  overflow-x: hidden;
+    flex: 1 1 0;
+    min-height: 0;
+    /* Important for flex scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
 }
 
 .filter-options {
