@@ -178,10 +178,10 @@ const FiltersSidebar: React.FC<Props> = ({
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 12 }}>
         {showApply && (
           <button
-            className={`apply-filters${hasPendingChanges ? ' dirty' : ''}`}
+            className={`btn btn-primary apply-filters${hasPendingChanges ? ' dirty' : ''}`}
             onClick={() => {
               if (onApply) return onApply();
               // default behaviour: update URL
@@ -214,7 +214,7 @@ const FiltersSidebar: React.FC<Props> = ({
             )}
           </button>
         )}
-        <button className="clear-filters" onClick={clearFilters}>
+        <button className="btn btn-secondary clear-filters" onClick={clearFilters}>
           Clear All Filters
         </button>
       </div>

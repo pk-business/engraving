@@ -242,6 +242,10 @@ const ProductsPage: React.FC = () => {
     if (shouldSyncPageParam) {
       syncPageParam(desiredPage);
     }
+    
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    });
   }
 
   // Debounced search: when `searchQuery` changes, wait before applying the
@@ -468,13 +472,13 @@ const ProductsPage: React.FC = () => {
         )}
 
         <div className="pagination">
-          <button className="pagination-btn" onClick={handlePrevPage} disabled={!canGoPrev} aria-label="Previous page">
+          <button className="pagination-btn btn-primary" onClick={handlePrevPage} disabled={!canGoPrev} aria-label="Previous page">
             <FiChevronLeft /> Previous
           </button>
           <span className="pagination-info">
             Page {currentPage} of {pageCount} | {totalItems} items
           </span>
-          <button className="pagination-btn" onClick={handleNextPage} disabled={!canGoNext} aria-label="Next page">
+          <button className="pagination-btn btn-primary" onClick={handleNextPage} disabled={!canGoNext} aria-label="Next page">
             Next <FiChevronRight />
           </button>
         </div>

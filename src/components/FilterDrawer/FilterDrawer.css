@@ -41,6 +41,8 @@
   overflow-y: auto;
   flex: 1 1 auto;
   align-self: flex-start;
+  /* Ensure it doesn't get hidden by mobile toolbar */
+    max-height: calc(100vh - 60px);
 }
 
 .filter-options {
@@ -125,19 +127,9 @@
       font-size: 0.85rem;
   }
 
-  .filter-drawer-footer {
-    gap: 6px;
-    padding-top: 8px;
-    }
-    
-    .filter-drawer-footer .btn {
-      padding: 8px 16px;
-      font-size: 0.9rem;
-  }
-
   /* Ensure filters-sidebar is compact inside the drawer on mobile */
   .filter-drawer .filters-sidebar {
-    width: 100%;
+    /* width: 100%; */
       padding: 0;
     background: transparent;
     border: none;
@@ -157,14 +149,6 @@
   line-height: 1.4;
 }
 
-.filter-drawer-footer {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  padding-top: 8px;
-  border-top: 1px solid #eee;
-}
-
 .drawer-close-btn {
   background: transparent;
   border: none;
@@ -172,22 +156,24 @@
   cursor: pointer;
 }
 
-.btn {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #d0d0d0;
-  cursor: pointer;
+/* Apply filters button - inherits from .btn-primary */
+.apply-filters {
+  flex: 1;
+  min-width: 0;
+  gap: 6px;
 }
 
-.btn-primary {
-  background: #2fa4a9;
-  color: white;
-  border: none;
+.apply-filters.dirty {
+  box-shadow: 0 0 0 2px rgba(47, 164, 169, 0.3);
 }
 
-.btn-secondary {
-  background: white;
+/* Clear filters button - inherits from .btn-secondary */
+.clear-filters {
+  flex: 1;
+  min-width: 0;
+  gap: 6px;
 }
+
 
 @media (min-width: 769px) {
   .filter-drawer-root {
