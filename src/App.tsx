@@ -5,6 +5,7 @@ import { AnnouncementProvider } from './contexts/AnnouncementContext';
 import { useAnnouncement } from './contexts/announcement.core';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import HomePage from './pages/HomePage/HomePage';
 import ProductsPage from './pages/ProductsPage/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage/ProductDetailPage';
@@ -21,6 +22,7 @@ function App() {
       <UserProvider>
         <AnnouncementProvider>
           <Router>
+            <ScrollToTop />
             <div className="app">
               <LiveRegion />
               <Header />

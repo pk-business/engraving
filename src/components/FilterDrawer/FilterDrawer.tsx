@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../constants';
 import './FilterDrawer.css';
 import FiltersSidebar from '../Filters/FiltersSidebar';
 
@@ -20,6 +21,18 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
+
+  // Sync state with URL params when drawer opens or location changes
+  useEffect(() => {
+    if (isOpen) {
+      const params = new URLSearchParams(location.search);
+      setSelectedMaterials(params.getAll('materials'));
+      setSelectedOccasions(params.getAll('occasions'));
+      setSelectedCategories(params.getAll('categories'));
+      setMinPrice(params.get('minPrice') || '');
+      setMaxPrice(params.get('maxPrice') || '');
+    }
+  }, [isOpen, location.search]);
 
   useEffect(() => {
     if (isOpen) {
@@ -66,16 +79,13 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
     setSelectedCategories((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [c]));
 
   const applyFilters = () => {
-    const params = new URLSearchParams(location.search);
-    params.delete('materials');
-    params.delete('occasions');
-    params.delete('categories');
+    const params = new URLSearchParams();
     selectedMaterials.forEach((m) => params.append('materials', m));
     selectedOccasions.forEach((o) => params.append('occasions', o));
     selectedCategories.forEach((c) => params.append('categories', c));
     if (minPrice) params.set('minPrice', minPrice);
     if (maxPrice) params.set('maxPrice', maxPrice);
-    navigate({ pathname: location.pathname, search: params.toString() });
+    navigate({ pathname: ROUTES.PRODUCTS, search: params.toString() });
     onClose();
   };
 
@@ -85,6 +95,9 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
     setSelectedCategories([]);
     setMinPrice('');
     setMaxPrice('');
+    // Navigate to products page with no filters
+    navigate(ROUTES.PRODUCTS);
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -124,11 +137,8 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="filter-drawer-footer">
-          <button className="btn btn-secondary" onClick={clearFilters}>
-            Clear
-          </button>
           <button className="btn btn-primary" onClick={applyFilters}>
-            Apply
+            Apply Filters
           </button>
         </div>
       </aside>

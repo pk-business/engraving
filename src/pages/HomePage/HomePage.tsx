@@ -42,7 +42,7 @@ const HomePage: React.FC = () => {
             <p className="placeholder-text">No products available. Start the API server with: npm run api</p>
           ) : (
             featuredProducts.map((product) => (
-              <Link key={product.id} to={`/products/${product.id}`} className="product-card">
+              <Link key={product.id} to={`/products/${product.id}`} state={{ product }} className="product-card">
                 <div className="product-image-container">
                   <div className="product-image product-image-main" style={{ backgroundImage: `url(${product.imageUrl.main})` }} />
                   <div className="product-image product-image-alt" style={{ backgroundImage: `url(${product.imageUrl.alt})` }} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { BsStarFill, BsStarHalf } from 'react-icons/bs';
 import { FiUpload } from 'react-icons/fi';
@@ -10,17 +10,22 @@ import { ROUTES } from '../../constants';
 import ProductService from '../../services/product.service';
 import { useCart } from '../../hooks/useCart';
 import { useAnnouncement } from '../../contexts/announcement.core';
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
 import type { Product } from '../../types/product.types';
 import './ProductDetailPage.css';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const { addToCart, cart } = useCart();
   const navigate = useNavigate();
   const { announce } = useAnnouncement();
   
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Check if product data was passed through navigation state
+  const passedProduct = location.state?.product as Product | undefined;
+  
+  const [product, setProduct] = useState<Product | null>(passedProduct || null);
+  const [loading, setLoading] = useState(!passedProduct);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [customText, setCustomText] = useState('');
   const [customImage, setCustomImage] = useState<File | null>(null);
@@ -36,17 +41,23 @@ const ProductDetailPage: React.FC = () => {
         setSelectedSize(data.sizes[0]);
       }
     } catch (error) {
-      console.error('Error fetching product:', error);
+      // Error fetching product
     } finally {
       setLoading(false);
     }
   }, [id]);
 
-  useEffect(() => {
-    if (id) {
+  React.useEffect(() => {
+    // Only fetch if we don't already have product data
+    if (id && !passedProduct) {
       fetchProduct();
+    } else if (passedProduct && !product) {
+      setProduct(passedProduct);
+      if (passedProduct.sizes && passedProduct.sizes.length > 0) {
+        setSelectedSize(passedProduct.sizes[0]);
+      }
     }
-  }, [id, fetchProduct]);
+  }, [id, fetchProduct, passedProduct, product]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -111,6 +122,13 @@ const ProductDetailPage: React.FC = () => {
 
   return (
     <div className="product-detail-page">
+      <Breadcrumbs 
+        items={[
+          { label: 'Products', path: ROUTES.PRODUCTS },
+          { label: product.name }
+        ]} 
+      />
+      
       <div className="product-container">
         {/* Image Gallery */}
         <div className="image-section">

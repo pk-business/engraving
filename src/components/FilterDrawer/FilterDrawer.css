@@ -40,6 +40,7 @@
   padding: 12px 0;
   overflow-y: auto;
   flex: 1 1 auto;
+  align-self: flex-start;
 }
 
 .filter-options {
@@ -53,7 +54,7 @@
 @media (max-width: 768px) {
   .filter-drawer {
     width: 78%;
-    padding: 10px 12px;
+    padding: 8px 10px;
     /* ensure the panel starts at the very top of the viewport on mobile */
     top: 0;
     left: 0;
@@ -65,31 +66,86 @@
     background: transparent;
     border-bottom: none;
     gap: 4px;
-    padding-bottom: 4px;
+    padding-bottom: 0;
+      margin-bottom: 0;
+    }
+    
+    .filter-drawer-header h2 {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+    
+    .filter-drawer-body {
+      padding: 0;
+      align-self: flex-start;
+      margin-top: 8px;
+    }
+    
+    .filter-drawer .filter-section {
+      margin-bottom: 12px;
   }
 
   .filter-drawer .filter-section h3 {
-    margin-bottom: 8px;
-    font-size: 1rem;
+    margin-bottom: 4px;
+      margin-top: 0;
+      font-size: 0.9rem;
     line-height: 1.2;
   }
 
+    .filter-drawer .filter-option {
+      font-size: 0.85rem;
+      gap: 6px;
+    }
+  
+    .filter-drawer .filter-option input[type="checkbox"],
+    .filter-drawer .filter-option input[type="radio"] {
+      width: 16px;
+      height: 16px;
+    }
+  
+    .filter-drawer .filter-option span {
+      font-size: 0.85rem;
+    }
   .filter-drawer .filter-options {
-    gap: 4px;
+    gap: 6px;
+    }
+    
+    .filter-drawer .price-inputs {
+      gap: 6px;
+    }
+    
+    .filter-drawer .price-input {
+      padding: 6px;
+      font-size: 0.85rem;
+      width: 80px;
+    }
+    
+    .filter-drawer .clear-filters {
+      padding: 8px;
+      font-size: 0.85rem;
   }
 
   .filter-drawer-footer {
     gap: 6px;
-    padding-top: 6px;
+    padding-top: 8px;
+    }
+    
+    .filter-drawer-footer .btn {
+      padding: 8px 16px;
+      font-size: 0.9rem;
   }
 
   /* Ensure filters-sidebar is compact inside the drawer on mobile */
   .filter-drawer .filters-sidebar {
-    width: 280px;
-    padding: 5px;
+    width: 100%;
+      padding: 0;
     background: transparent;
     border: none;
     box-shadow: none;
+    position: static;
+      top: auto;
+      height: auto;
+      margin: 0;
   }
 }
 
@@ -98,6 +154,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  line-height: 1.4;
 }
 
 .filter-drawer-footer {

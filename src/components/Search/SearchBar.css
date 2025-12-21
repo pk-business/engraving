@@ -58,6 +58,7 @@
   .searchbar {
     width: 100%;
     padding: 8px 10px;
+    height: 28px;
   }
   .searchbar-input {
     min-width: 0;

@@ -53,11 +53,9 @@ const LoginPage: React.FC = () => {
         localStorage.setItem('jwt', data.jwt);
       }
 
-      console.log('Login successful:', data);
       navigate('/');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred during login';
-      console.error('Login error:', error);
       setError(errorMessage);
     } finally {
       setIsLoading(false);

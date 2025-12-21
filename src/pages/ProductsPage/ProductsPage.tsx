@@ -5,6 +5,7 @@ import ProductService from '../../services/product.service';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
 import FiltersSidebar from '../../components/Filters/FiltersSidebar';
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
 import { getCategories, type TaxonomyItem } from '../../services/taxonomy.service';
 import './ProductsPage.css';
 
@@ -39,15 +40,12 @@ const ProductsPage: React.FC = () => {
     const categoriesParams = searchParams.getAll('categories');
     const materialsParams = searchParams.getAll('materials');
 
-    if (qParam) {
-      setSearchQuery(qParam);
-    }
+    // Always sync with URL - clear if no params
+    setSearchQuery(qParam || '');
 
     // handle occasions: support single 'occasion' or multiple 'occasions='
     const occasionsToSet = occasionParam.length > 0 ? occasionParam : occasionSingle ? [occasionSingle] : [];
-    if (occasionsToSet.length > 0) {
-      setSelectedOccasions(occasionsToSet);
-    }
+    setSelectedOccasions(occasionsToSet);
 
     // handle categories: support singular 'category' or plural 'categories'
     const categoriesToUse = categoriesParams.length > 0 ? categoriesParams : categoryParam ? [categoryParam] : [];
@@ -57,12 +55,12 @@ const ProductsPage: React.FC = () => {
       const mapped = categoryMap[firstCat];
       setSelectedCategory(firstCat);
       if (mapped && mapped.length > 0) setSelectedOccasions(mapped);
+    } else {
+      setSelectedCategory(null);
     }
 
     // materials (from drawer) -> map to MaterialType if possible
-    if (materialsParams.length > 0) {
-      setSelectedMaterials(materialsParams);
-    }
+    setSelectedMaterials(materialsParams);
   }, [searchParams]);
 
   // load categories for labels
@@ -74,7 +72,7 @@ const ProductsPage: React.FC = () => {
         if (!mounted) return;
         setCategories(cats);
       } catch (err) {
-        console.error('Failed to load categories', err);
+        // Failed to load categories
       }
     })();
     return () => {
@@ -95,7 +93,7 @@ const ProductsPage: React.FC = () => {
       const data = await ProductService.getProducts(filters);
       setProducts(data);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      // Error fetching products
     } finally {
       setLoading(false);
     }
@@ -185,6 +183,8 @@ const ProductsPage: React.FC = () => {
 
       {/* Products Grid */}
       <main className="products-main">
+        <Breadcrumbs items={[{ label: 'Products' }]} />
+        
         <div className="products-header">
           <h1>{selectedCategoryLabel || 'Our Products'}</h1>
           <div className="products-controls">
@@ -195,6 +195,67 @@ const ProductsPage: React.FC = () => {
               <option value="newest">Newest</option>
             </select>
           </div>
+
+          {/* Active Filters */}
+          {(selectedMaterials.length > 0 ||
+            selectedOccasions.length > 0 ||
+            selectedCategory ||
+            minPrice ||
+            maxPrice) && (
+            <div className="active-filters">
+              {selectedMaterials.map((material) => (
+                <span key={material} className="filter-chip">
+                  {material}
+                  <button
+                    onClick={() => toggleMaterial(material)}
+                    className="filter-chip-remove"
+                    aria-label={`Remove ${material} filter`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+              {selectedOccasions.map((occasion) => (
+                <span key={occasion} className="filter-chip">
+                  {occasion}
+                  <button
+                    onClick={() => toggleOccasion(occasion)}
+                    className="filter-chip-remove"
+                    aria-label={`Remove ${occasion} filter`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+              {selectedCategory && (
+                <span className="filter-chip">
+                  {selectedCategoryLabel}
+                  <button
+                    onClick={() => toggleCategory(selectedCategory)}
+                    className="filter-chip-remove"
+                    aria-label="Remove category filter"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              {(minPrice || maxPrice) && (
+                <span className="filter-chip">
+                  Price: {minPrice || '0'} - {maxPrice || '∞'}
+                  <button
+                    onClick={() => {
+                      setMinPrice('');
+                      setMaxPrice('');
+                    }}
+                    className="filter-chip-remove"
+                    aria-label="Remove price filter"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {loading ? (
@@ -203,7 +264,12 @@ const ProductsPage: React.FC = () => {
           <div className="products-grid">
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
-                <Link to={`/products/${product.id}`} key={product.id} className="product-card">
+                <Link 
+                  to={`/products/${product.id}`} 
+                  key={product.id} 
+                  className="product-card"
+                  state={{ product }}
+                >
                   <div className="product-image-container">
                     <div
                       className="product-image product-image-main"

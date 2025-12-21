@@ -40,7 +40,6 @@ const CheckoutPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Processing order...', { shippingInfo, paymentMethod });
   };
 
   return (

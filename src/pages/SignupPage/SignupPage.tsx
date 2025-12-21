@@ -55,12 +55,10 @@ const SignupPage: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log('Registration successful:', data);
       alert('Account created successfully! Please log in.');
       navigate('/login');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred during registration';
-      console.error('Registration error:', error);
       alert(errorMessage);
     }
   };
