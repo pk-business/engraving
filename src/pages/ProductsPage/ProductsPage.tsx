@@ -3,9 +3,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { Product, ProductFilter, ProductListResponse } from '../../types/product.types';
 import ProductService, { applyLocalFilters } from '../../services/product.service';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiFilter } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
 import FiltersSidebar from '../../components/Filters/FiltersSidebar';
+import FilterDrawer from '../../components/FilterDrawer/FilterDrawer';
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
 import { getCategories, type TaxonomyItem } from '../../services/taxonomy.service';
 import { PAGINATION } from '../../constants';
@@ -66,6 +67,7 @@ const ProductsPage: React.FC = () => {
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sortBy, setSortBy] = useState('featured');
   const [page, setPage] = useState(1);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const pageSize = PAGINATION.PRODUCTS_PER_PAGE;
   const queryClient = useQueryClient();
   const searchEffectInitializedRef = useRef(false);
@@ -421,13 +423,19 @@ const ProductsPage: React.FC = () => {
         <div className="products-header">
           <h1>{selectedCategoryLabel || 'Our Products'}</h1>
           <div className="products-controls">
+            <button 
+              className="filter-button"
+              onClick={() => setIsFilterModalOpen(true)}
+              aria-label="Open filters"
+            >
+              <FiFilter /> Filters
+            </button>
             <select className="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
               <option value="featured">Sort by: Featured</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
               <option value="newest">Newest</option>
             </select>
-            {/* Apply button moved to mobile FilterDrawer; Apply via URL now triggers fetch */}
           </div>
           <div className="results-summary" aria-live="polite">
             {totalItems > 0
@@ -483,6 +491,24 @@ const ProductsPage: React.FC = () => {
           </button>
         </div>
       </main>
+
+      {/* Filter Drawer (mobile only) - reused for filtering on products page */}
+      <FilterDrawer
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        selectedMaterials={selectedMaterials}
+        onToggleMaterial={toggleMaterial}
+        selectedOccasions={selectedOccasions}
+        onToggleOccasion={toggleOccasion}
+        selectedCategory={selectedCategory}
+        onToggleCategory={toggleCategory}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
+        setMinPrice={setMinPrice}
+        setMaxPrice={setMaxPrice}
+        onApply={applyFilters}
+        onClear={clearFilters}
+      />
     </div>
   );
 };

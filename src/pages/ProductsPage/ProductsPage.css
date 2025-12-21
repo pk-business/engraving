@@ -103,6 +103,31 @@
   display: flex;
   gap: 15px;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-button {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #2FA4A9;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.2s;
+  min-height: 44px;
+}
+
+.filter-button:hover {
+  background: #27898d;
+}
+
+.filter-button:active {
+  background: #1f7378;
 }
 
 .search-wrapper {
@@ -220,29 +245,34 @@
   .products-page {
     flex-direction: column;
     padding: 12px;
-      gap: 0;
+    gap: 0;
   }
 
-    /* hide the sidebar only when it's part of the products page layout
-       but keep the same component visible when rendered inside the filter drawer (portal) */
-    .products-page .filters-sidebar {
-      display: none;
-    }
-        .products-header h1 {
-          font-size: 1.5rem;
-          margin-bottom: 16px;
-        }
-    
-        .products-controls {
-          flex-direction: column;
-          gap: 12px;
-        }
-  
-        .search-wrapper {
-          min-width: 100%;
-        }
-    
-        .sort-select {
+  /* hide the sidebar only when it's part of the products page layout
+     but keep the same component visible when rendered inside the filter modal (portal) */
+  .products-page .filters-sidebar {
+    display: none;
+  }
+
+  .filter-button {
+    display: flex;
+  }
+
+  .products-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  .products-controls {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .search-wrapper {
+    min-width: 100%;
+  }
+
+  .sort-select {
           width: 100%;
         }
     /* Show two product cards per row on mobile */
