@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useIsFetching } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants';
 import './FilterDrawer.css';
 import FiltersSidebar from '../Filters/FiltersSidebar';
@@ -13,7 +12,6 @@ interface Props {
 
 const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const panelRef = useRef<HTMLDivElement | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const previousActiveRef = useRef<Element | null>(null);
@@ -22,8 +20,6 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
-  const pendingProducts = useIsFetching({ queryKey: ['products'] });
-  const isApplying = pendingProducts > 0;
 
   useEffect(() => {
     if (isOpen) {
