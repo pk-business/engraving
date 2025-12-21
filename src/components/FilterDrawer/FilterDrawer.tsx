@@ -126,9 +126,17 @@ const FilterDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
             setMinPrice={setMinPrice}
             setMaxPrice={setMaxPrice}
             clearFilters={clearFilters}
-            onApply={applyFilters}
-            showApply={true}
+            showApply={false}
           />
+        </div>
+
+        <div className="filter-drawer-footer">
+          <button className="btn btn-primary apply-filters" onClick={applyFilters}>
+            Apply
+          </button>
+          <button className="btn btn-secondary clear-filters" onClick={clearFilters}>
+            Clear
+          </button>
         </div>
       </aside>
     </div>,
