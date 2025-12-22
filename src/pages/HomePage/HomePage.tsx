@@ -20,6 +20,8 @@ import LandingService from '../../services/landing.service';
 import type { Product } from '../../types/product.types';
 import type { HeroSlide } from '../../types/landing.types';
 import { useQuery } from '@tanstack/react-query';
+import { useHeroSlider } from '../../hooks/useHeroSlider';
+import { buildOccasionUrl } from '../../utils/urlBuilder';
 import './HomePage.css';
 
 const OCCASION_FILTERS: Record<string, string[]> = {
@@ -31,20 +33,9 @@ const OCCASION_FILTERS: Record<string, string[]> = {
   'home-living': ['home'],
 };
 
-const buildOccasionUrl = (key: string): string => {
-  const occasions = OCCASION_FILTERS[key] ?? [];
-  if (occasions.length === 0) return '/products';
-  const params = new URLSearchParams();
-  occasions.forEach((occasion) => params.append('occasions', occasion));
-  params.set('category', key);
-  return `/products?${params.toString()}`;
-};
-
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]); // fallback for SSR or initial
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isSlideChanging, setIsSlideChanging] = useState(false);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
   // Fetch hero slides
   const {
@@ -55,6 +46,13 @@ const HomePage: React.FC = () => {
     queryKey: ['hero-slides'],
     queryFn: () => LandingService.getLandingPageData(),
     staleTime: 1000 * 60 * 10, // 10 minutes
+  });
+
+  // Hero slider management
+  const { currentSlide, isSlideChanging, goToSlide, nextSlide, prevSlide } = useHeroSlider({
+    slidesCount: heroSlides?.length || 0,
+    autoAdvanceInterval: 8000,
+    transitionDuration: 300,
   });
 
   // Fetch featured products
@@ -76,40 +74,6 @@ const HomePage: React.FC = () => {
     }
   }, [data]);
 
-  // Auto-advance slides every 8 seconds
-  useEffect(() => {
-    if (!heroSlides || heroSlides.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setIsSlideChanging(true);
-      setTimeout(() => {
-        setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-        setIsSlideChanging(false);
-      }, 300);
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, [heroSlides]);
-
-  const handleSlideChange = (index: number) => {
-    if (index === currentSlide || isSlideChanging) return;
-    setIsSlideChanging(true);
-    setTimeout(() => {
-      setCurrentSlide(index);
-      setIsSlideChanging(false);
-    }, 300);
-  };
-
-  const handlePrevSlide = () => {
-    if (!heroSlides || isSlideChanging) return;
-    handleSlideChange((currentSlide - 1 + heroSlides.length) % heroSlides.length);
-  };
-
-  const handleNextSlide = () => {
-    if (!heroSlides || isSlideChanging) return;
-    handleSlideChange((currentSlide + 1) % heroSlides.length);
-  };
-
   const handleSlideAction = (slide: HeroSlide) => {
     const filterUrl = LandingService.buildFilterUrl(slide);
     navigate(filterUrl);
@@ -124,7 +88,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="home-page">
       {/* Hero Section */}
-      <section 
+      <section
         key={currentSlide}
         className={`hero-section ${isSlideChanging ? 'fade-out' : 'fade-in'}`}
         style={{
@@ -150,10 +114,7 @@ const HomePage: React.FC = () => {
             <>
               <h1>{activeSlide?.title}</h1>
               <p>{activeSlide?.description}</p>
-              <button 
-                className="cta-button" 
-                onClick={() => activeSlide && handleSlideAction(activeSlide)}
-              >
+              <button className="cta-button" onClick={() => activeSlide && handleSlideAction(activeSlide)}>
                 {activeSlide?.buttonText || 'Shop Now'}
               </button>
             </>
@@ -163,18 +124,10 @@ const HomePage: React.FC = () => {
         {/* Slide Navigation */}
         {heroSlides && heroSlides.length > 1 && (
           <>
-            <button 
-              className="hero-nav-button hero-nav-prev" 
-              onClick={handlePrevSlide}
-              aria-label="Previous slide"
-            >
+            <button className="hero-nav-button hero-nav-prev" onClick={prevSlide} aria-label="Previous slide">
               <FaChevronLeft />
             </button>
-            <button 
-              className="hero-nav-button hero-nav-next" 
-              onClick={handleNextSlide}
-              aria-label="Next slide"
-            >
+            <button className="hero-nav-button hero-nav-next" onClick={nextSlide} aria-label="Next slide">
               <FaChevronRight />
             </button>
 
@@ -184,7 +137,7 @@ const HomePage: React.FC = () => {
                 <button
                   key={index}
                   className={`hero-indicator ${index === currentSlide ? 'active' : ''}`}
-                  onClick={() => handleSlideChange(index)}
+                  onClick={() => goToSlide(index)}
                   aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
@@ -232,38 +185,43 @@ const HomePage: React.FC = () => {
             ))
           )}
         </div>
+        <div style={{ textAlign: 'center', marginTop: '30px' }}>
+          <button className="btn btn-primary browse-all-btn" onClick={() => navigate('/products')}>
+            Browse All Products
+          </button>
+        </div>
       </section>
 
       {/* Occasions Section */}
       <section className="occasions-section">
         <h2>Shop by Occasion</h2>
         <div className="occasions-grid">
-          <Link to={buildOccasionUrl('personal-milestones')} className="occasion-card personal">
+          <Link to={buildOccasionUrl('personal-milestones', OCCASION_FILTERS)} className="occasion-card personal">
             <FaGift className="occasion-icon" />
             <span>Personal Milestones</span>
           </Link>
 
-          <Link to={buildOccasionUrl('celebrations-holidays')} className="occasion-card celebrations">
+          <Link to={buildOccasionUrl('celebrations-holidays', OCCASION_FILTERS)} className="occasion-card celebrations">
             <FaCalendarAlt className="occasion-icon" />
             <span>Celebrations & Holidays</span>
           </Link>
 
-          <Link to={buildOccasionUrl('love-relationships')} className="occasion-card love">
+          <Link to={buildOccasionUrl('love-relationships', OCCASION_FILTERS)} className="occasion-card love">
             <FaUsers className="occasion-icon" />
             <span>Love & Relationships</span>
           </Link>
 
-          <Link to={buildOccasionUrl('corporate-professional')} className="occasion-card corporate">
+          <Link to={buildOccasionUrl('corporate-professional', OCCASION_FILTERS)} className="occasion-card corporate">
             <FaBriefcase className="occasion-icon" />
             <span>Corporate & Professional</span>
           </Link>
 
-          <Link to={buildOccasionUrl('hobbies-interests')} className="occasion-card hobbies">
+          <Link to={buildOccasionUrl('hobbies-interests', OCCASION_FILTERS)} className="occasion-card hobbies">
             <FaGamepad className="occasion-icon" />
             <span>Hobbies & Interests</span>
           </Link>
 
-          <Link to={buildOccasionUrl('home-living')} className="occasion-card home">
+          <Link to={buildOccasionUrl('home-living', OCCASION_FILTERS)} className="occasion-card home">
             <FaHome className="occasion-icon" />
             <span>Home & Living</span>
           </Link>

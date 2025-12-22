@@ -1,5 +1,6 @@
 import { api } from './api-client';
 import type { LandingPageResponse, HeroSlide } from '../types/landing.types';
+import { buildProductFilterUrl } from '../utils/urlBuilder';
 
 class LandingService {
   /**
@@ -32,22 +33,10 @@ class LandingService {
    * Build the product filter URL from a hero slide's category and occasion
    */
   buildFilterUrl(slide: HeroSlide): string {
-    const params = new URLSearchParams();
-    
-    // Use category name or slug if available
-    if (slide.category) {
-      const categoryValue = slide.category.slug || slide.category.name;
-      params.set('category', categoryValue);
-    }
-    
-    // Use occasion name or slug if available
-    if (slide.occasion) {
-      const occasionValue = slide.occasion.slug || slide.occasion.name;
-      params.append('occasions', occasionValue);
-    }
-    
-    const queryString = params.toString();
-    return queryString ? `/products?${queryString}` : '/products';
+    return buildProductFilterUrl({
+      category: slide.category?.slug || slide.category?.name || null,
+      occasions: slide.occasion ? [slide.occasion.slug || slide.occasion.name] : [],
+    });
   }
 
   /**
