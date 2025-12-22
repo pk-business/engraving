@@ -359,6 +359,118 @@ html {
 .text-muted { color: var(--color-text-muted); }
 .text-primary { color: var(--color-primary); }
 
+/* ==================== Common Component Utilities ==================== */
+/* Transition utilities */
+.transition-fast {
+  transition: all var(--transition-fast) ease;
+}
+
+.transition-normal {
+  transition: all var(--transition-normal) ease;
+}
+
+.transition-transform {
+  transition: transform var(--transition-fast) ease;
+}
+
+.transition-colors {
+  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.transition-opacity {
+  transition: opacity var(--transition-normal) ease;
+}
+
+/* Border radius utilities */
+.rounded-sm {
+  border-radius: var(--radius-sm);
+}
+
+.rounded-md {
+  border-radius: var(--radius-md);
+}
+
+.rounded-lg {
+  border-radius: var(--radius-lg);
+}
+
+.rounded-full {
+  border-radius: var(--radius-full);
+}
+
+/* Cursor utilities */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
+
+/* Interactive element - combines common patterns */
+.interactive {
+  cursor: pointer;
+  transition: all var(--transition-fast) ease;
+  user-select: none;
+}
+
+.interactive:hover {
+  opacity: 0.9;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Backdrop utility */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  animation: fadeIn var(--transition-normal) ease;
+}
+
+/* Drawer/Modal base */
+.drawer-base {
+  position: fixed;
+  background: var(--color-white);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Touch-optimized item (44px min height) */
+.touch-target {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+
+/* Common filter option style */
+.filter-option-base {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  min-height: 44px;
+  padding: 8px 0;
+  line-height: 1.4;
+}
+
+/* Input checkbox/radio styling */
+.input-check {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
 /* Mobile typography tweaks: reduce base font-size and heading scales for small screens */
 @media (max-width: 768px) {
 

@@ -2,7 +2,6 @@
   position: fixed;
   inset: 0;
   z-index: 2000;
-  display: block;
 }
 
 .drawer-backdrop {
@@ -10,10 +9,10 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
   animation: fadeIn 0.3s ease;
-  }
-  
-  @keyframes fadeIn {
-    from {
+}
+
+@keyframes fadeIn {
+  from {
       opacity: 0;
     }
   
@@ -23,7 +22,7 @@
   }
   
   @keyframes slideUp {
-    from {
+  from {
       transform: translateY(100%);
     }
   
@@ -35,19 +34,15 @@
 .filter-drawer {
   position: fixed;
   right: 0;
-  top: 0;
-  height: 100vh;
-  height: 100dvh;
-  /* Dynamic viewport height for mobile browsers */
+  top: var(--header-height);
+    height: calc(100vh - var(--header-height));
   width: 85%;
   max-width: 420px;
-  background: #fff;
+  background: var(--color-white);
   box-shadow: -2px 0 16px rgba(0, 0, 0, 0.2);
   padding: 0;
   display: flex;
   flex-direction: column;
-  transform: translateY(0);
-  will-change: transform;
   overflow: hidden;
   animation: slideUp 0.3s ease;
 }
@@ -56,52 +51,59 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  border-bottom: 1px solid #eee;
-  padding: 12px 16px 8px 16px;
+  gap: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-xs) var(--spacing-md);
   flex-shrink: 0;
-  /* Prevent header from shrinking */
 }
 
 .filter-drawer-body {
-  padding: 12px 16px;
+  padding: var(--spacing-sm) var(--spacing-md);
   overflow-y: auto;
   overflow-x: hidden;
-  flex: 1 1 0;
-  min-height: 0;
-  /* Important for flex scrolling */
+  flex: 1;
   -webkit-overflow-scrolling: touch;
-  /* Smooth scrolling on iOS */
 }
 
 .filter-options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 2px;
+    margin-top: var(--spacing-sm);
 }
 
 .filter-drawer-footer {
   display: flex;
-  flex-direction: row;
-  gap: 8px;
-  padding: 12px 16px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
-  /* iOS safe area support */
-  border-top: 1px solid #eee;
-  background: #fff;
+  gap: 2px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    padding-bottom: max(var(--spacing-sm), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--color-border);
+    background: var(--color-white);
   flex-shrink: 0;
-  /* Prevent footer from shrinking */
 }
 
 .filter-option {
   font-size: 0.95rem;
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
   line-height: 1.4;
   padding: 8px 0;
   min-height: 44px;
+  cursor: pointer;
+  }
+  
+  .filter-option input[type="checkbox"],
+  .filter-option input[type="radio"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  
+  .filter-option span {
+    cursor: pointer;
+    user-select: none;
 }
 
 .drawer-close-btn {
@@ -111,31 +113,17 @@
   cursor: pointer;
 }
 
-/* Apply filters button - inherits from .btn-primary */
-.apply-filters {
+.filter-drawer-footer .apply-filters,
+.filter-drawer-footer .clear-filters {
   flex: 1;
   min-width: 0;
+  padding: 10px 8px;
+    font-size: 0.9rem;
+    min-height: 44px;
   gap: 6px;
   white-space: nowrap;
 }
 
 .apply-filters.dirty {
   box-shadow: 0 0 0 2px rgba(47, 164, 169, 0.3);
-}
-
-/* Clear filters button - inherits from .btn-secondary */
-.clear-filters {
-  flex: 1;
-  min-width: 0;
-  gap: 6px;
-  white-space: nowrap;
-}
-
-.filter-drawer-footer .apply-filters,
-.filter-drawer-footer .clear-filters {
-  flex: 1;
-  padding: 10px 8px;
-  font-size: 0.9rem;
-  min-height: 44px;
-  /* iOS touch target size */
 }

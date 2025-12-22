@@ -4,17 +4,17 @@
 
 .hero-section {
   position: relative;
-  background: linear-gradient(0deg, #1f2A44 0%, #3E4C6D 100%);
+  background: linear-gradient(0deg, var(--color-dark) 0%, var(--color-dark-blue) 100%);
   background-size: cover;
   background-position: center;
-  color: #FAFAFA;
-  padding: 60px 20px;
+  color: var(--color-bg);
+    padding: 60px var(--spacing-lg);
   text-align: center;
   min-height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity var(--transition-normal) ease-in-out;
   overflow: hidden;
   animation: slideBackgroundIn 0.8s ease-out;
 }
@@ -63,39 +63,39 @@
 
 .hero-content h1 {
   font-size: 2rem;
-  margin-bottom: 20px;
-  color: #FAFAFA;
+  margin-bottom: var(--spacing-lg);
+    color: var(--color-bg);
 }
 
 .hero-content p {
   font-size: 1rem;
-  margin-bottom: 30px;
+  margin-bottom: var(--spacing-xl);
   line-height: 1.6;
 }
 
 .cta-button {
-  background-color: #F2A541;
-  color: #1f2A44;
+  background-color: var(--color-secondary);
+    color: var(--color-dark);
   padding: 14px 32px;
-    font-size: 1rem;
+  font-size: 1rem;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-weight: 700;
-  transition: transform 0.2s, background 0.2s;
+  transition: transform var(--transition-fast), background var(--transition-fast);
   min-height: 44px;
-    min-width: 44px;
+  min-width: 44px;
 }
 
 .cta-button:hover {
   transform: scale(1.05);
-  background: #ffb65a;
+  background: var(--color-secondary-hover);
 }
 
 .services-section,
 .featured-section,
 .occasions-section {
-  padding: 40px 16px;
+  padding: var(--spacing-2xl) var(--spacing-md);
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -105,39 +105,39 @@
 .occasions-section h2 {
   text-align: center;
   font-size: 2rem;
-  margin-bottom: 40px;
-  color: #1f2A44;
+  margin-bottom: var(--spacing-2xl);
+    color: var(--color-dark);
   font-weight: 700;
 }
 
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+  gap: var(--spacing-lg);
 }
 
 .service-card {
-  background: #FAFAFA;
-  padding: 30px;
-  border-radius: 10px;
+  background: var(--color-bg);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
   text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
-  border: 1px solid #e5e7eb;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    border: 1px solid var(--color-border);
 }
 
 .service-icon {
   font-size: 3rem;
-  color: #2FA4A9;
-  margin-bottom: 20px;
+  color: var(--color-primary);
+    margin-bottom: var(--spacing-lg);
 }
 
 .service-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .service-card h3 {
-  color: #1f2A44;
+  color: var(--color-dark);
   margin-bottom: 15px;
   font-weight: 600;
 }
@@ -161,19 +161,18 @@
 .occasions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
+  gap: var(--spacing-sm);
 }
 
 .occasion-card {
-  /* background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); */
   color: white;
-  padding: 40px 20px;
-  border-radius: 10px;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+    border-radius: var(--radius-lg);
   text-align: center;
   font-weight: 600;
   font-size: 1.1rem;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -182,19 +181,19 @@
 }
 
 .occasion-card.personal {
-  background: linear-gradient(135deg, #f2a541 0%, #f6d365 100%);
-  color: #1f2A44;
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #f6d365 100%);
+    color: var(--color-dark);
   border: 1px solid rgba(0,0,0,0.06);
 }
 
 .occasion-card.celebrations {
   background: linear-gradient(135deg, #8e44ad 0%, #f093fb 100%);
-  color: #ffffff;
+  color: var(--color-white);
 }
 
 .occasion-card.love {
   background: linear-gradient(135deg, #ff6b6b 0%, #ff9a9e 100%);
-  color: #ffffff;
+  color: var(--color-white);
 }
 
 .occasion-card.corporate {

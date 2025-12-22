@@ -155,48 +155,53 @@ const FiltersSidebar: React.FC<Props> = ({
       <div className="filter-section">
         <h3>Price</h3>
         <div className="filter-options">
-          <label className="filter-option">
+          <label htmlFor="price-under-20" className="filter-option">
             <input
+              id="price-under-20"
               type="radio"
               name="priceRange"
               checked={priceRange === 'under-20'}
-              onChange={() => setPriceRange('under-20')}
+              onChange={() => setPriceRange(priceRange === 'under-20' ? '' : 'under-20')}
             />
             <span>Under $20</span>
           </label>
-          <label className="filter-option">
+          <label htmlFor="price-20-50" className="filter-option">
             <input
+              id="price-20-50"
               type="radio"
               name="priceRange"
               checked={priceRange === '20-50'}
-              onChange={() => setPriceRange('20-50')}
+              onChange={() => setPriceRange(priceRange === '20-50' ? '' : '20-50')}
             />
             <span>$20 - $50</span>
           </label>
-          <label className="filter-option">
+          <label htmlFor="price-50-100" className="filter-option">
             <input
+              id="price-50-100"
               type="radio"
               name="priceRange"
               checked={priceRange === '50-100'}
-              onChange={() => setPriceRange('50-100')}
+              onChange={() => setPriceRange(priceRange === '50-100' ? '' : '50-100')}
             />
             <span>$50 - $100</span>
           </label>
-          <label className="filter-option">
+          <label htmlFor="price-100-500" className="filter-option">
             <input
+              id="price-100-500"
               type="radio"
               name="priceRange"
               checked={priceRange === '100-500'}
-              onChange={() => setPriceRange('100-500')}
+              onChange={() => setPriceRange(priceRange === '100-500' ? '' : '100-500')}
             />
             <span>$100 - $500</span>
           </label>
-          <label className="filter-option">
+          <label htmlFor="price-over-500" className="filter-option">
             <input
+              id="price-over-500"
               type="radio"
               name="priceRange"
               checked={priceRange === 'over-500'}
-              onChange={() => setPriceRange('over-500')}
+              onChange={() => setPriceRange(priceRange === 'over-500' ? '' : 'over-500')}
             />
             <span>Over $500</span>
           </label>
