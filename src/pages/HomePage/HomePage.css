@@ -3,10 +3,62 @@
 }
 
 .hero-section {
+  position: relative;
   background: linear-gradient(0deg, #1f2A44 0%, #3E4C6D 100%);
+  background-size: cover;
+  background-position: center;
   color: #FAFAFA;
   padding: 60px 20px;
   text-align: center;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease-in-out;
+  overflow: hidden;
+  animation: slideBackgroundIn 0.8s ease-out;
+}
+
+@keyframes slideBackgroundIn {
+  from {
+    background-position: 120% center;
+  }
+  to {
+    background-position: center;
+  }
+}
+
+.hero-section.fade-out {
+  opacity: 0.7;
+}
+
+.hero-section.fade-in {
+  opacity: 1;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(31, 42, 68, 0.5);
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  animation: slideInFromRight 0.8s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .hero-content h1 {
@@ -283,5 +335,113 @@
 
   .occasions-grid {
     gap: 20px;
+  }
+
+  .hero-section {
+    min-height: 500px;
+  }
+}
+
+/* Hero Navigation Buttons */
+.hero-nav-button {
+  position: absolute;
+  bottom: 20px;
+  z-index: 2;
+  background: transparent;
+  border: none;
+  color: #FAFAFA;
+  font-size: 1.5rem;
+  padding: 16px 12px;
+  cursor: pointer;
+  transition: color 0.3s, opacity 0.3s, transform 0.2s;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-nav-button:hover {
+  color: #F2A541;
+  transform: scale(1.2);
+}
+
+.hero-nav-button:active {
+  transform: scale(1.1);
+}
+
+.hero-nav-prev {
+  left: 20px;
+}
+
+.hero-nav-next {
+  right: 20px;
+}
+
+/* Hero Indicators */
+.hero-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+}
+
+.hero-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+  min-width: unset;
+  min-height: unset;
+}
+
+.hero-indicator:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.hero-indicator.active {
+  background: #F2A541;
+  border-color: #F2A541;
+  width: 24px;
+  border-radius: 6px;
+}
+
+/* Mobile adjustments for hero controls */
+@media (max-width: 768px) {
+  .hero-nav-button {
+    font-size: 1.2rem;
+    padding: 12px 8px;
+  }
+
+  .hero-nav-prev {
+    left: 8px;
+  }
+
+  .hero-nav-next {
+    right: 8px;
+  }
+
+  .hero-indicators {
+    bottom: 16px !important;
+    gap: 4px !important;
+  }
+
+  .hero-indicator {
+    width: 4px !important;
+    height: 4px !important;
+    border-width: 1px !important;
+  }
+
+  .hero-indicator.active {
+    width: 12px !important;
+    height: 4px !important;
+    border-radius: 2px !important;
   }
 }

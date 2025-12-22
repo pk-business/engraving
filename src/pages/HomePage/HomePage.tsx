@@ -11,10 +11,14 @@ import {
   FaBriefcase,
   FaGamepad,
   FaHome,
+  FaChevronLeft,
+  FaChevronRight,
 } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import ProductService from '../../services/product.service';
+import LandingService from '../../services/landing.service';
 import type { Product } from '../../types/product.types';
+import type { HeroSlide } from '../../types/landing.types';
 import { useQuery } from '@tanstack/react-query';
 import './HomePage.css';
 
@@ -39,7 +43,21 @@ const buildOccasionUrl = (key: string): string => {
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]); // fallback for SSR or initial
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isSlideChanging, setIsSlideChanging] = useState(false);
 
+  // Fetch hero slides
+  const {
+    data: heroSlides,
+    isLoading: heroLoading,
+    isError: heroError,
+  } = useQuery<HeroSlide[], Error>({
+    queryKey: ['hero-slides'],
+    queryFn: () => LandingService.getLandingPageData(),
+    staleTime: 1000 * 60 * 10, // 10 minutes
+  });
+
+  // Fetch featured products
   const {
     data,
     isLoading: loading,
@@ -58,20 +76,121 @@ const HomePage: React.FC = () => {
     }
   }, [data]);
 
+  // Auto-advance slides every 8 seconds
+  useEffect(() => {
+    if (!heroSlides || heroSlides.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setIsSlideChanging(true);
+      setTimeout(() => {
+        setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+        setIsSlideChanging(false);
+      }, 300);
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [heroSlides]);
+
+  const handleSlideChange = (index: number) => {
+    if (index === currentSlide || isSlideChanging) return;
+    setIsSlideChanging(true);
+    setTimeout(() => {
+      setCurrentSlide(index);
+      setIsSlideChanging(false);
+    }, 300);
+  };
+
+  const handlePrevSlide = () => {
+    if (!heroSlides || isSlideChanging) return;
+    handleSlideChange((currentSlide - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  const handleNextSlide = () => {
+    if (!heroSlides || isSlideChanging) return;
+    handleSlideChange((currentSlide + 1) % heroSlides.length);
+  };
+
+  const handleSlideAction = (slide: HeroSlide) => {
+    const filterUrl = LandingService.buildFilterUrl(slide);
+    navigate(filterUrl);
+  };
+
   const fetchedFeatured: Product[] = data ?? [];
   const displayFeatured: Product[] = featuredProducts.length > 0 ? featuredProducts : fetchedFeatured;
+
+  const activeSlide = heroSlides?.[currentSlide];
+  const backgroundImageUrl = activeSlide ? LandingService.getBackgroundImageUrl(activeSlide) : null;
 
   return (
     <div className="home-page">
       {/* Hero Section */}
-      <section className="hero-section">
+      <section 
+        key={currentSlide}
+        className={`hero-section ${isSlideChanging ? 'fade-out' : 'fade-in'}`}
+        style={{
+          backgroundImage: backgroundImageUrl ? `url(${backgroundImageUrl})` : undefined,
+        }}
+      >
+        <div className="hero-overlay" />
         <div className="hero-content">
-          <h1>Create Something Unique</h1>
-          <p>Premium laser engraved & CNC cut custom items for every occasion</p>
-          <button className="cta-button" onClick={() => navigate('/products')}>
-            Shop Now
-          </button>
+          {heroLoading ? (
+            <>
+              <h1>Loading...</h1>
+              <p>Please wait while we load the latest content</p>
+            </>
+          ) : heroError || !heroSlides || heroSlides.length === 0 ? (
+            <>
+              <h1>Create Something Unique</h1>
+              <p>Premium laser engraved & CNC cut custom items for every occasion</p>
+              <button className="cta-button" onClick={() => navigate('/products')}>
+                Shop Now
+              </button>
+            </>
+          ) : (
+            <>
+              <h1>{activeSlide?.title}</h1>
+              <p>{activeSlide?.description}</p>
+              <button 
+                className="cta-button" 
+                onClick={() => activeSlide && handleSlideAction(activeSlide)}
+              >
+                {activeSlide?.buttonText || 'Shop Now'}
+              </button>
+            </>
+          )}
         </div>
+
+        {/* Slide Navigation */}
+        {heroSlides && heroSlides.length > 1 && (
+          <>
+            <button 
+              className="hero-nav-button hero-nav-prev" 
+              onClick={handlePrevSlide}
+              aria-label="Previous slide"
+            >
+              <FaChevronLeft />
+            </button>
+            <button 
+              className="hero-nav-button hero-nav-next" 
+              onClick={handleNextSlide}
+              aria-label="Next slide"
+            >
+              <FaChevronRight />
+            </button>
+
+            {/* Slide Indicators */}
+            <div className="hero-indicators">
+              {heroSlides.map((_, index) => (
+                <button
+                  key={index}
+                  className={`hero-indicator ${index === currentSlide ? 'active' : ''}`}
+                  onClick={() => handleSlideChange(index)}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
       {/* Featured Products Section */}
