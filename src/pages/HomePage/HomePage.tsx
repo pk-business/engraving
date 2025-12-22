@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   FaCut,
   FaCogs,
@@ -35,7 +35,6 @@ const OCCASION_FILTERS: Record<string, string[]> = {
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
   // Fetch hero slides
   const {
@@ -57,7 +56,7 @@ const HomePage: React.FC = () => {
 
   // Fetch featured products
   const {
-    data,
+    data: featuredProducts = [],
     isLoading: loading,
     isError,
     error,
@@ -68,19 +67,10 @@ const HomePage: React.FC = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  useEffect(() => {
-    if (data) {
-      setFeaturedProducts(data);
-    }
-  }, [data]);
-
   const handleSlideAction = (slide: HeroSlide) => {
     const filterUrl = LandingService.buildFilterUrl(slide);
     navigate(filterUrl);
   };
-
-  const fetchedFeatured: Product[] = data ?? [];
-  const displayFeatured: Product[] = featuredProducts.length > 0 ? featuredProducts : fetchedFeatured;
 
   const activeSlide = heroSlides?.[currentSlide];
   const backgroundImageUrl = activeSlide ? LandingService.getBackgroundImageUrl(activeSlide) : null;
@@ -157,10 +147,10 @@ const HomePage: React.FC = () => {
             </div>
           ) : isError ? (
             <p className="placeholder-text">Error loading featured products: {error?.message ?? 'Unknown error'}</p>
-          ) : featuredProducts.length === 0 && fetchedFeatured.length === 0 ? (
+          ) : featuredProducts.length === 0 ? (
             <p className="placeholder-text">No products available. Start the API server with: npm run api</p>
           ) : (
-            displayFeatured.map((product) => (
+            featuredProducts.map((product) => (
               <Link key={product.id} to={`/products/${product.id}`} state={{ product }} className="product-card">
                 <div className="product-image-container">
                   <div
