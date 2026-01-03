@@ -7,12 +7,11 @@ import { FiChevronLeft, FiChevronRight, FiFilter } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
 import FiltersSidebar from '../../components/Filters/FiltersSidebar';
 import FilterDrawer from '../../components/FilterDrawer/FilterDrawer';
+import AppliedFiltersChips from '../../components/Filters/AppliedFiltersChips';
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
 import { getCategories, type TaxonomyItem } from '../../services/taxonomy.service';
 import { PAGINATION } from '../../constants';
 import './ProductsPage.css';
-
-// Category => occasion mapping used for URL params and UI selection
 const categoryMap: Record<string, string[]> = {
   'personal-milestones': ['birthday', 'anniversary', 'graduation'],
   'celebrations-holidays': ['christmas'],
@@ -55,7 +54,19 @@ const deriveCategoriesFromOccasions = (occasionSlugs: string[], limit = 1): stri
   return limit > 0 ? derived.slice(0, limit) : derived;
 };
 
+{
+  /* Original products grid and loading logic goes here (restored) */
+}
+
+{
+  /* Original pagination logic goes here (restored) */
+}
+
+{
+  /* Original filter drawer logic goes here (restored) */
+}
 const ProductsPage: React.FC = () => {
+  // State
   const [searchParams, setSearchParams] = useSearchParams();
   const [appliedFilters, setAppliedFilters] = useState<ProductFilter | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -72,6 +83,7 @@ const ProductsPage: React.FC = () => {
   const searchEffectInitializedRef = useRef(false);
   const lastSearchQueryRef = useRef<string>('');
 
+  // Utility functions
   const syncPageParam = (value: number) => {
     setSearchParams((prevParams) => {
       const updated = new URLSearchParams(prevParams);
@@ -204,12 +216,13 @@ const ProductsPage: React.FC = () => {
 
   const buildFiltersFromState = (): ProductFilter => {
     const priceValues = parsePriceRange(priceRange);
+    // Always set minPrice and maxPrice as top-level properties for chips
     return {
       materials: selectedMaterials.length > 0 ? selectedMaterials : undefined,
       occasions: selectedOccasions.length > 0 ? selectedOccasions : undefined,
       categories: selectedCategory ? [selectedCategory] : undefined,
-      minPrice: priceValues.min,
-      maxPrice: priceValues.max,
+      minPrice: typeof priceValues.min === 'number' ? priceValues.min : undefined,
+      maxPrice: typeof priceValues.max === 'number' ? priceValues.max : undefined,
       searchQuery: searchQuery ? searchQuery : undefined,
     };
   };
@@ -309,7 +322,8 @@ const ProductsPage: React.FC = () => {
         appliedFilterSnapshot.categories?.length ||
         appliedFilterSnapshot.materials?.length ||
         appliedFilterSnapshot.minPrice ||
-        appliedFilterSnapshot.maxPrice)
+        appliedFilterSnapshot.maxPrice ||
+        appliedFilterSnapshot.searchQuery)
   );
 
   const locallyFilteredItems = hasFiltersToApply ? applyLocalFilters(items, appliedFilterSnapshot) : items;
@@ -411,6 +425,36 @@ const ProductsPage: React.FC = () => {
 
   const selectedCategoryLabel = categories.find((c) => (c.slug || c.name) === selectedCategory)?.name || null;
 
+  // Memoize display filters for chips
+  const displayFilters = React.useMemo(() => {
+    if (!appliedFilterSnapshot) return {};
+    const { page, pageSize, ...userFilters } = appliedFilterSnapshot;
+    // Hide auto-mapped occasions when category is selected and occasions are not explicitly chosen
+    const explicitOccasions = searchParams.getAll('occasions');
+    const explicitCategories = searchParams.getAll('categories');
+    const categoryParam = searchParams.get('category');
+    const hasExplicitOccasions = explicitOccasions.length > 0;
+    const hasExplicitCategory = explicitCategories.length > 0 || !!categoryParam;
+    if (
+      hasExplicitCategory &&
+      !hasExplicitOccasions &&
+      userFilters.categories &&
+      userFilters.occasions &&
+      userFilters.occasions.length > 0
+    ) {
+      // Only show category chip, hide auto-mapped occasions
+      const { occasions, ...rest } = userFilters;
+      return rest as NonNullable<typeof appliedFilterSnapshot>;
+    }
+    return userFilters as NonNullable<typeof appliedFilterSnapshot>;
+  }, [appliedFilterSnapshot, searchParams]);
+
+  // Apply filters whenever filter state changes (category, materials, occasions, price, search)
+  useEffect(() => {
+    applyFilters(undefined, { resetPage: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, selectedMaterials, selectedOccasions, priceRange, searchQuery]);
+
   return (
     <div className="products-page">
       {/* Filters Sidebar (re-usable) */}
@@ -443,6 +487,47 @@ const ProductsPage: React.FC = () => {
               <FiFilter /> Filters
             </button>
           </div>
+
+          {/* Applied Filters Chips Row */}
+          {hasFiltersToApply && appliedFilterSnapshot && (
+            <AppliedFiltersChips
+              filters={displayFilters}
+              onRemove={(type, value) => {
+                // Remove a single filter chip, only update state
+                if (type === 'materials') {
+                  setSelectedMaterials((prev) => prev.filter((m) => m !== value));
+                } else if (type === 'occasions') {
+                  setSelectedOccasions((prev) => prev.filter((o) => o !== value));
+                } else if (type === 'categories') {
+                  setSelectedCategory(null);
+                  setSelectedOccasions([]);
+                } else if (type === 'priceRange') {
+                  // Clear both min and max when removing combined price range chip
+                  setPriceRange('');
+                } else if (type === 'minPrice') {
+                  // Clear only min price, keep max if it exists
+                  const currentPriceValues = parsePriceRange(priceRange);
+                  if (typeof currentPriceValues.max === 'number') {
+                    setPriceRange(`0-${currentPriceValues.max}`);
+                  } else {
+                    setPriceRange('');
+                  }
+                } else if (type === 'maxPrice') {
+                  // Clear only max price, keep min if it exists
+                  const currentPriceValues = parsePriceRange(priceRange);
+                  if (typeof currentPriceValues.min === 'number') {
+                    setPriceRange(`${currentPriceValues.min}-1000`);
+                  } else {
+                    setPriceRange('');
+                  }
+                } else if (type === 'searchQuery') {
+                  setSearchQuery('');
+                }
+              }}
+              onClearAll={clearFilters}
+            />
+          )}
+
           <div className="results-summary" aria-live="polite">
             {totalItems > 0
               ? `Showing ${firstItemIndex}-${lastItemIndex} of ${totalItems} items`

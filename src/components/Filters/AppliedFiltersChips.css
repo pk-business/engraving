@@ -1,0 +1,39 @@
+.applied-filters-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  align-items: center;
+}
+.applied-filter-chip {
+  background: #f0f0f0;
+  border-radius: 16px;
+  padding: 0.25rem 0.75rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  border: 1px solid #ddd;
+}
+.chip-remove-btn {
+  background: none;
+  border: none;
+  color: #888;
+  margin-left: 0.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.chip-remove-btn:hover {
+  color: #d00;
+}
+.chip-clear-all-btn {
+  background: none;
+  border: none;
+  color: #0077cc;
+  margin-left: 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.chip-clear-all-btn:hover {
+  color: #d00;
+}

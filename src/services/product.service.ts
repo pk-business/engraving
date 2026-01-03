@@ -130,6 +130,7 @@ export function mapStrapiToProduct(item: UnknownRecord): Product {
   let imageUrl = '';
   let mainImageAlt = '';
   let mainImageUrl: string | null = null;
+  const PLACEHOLDER_IMAGE = '/images/placeholder.jpg';
 
   const fi = (attrs.featuredImage ?? item.featuredImage) as unknown;
   if (fi) {
@@ -178,6 +179,13 @@ export function mapStrapiToProduct(item: UnknownRecord): Product {
     images.push(built ?? item.imageUrl);
   }
 
+  // Ensure imageUrl.main is always a valid URL or a placeholder
+  if (!imageUrl || imageUrl === 'Tumbler' || imageUrl === attrs.name) {
+    imageUrl =
+      images.find((u) => typeof u === 'string' && (u.startsWith('http://') || u.startsWith('https://'))) ||
+      PLACEHOLDER_IMAGE;
+  }
+
   const normalizedOccasions = extractNameList(attrs.occasions);
   const normalizedCategories = extractNameList(attrs.categories);
   const categoryList = normalizedCategories.length > 0 ? normalizedCategories : extractNameList(attrs.category);
@@ -188,10 +196,10 @@ export function mapStrapiToProduct(item: UnknownRecord): Product {
     description: toStringValue(attrs.description, ''),
     price: toNumberValue(attrs.price, 0),
     imageUrl: {
-      main: imageUrl || (images[0] ?? ''),
+      main: imageUrl,
       alt:
         mainImageAlt ||
-        images.find((u) => u && u !== (imageUrl || (images[0] ?? ''))) ||
+        images.find((u) => u && u !== imageUrl) ||
         toStringValue(attrs.imageAlt) ||
         toStringValue(attrs.alt) ||
         '',
