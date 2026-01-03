@@ -425,6 +425,30 @@ const ProductsPage: React.FC = () => {
 
   const selectedCategoryLabel = categories.find((c) => (c.slug || c.name) === selectedCategory)?.name || null;
 
+  // Memoize display filters for chips
+  const displayFilters = React.useMemo(() => {
+    if (!appliedFilterSnapshot) return {};
+    const { page, pageSize, ...userFilters } = appliedFilterSnapshot;
+    // Hide auto-mapped occasions when category is selected and occasions are not explicitly chosen
+    const explicitOccasions = searchParams.getAll('occasions');
+    const explicitCategories = searchParams.getAll('categories');
+    const categoryParam = searchParams.get('category');
+    const hasExplicitOccasions = explicitOccasions.length > 0;
+    const hasExplicitCategory = explicitCategories.length > 0 || !!categoryParam;
+    if (
+      hasExplicitCategory &&
+      !hasExplicitOccasions &&
+      userFilters.categories &&
+      userFilters.occasions &&
+      userFilters.occasions.length > 0
+    ) {
+      // Only show category chip, hide auto-mapped occasions
+      const { occasions, ...rest } = userFilters;
+      return rest as NonNullable<typeof appliedFilterSnapshot>;
+    }
+    return userFilters as NonNullable<typeof appliedFilterSnapshot>;
+  }, [appliedFilterSnapshot, searchParams]);
+
   // Apply filters whenever filter state changes (category, materials, occasions, price, search)
   useEffect(() => {
     applyFilters(undefined, { resetPage: true });
@@ -467,27 +491,7 @@ const ProductsPage: React.FC = () => {
           {/* Applied Filters Chips Row */}
           {hasFiltersToApply && appliedFilterSnapshot && (
             <AppliedFiltersChips
-              filters={(() => {
-                const { page, pageSize, ...userFilters } = appliedFilterSnapshot;
-                // Hide auto-mapped occasions when category is selected and occasions are not explicitly chosen
-                const explicitOccasions = searchParams.getAll('occasions');
-                const explicitCategories = searchParams.getAll('categories');
-                const categoryParam = searchParams.get('category');
-                const hasExplicitOccasions = explicitOccasions.length > 0;
-                const hasExplicitCategory = explicitCategories.length > 0 || !!categoryParam;
-                if (
-                  hasExplicitCategory &&
-                  !hasExplicitOccasions &&
-                  userFilters.categories &&
-                  userFilters.occasions &&
-                  userFilters.occasions.length > 0
-                ) {
-                  // Only show category chip, hide auto-mapped occasions
-                  const { occasions, ...rest } = userFilters;
-                  return rest as NonNullable<typeof appliedFilterSnapshot>;
-                }
-                return userFilters as NonNullable<typeof appliedFilterSnapshot>;
-              })()}
+              filters={displayFilters}
               onRemove={(type, value) => {
                 // Remove a single filter chip, only update state
                 if (type === 'materials') {
@@ -497,8 +501,25 @@ const ProductsPage: React.FC = () => {
                 } else if (type === 'categories') {
                   setSelectedCategory(null);
                   setSelectedOccasions([]);
-                } else if (type === 'minPrice' || type === 'maxPrice') {
+                } else if (type === 'priceRange') {
+                  // Clear both min and max when removing combined price range chip
                   setPriceRange('');
+                } else if (type === 'minPrice') {
+                  // Clear only min price, keep max if it exists
+                  const currentPriceValues = parsePriceRange(priceRange);
+                  if (typeof currentPriceValues.max === 'number') {
+                    setPriceRange(`0-${currentPriceValues.max}`);
+                  } else {
+                    setPriceRange('');
+                  }
+                } else if (type === 'maxPrice') {
+                  // Clear only max price, keep min if it exists
+                  const currentPriceValues = parsePriceRange(priceRange);
+                  if (typeof currentPriceValues.min === 'number') {
+                    setPriceRange(`${currentPriceValues.min}-1000`);
+                  } else {
+                    setPriceRange('');
+                  }
                 } else if (type === 'searchQuery') {
                   setSearchQuery('');
                 }
