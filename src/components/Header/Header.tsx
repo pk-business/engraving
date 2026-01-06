@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../hooks/useCart';
 import { useUser } from '../../hooks/useUser';
@@ -8,23 +8,33 @@ import { VscAccount } from 'react-icons/vsc';
 import './Header.css';
 import SearchBar from '../Search/SearchBar';
 import NavigationDrawer from '../NavigationDrawer/NavigationDrawer';
-import NavigationDropdown from '../NavigationDropdown/NavigationDropdown';
+import DesktopNavDropdown from '../DesktopNavDropdown/DesktopNavDropdown';
+import blogIcon from '../../assets/images/blog.svg';
 
 const Header: React.FC = () => {
   const { cart } = useCart();
   const { user, logout } = useUser();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
+  const [activeDesktopDropdown, setActiveDesktopDropdown] = useState<
+    'occasion' | 'recipient' | 'product' | 'teams' | null
+  >(null);
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const isActive = (path: string) => {
-    if (path === ROUTES.HOME) {
-      return location.pathname === path;
+  const handleDropdownMouseEnter = (type: 'occasion' | 'recipient' | 'product' | 'teams') => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
     }
-    return location.pathname.startsWith(path);
+    setActiveDesktopDropdown(type);
+  };
+
+  const handleDropdownMouseLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => {
+      setActiveDesktopDropdown(null);
+    }, 200);
   };
 
   const isSearchInputFocused = () => {
@@ -65,6 +75,10 @@ const Header: React.FC = () => {
 
           {/* Right Section */}
           <div className="header-right">
+            <Link to={ROUTES.BLOG} className="blog-icon" aria-label="Blog">
+              <img src={blogIcon} alt="Blog" width="22" height="22" />
+            </Link>
+
             <div
               className="account-dropdown"
               onMouseEnter={() => setIsAccountDropdownOpen(true)}
@@ -140,59 +154,69 @@ const Header: React.FC = () => {
 
         {/* Desktop Navigation (below header-top) */}
         <nav className="nav-desktop">
-            <Link to={ROUTES.HOME} className={`nav-link ${isActive(ROUTES.HOME) ? 'active' : ''}`}>
-              Home
-            </Link>
-            <div 
-              className="nav-products-dropdown"
-              onMouseEnter={() => setIsProductsDropdownOpen(true)}
-              onMouseLeave={() => setIsProductsDropdownOpen(false)}
-            >
-              <Link 
-                to={ROUTES.PRODUCTS} 
-                className={`nav-link ${isActive(ROUTES.PRODUCTS) ? 'active' : ''}`}
-              >
-                Products
-              </Link>
-              <NavigationDropdown 
-                isOpen={isProductsDropdownOpen} 
-                onClose={() => setIsProductsDropdownOpen(false)} 
-              />
-            </div>
-            <Link to={ROUTES.BLOG} className={`nav-link ${isActive(ROUTES.BLOG) ? 'active' : ''}`}>
-              Blog
-            </Link>
-          </nav>
+          <div
+            className="nav-dropdown-wrapper"
+            onMouseEnter={() => handleDropdownMouseEnter('occasion')}
+            onMouseLeave={handleDropdownMouseLeave}
+          >
+            <button className="nav-link" type="button">
+              By Occasion
+            </button>
+            <DesktopNavDropdown
+              isOpen={activeDesktopDropdown === 'occasion'}
+              onClose={() => setActiveDesktopDropdown(null)}
+              type="occasion"
+            />
+          </div>
+
+          <div
+            className="nav-dropdown-wrapper"
+            onMouseEnter={() => handleDropdownMouseEnter('recipient')}
+            onMouseLeave={handleDropdownMouseLeave}
+          >
+            <button className="nav-link" type="button">
+              By Recipient
+            </button>
+            <DesktopNavDropdown
+              isOpen={activeDesktopDropdown === 'recipient'}
+              onClose={() => setActiveDesktopDropdown(null)}
+              type="recipient"
+            />
+          </div>
+
+          <div
+            className="nav-dropdown-wrapper"
+            onMouseEnter={() => handleDropdownMouseEnter('product')}
+            onMouseLeave={handleDropdownMouseLeave}
+          >
+            <button className="nav-link" type="button">
+              By Product
+            </button>
+            <DesktopNavDropdown
+              isOpen={activeDesktopDropdown === 'product'}
+              onClose={() => setActiveDesktopDropdown(null)}
+              type="product"
+            />
+          </div>
+
+          <div
+            className="nav-dropdown-wrapper"
+            onMouseEnter={() => handleDropdownMouseEnter('teams')}
+            onMouseLeave={handleDropdownMouseLeave}
+          >
+            <button className="nav-link" type="button">
+              For Teams
+            </button>
+            <DesktopNavDropdown
+              isOpen={activeDesktopDropdown === 'teams'}
+              onClose={() => setActiveDesktopDropdown(null)}
+              type="teams"
+            />
+          </div>
+        </nav>
 
         {/* Right Section is moved into header-top for mobile/row layout */}
       </div>
-
-      {/* Mobile Navigation */}
-      {isMobileMenuOpen && (
-        <nav className="nav-mobile">
-          <Link
-            to={ROUTES.HOME}
-            className={`nav-link-mobile ${isActive(ROUTES.HOME) ? 'active' : ''}`}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Home
-          </Link>
-          <Link
-            to={ROUTES.PRODUCTS}
-            className={`nav-link-mobile ${isActive(ROUTES.PRODUCTS) ? 'active' : ''}`}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Products
-          </Link>
-          <Link
-            to={ROUTES.BLOG}
-            className={`nav-link-mobile ${isActive(ROUTES.BLOG) ? 'active' : ''}`}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Blog
-          </Link>
-        </nav>
-      )}
 
       {/* Navigation Drawer (mobile only) */}
       <NavigationDrawer isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />

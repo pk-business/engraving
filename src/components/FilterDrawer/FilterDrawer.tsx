@@ -13,8 +13,8 @@ interface Props {
   onToggleMaterial?: (m: string) => void;
   selectedOccasions?: string[];
   onToggleOccasion?: (o: string) => void;
-  selectedCategory?: string | null;
-  onToggleCategory?: (c: string) => void;
+  selectedProductCategory?: string | null;
+  onToggleProductCategory?: (c: string) => void;
   priceRange?: string;
   setPriceRange?: (v: string) => void;
   onApply?: () => void;
@@ -28,8 +28,8 @@ const FilterDrawer: React.FC<Props> = ({
   onToggleMaterial: externalToggleMaterial,
   selectedOccasions: externalOccasions,
   onToggleOccasion: externalToggleOccasion,
-  selectedCategory: externalCategory,
-  onToggleCategory: externalToggleCategory,
+  selectedProductCategory: externalProductCategory,
+  onToggleProductCategory: externalToggleProductCategory,
   priceRange: externalPriceRange,
   setPriceRange: externalSetPriceRange,
   onApply: externalOnApply,
@@ -43,13 +43,13 @@ const FilterDrawer: React.FC<Props> = ({
   // Internal state (used when external props not provided)
   const [internalMaterials, setInternalMaterials] = useState<string[]>([]);
   const [internalOccasions, setInternalOccasions] = useState<string[]>([]);
-  const [internalCategories, setInternalCategories] = useState<string[]>([]);
+  const [internalProductCategories, setInternalProductCategories] = useState<string[]>([]);
   const [internalPriceRange, setInternalPriceRange] = useState<string>('');
 
   // Use external state if provided, otherwise use internal
   const selectedMaterials = externalMaterials ?? internalMaterials;
   const selectedOccasions = externalOccasions ?? internalOccasions;
-  const selectedCategories = externalCategory ? [externalCategory] : internalCategories;
+  const selectedProductCategories = externalProductCategory ? [externalProductCategory] : internalProductCategories;
   const priceRange = externalPriceRange ?? internalPriceRange;
 
   useEffect(() => {
@@ -105,11 +105,11 @@ const FilterDrawer: React.FC<Props> = ({
     }
   };
 
-  const toggleCategory = (c: string) => {
-    if (externalToggleCategory) {
-      externalToggleCategory(c);
+  const toggleProductCategory = (c: string) => {
+    if (externalToggleProductCategory) {
+      externalToggleProductCategory(c);
     } else {
-      setInternalCategories((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [c]));
+      setInternalProductCategories((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [c]));
     }
   };
 
@@ -121,7 +121,7 @@ const FilterDrawer: React.FC<Props> = ({
       const params = new URLSearchParams();
       selectedMaterials.forEach((m) => params.append('materials', m));
       selectedOccasions.forEach((o) => params.append('occasions', o));
-      selectedCategories.forEach((c) => params.append('categories', c));
+      selectedProductCategories.forEach((c) => params.append('productCategories', c));
       if (priceRange) params.set('priceRange', priceRange);
       navigate({ pathname: ROUTES.PRODUCTS, search: params.toString() });
       requestAnimationFrame(() => {
@@ -138,7 +138,7 @@ const FilterDrawer: React.FC<Props> = ({
     } else {
       setInternalMaterials([]);
       setInternalOccasions([]);
-      setInternalCategories([]);
+      setInternalProductCategories([]);
       setInternalPriceRange('');
       // Navigate to products page with no filters
       navigate(ROUTES.PRODUCTS);
@@ -175,8 +175,8 @@ const FilterDrawer: React.FC<Props> = ({
             onToggleMaterial={(m) => toggleMaterial(m)}
             selectedOccasions={selectedOccasions}
             onToggleOccasion={(o) => toggleOccasion(o)}
-            selectedCategory={selectedCategories[0] || null}
-            onToggleCategory={(c) => toggleCategory(c)}
+            selectedProductCategory={selectedProductCategories[0] || null}
+            onToggleProductCategory={(c) => toggleProductCategory(c)}
             priceRange={priceRange}
             setPriceRange={externalSetPriceRange || setInternalPriceRange}
             clearFilters={clearFilters}

@@ -14,7 +14,7 @@ const NavigationDropdown: React.FC<Props> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const [materials, setMaterials] = useState<TaxonomyItem[]>([]);
   const [occasions, setOccasions] = useState<TaxonomyItem[]>([]);
-  const [categories, setCategories] = useState<TaxonomyItem[]>([]);
+  const [productCategories, setProductCategories] = useState<TaxonomyItem[]>([]);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -22,11 +22,11 @@ const NavigationDropdown: React.FC<Props> = ({ isOpen, onClose }) => {
     let mounted = true;
     async function load() {
       try {
-        const { materials: mats, occasions: occs, categories: cats } = await getAllTaxonomies();
+        const { materials: mats, occasions: occs, productCategories: cats } = await getAllTaxonomies();
         if (!mounted) return;
         setMaterials(mats);
         setOccasions(occs);
-        setCategories(cats);
+        setProductCategories(cats);
         setLoading(false);
       } catch (error) {
         console.error('Failed to load taxonomies', error);
@@ -48,7 +48,7 @@ const NavigationDropdown: React.FC<Props> = ({ isOpen, onClose }) => {
     } else if (type === 'occasion') {
       params.append('occasions', slug);
     } else if (type === 'category') {
-      params.append('categories', slug);
+      params.append('productCategories', slug);
     }
     navigate(`${ROUTES.PRODUCTS}?${params.toString()}`);
     onClose();
@@ -69,16 +69,13 @@ const NavigationDropdown: React.FC<Props> = ({ isOpen, onClose }) => {
           <>
             {/* Products/Categories Section */}
             <div className="nav-dropdown-section">
-              <button
-                className="nav-dropdown-section-header"
-                onClick={() => toggleSection('products')}
-              >
+              <button className="nav-dropdown-section-header" onClick={() => toggleSection('products')}>
                 <span>Products</span>
                 {expandedSection === 'products' ? <FiChevronDown /> : <FiChevronRight />}
               </button>
               {expandedSection === 'products' && (
                 <div className="nav-dropdown-section-items">
-                  {categories.map((cat) => (
+                  {productCategories.map((cat) => (
                     <button
                       key={cat.id}
                       className="nav-dropdown-item"
@@ -93,10 +90,7 @@ const NavigationDropdown: React.FC<Props> = ({ isOpen, onClose }) => {
 
             {/* Occasion Section */}
             <div className="nav-dropdown-section">
-              <button
-                className="nav-dropdown-section-header"
-                onClick={() => toggleSection('occasion')}
-              >
+              <button className="nav-dropdown-section-header" onClick={() => toggleSection('occasion')}>
                 <span>Occasion</span>
                 {expandedSection === 'occasion' ? <FiChevronDown /> : <FiChevronRight />}
               </button>
@@ -117,10 +111,7 @@ const NavigationDropdown: React.FC<Props> = ({ isOpen, onClose }) => {
 
             {/* Material Section */}
             <div className="nav-dropdown-section">
-              <button
-                className="nav-dropdown-section-header"
-                onClick={() => toggleSection('material')}
-              >
+              <button className="nav-dropdown-section-header" onClick={() => toggleSection('material')}>
                 <span>Material</span>
                 {expandedSection === 'material' ? <FiChevronDown /> : <FiChevronRight />}
               </button>

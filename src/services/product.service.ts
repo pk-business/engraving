@@ -18,7 +18,8 @@ const STRAPI_POPULATE_PARAMS = {
   gallery: { populate: '*' },
   material: { populate: '*' },
   occasions: { fields: ['name', 'slug'] },
-  categories: { fields: ['name', 'slug'] },
+  product_category: { fields: ['name', 'slug'] },
+  recipient_lists: { fields: ['name', 'slug'] },
 } as const;
 
 type UnknownRecord = Record<string, unknown>;
@@ -187,8 +188,8 @@ export function mapStrapiToProduct(item: UnknownRecord): Product {
   }
 
   const normalizedOccasions = extractNameList(attrs.occasions);
-  const normalizedCategories = extractNameList(attrs.categories);
-  const categoryList = normalizedCategories.length > 0 ? normalizedCategories : extractNameList(attrs.category);
+  const normalizedRecipientLists = extractNameList(attrs.recipient_lists);
+  const productCategoryName = extractMaterialName(attrs.product_category);
 
   return {
     id,
@@ -207,13 +208,15 @@ export function mapStrapiToProduct(item: UnknownRecord): Product {
     images,
     material: extractMaterialName(attrs.material),
     occasions: normalizedOccasions,
-    categories: categoryList,
-    category: categoryList[0] ?? '',
+    productCategory: productCategoryName || null,
+    recipientLists: normalizedRecipientLists,
     customizable: !!attrs.customizable,
     sizes: attrs.sizes || [],
     inStock: attrs.inStock !== undefined ? attrs.inStock : true,
     rating: toNumberValue(attrs.rating, 0),
     reviewCount: toNumberValue(attrs.reviewCount, 0),
+    isFeaturedProduct: !!attrs.isFeaturedProduct,
+    bulkEligible: !!attrs.bulkEligible,
   } as Product;
 }
 
@@ -275,7 +278,6 @@ class ProductService {
           const search = filters.searchQuery;
           params['filters[$or]'] = `name:contains:${search},description:contains:${search}`;
         }
-        let andIndex = 0;
         if (filters.materials && filters.materials.length > 0) {
           const cleanMaterials = filters.materials.map((m: string) => (m || '').toString().trim()).filter(Boolean);
           if (cleanMaterials.length === 1) {
@@ -296,15 +298,20 @@ class ProductService {
             });
           }
         }
-        if (filters.categories && filters.categories.length > 0) {
-          if (filters.categories.length === 1) {
-            params['filters[categories][name][$eq]'] = filters.categories[0];
+        if (filters.productCategories && filters.productCategories.length > 0) {
+          if (filters.productCategories.length === 1) {
+            params['filters[product_category][name][$eq]'] = filters.productCategories[0];
           } else {
-            filters.categories.forEach((c) => {
-              params[`filters[$and][${andIndex}][categories][name][$eq]`] = c;
-              andIndex += 1;
+            filters.productCategories.forEach((c, idx) => {
+              params[`filters[$or][${idx}][product_category][name][$eq]`] = c;
             });
           }
+        }
+        if (filters.bulkEligible !== undefined) {
+          params['filters[bulkEligible][$eq]'] = filters.bulkEligible;
+        }
+        if (filters.isFeaturedProduct !== undefined) {
+          params['filters[isFeaturedProduct][$eq]'] = filters.isFeaturedProduct;
         }
       }
 
@@ -344,7 +351,7 @@ class ProductService {
                   ] = `name:contains:${filters.searchQuery},description:contains:${filters.searchQuery}`;
                 return api
                   .get(apiPath(PRODUCTS_RESOURCE), { params: p })
-                  .then((r) => ((r.data?.data || r.data || []) as UnknownRecord[]));
+                  .then((r) => (r.data?.data || r.data || []) as UnknownRecord[]);
               })
             );
             const mergedRaw: UnknownRecord[] = [];
@@ -385,7 +392,7 @@ class ProductService {
                   ] = `name:contains:${filters.searchQuery},description:contains:${filters.searchQuery}`;
                 return api
                   .get(apiPath(PRODUCTS_RESOURCE), { params: p })
-                  .then((r) => ((r.data?.data || r.data || []) as UnknownRecord[]));
+                  .then((r) => (r.data?.data || r.data || []) as UnknownRecord[]);
               })
             );
             const mergedRaw: UnknownRecord[] = [];
@@ -493,22 +500,30 @@ class ProductService {
 
   async getFeaturedProducts(limit = 8): Promise<Product[]> {
     try {
-      const params: Record<string, unknown> = {};
+      // For Strapi API, use filters to get products where isFeaturedProduct is true
       if (IS_STRAPI_API) {
-        params['pagination[pageSize]'] = limit;
-        params.sort = 'createdAt:desc';
-        params.populate = STRAPI_POPULATE_PARAMS;
+        const params: Record<string, unknown> = {
+          'filters[isFeaturedProduct][$eq]': true,
+          'pagination[pageSize]': limit,
+          sort: 'createdAt:desc',
+          populate: STRAPI_POPULATE_PARAMS,
+        };
+
+        const res = await api.get(apiPath(PRODUCTS_RESOURCE), { params });
+        const payload = res.data;
+        const raw = (Array.isArray(payload) ? payload : payload?.data || []) as UnknownRecord[];
+        return raw.map((p) => mapStrapiToProduct(p));
       } else {
-        params._limit = limit;
-        params._sort = 'createdAt';
-        params._order = 'desc';
+        // For local/mock data, fetch all and filter by isFeaturedProduct
+        const res = await api.get(apiPath(PRODUCTS_RESOURCE));
+        const payload = res.data;
+        const raw = (Array.isArray(payload) ? payload : payload?.data || []) as UnknownRecord[];
+        const products = raw.map((p) => mapStrapiToProduct(p));
+
+        // Filter for featured products and limit
+        const featured = products.filter((p) => p.isFeaturedProduct === true);
+        return featured.slice(0, limit);
       }
-
-      const res = await api.get(apiPath(PRODUCTS_RESOURCE), { params });
-
-      const payload = res.data;
-      const raw = (Array.isArray(payload) ? payload : payload?.data || []) as UnknownRecord[];
-      return raw.map((p) => mapStrapiToProduct(p));
     } catch (err) {
       console.error('Error fetching featured products:', err);
       return [];
@@ -534,10 +549,13 @@ function applyLocalFilters(products: Product[], filters?: ProductFilter): Produc
 
   const materialFilters = normalizeList(filters.materials);
   const occasionFilters = normalizeList(filters.occasions);
-  const categoryFilters = normalizeList(filters.categories);
+  const productCategoryFilters = normalizeList(filters.productCategories);
+  const recipientListFilters = normalizeList(filters.recipientLists);
   const minPrice = filters.priceRange?.min ?? filters.minPrice;
   const maxPrice = filters.priceRange?.max ?? filters.maxPrice;
   const searchQuery = (filters.searchQuery || '').toLowerCase().trim();
+  const isFeaturedProduct = filters.isFeaturedProduct;
+  const bulkEligible = filters.bulkEligible;
 
   return products.filter((product) => {
     if (materialFilters && materialFilters.length > 0) {
@@ -548,23 +566,24 @@ function applyLocalFilters(products: Product[], filters?: ProductFilter): Produc
     }
 
     if (occasionFilters && occasionFilters.length > 0) {
-      const productOccasions = (product.occasions || [])
-        .map((occ) => slugify((occ || '').toString()))
-        .filter(Boolean);
+      const productOccasions = (product.occasions || []).map((occ) => slugify((occ || '').toString())).filter(Boolean);
       if (!productOccasions.some((occ) => occasionFilters.includes(occ))) {
         return false;
       }
     }
 
-    if (categoryFilters && categoryFilters.length > 0) {
-      const productCategories = (product.categories || [])
-        .map((cat) => slugify((cat || '').toString()))
+    if (productCategoryFilters && productCategoryFilters.length > 0) {
+      const productCategory = slugify((product.productCategory || '').toString());
+      if (!productCategory || !productCategoryFilters.includes(productCategory)) {
+        return false;
+      }
+    }
+
+    if (recipientListFilters && recipientListFilters.length > 0) {
+      const productRecipients = (product.recipientLists || [])
+        .map((rec) => slugify((rec || '').toString()))
         .filter(Boolean);
-      const primaryCategory = slugify((product.category || '').toString());
-      const matches =
-        productCategories.some((cat) => categoryFilters.includes(cat)) ||
-        (!!primaryCategory && categoryFilters.includes(primaryCategory));
-      if (!matches) {
+      if (!productRecipients.some((rec) => recipientListFilters.includes(rec))) {
         return false;
       }
     }
@@ -583,6 +602,14 @@ function applyLocalFilters(products: Product[], filters?: ProductFilter): Produc
       if (!name.includes(searchQuery) && !description.includes(searchQuery)) {
         return false;
       }
+    }
+
+    if (typeof isFeaturedProduct === 'boolean' && product.isFeaturedProduct !== isFeaturedProduct) {
+      return false;
+    }
+
+    if (typeof bulkEligible === 'boolean' && product.bulkEligible !== bulkEligible) {
+      return false;
     }
 
     return true;

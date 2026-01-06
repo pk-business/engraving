@@ -9,7 +9,7 @@ import FiltersSidebar from '../../components/Filters/FiltersSidebar';
 import FilterDrawer from '../../components/FilterDrawer/FilterDrawer';
 import AppliedFiltersChips from '../../components/Filters/AppliedFiltersChips';
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs';
-import { getCategories, type TaxonomyItem } from '../../services/taxonomy.service';
+import { getProductCategories, type TaxonomyItem } from '../../services/taxonomy.service';
 import { PAGINATION } from '../../constants';
 import './ProductsPage.css';
 const categoryMap: Record<string, string[]> = {
@@ -72,8 +72,8 @@ const ProductsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [categories, setCategories] = useState<TaxonomyItem[]>([]);
+  const [selectedProductCategory, setSelectedProductCategory] = useState<string | null>(null);
+  const [productCategories, setProductCategories] = useState<TaxonomyItem[]>([]);
   const [priceRange, setPriceRange] = useState<string>('');
   const [sortBy, setSortBy] = useState('featured');
   const [page, setPage] = useState(1);
@@ -100,8 +100,8 @@ const ProductsPage: React.FC = () => {
     const qParam = searchParams.get('q');
     const occasionParam = searchParams.getAll('occasions');
     const occasionSingle = searchParams.get('occasion');
-    const categoryParam = searchParams.get('category');
-    const categoriesParams = searchParams.getAll('categories');
+    const productCategoryParam = searchParams.get('productCategory');
+    const productCategoriesParams = searchParams.getAll('productCategories');
     const materialsParams = searchParams.getAll('materials');
 
     if (qParam) {
@@ -112,16 +112,18 @@ const ProductsPage: React.FC = () => {
 
     const occasionsToSet = occasionParam.length > 0 ? occasionParam : occasionSingle ? [occasionSingle] : [];
 
-    const explicitCategories = categoriesParams.length > 0 ? categoriesParams : categoryParam ? [categoryParam] : [];
-    const derivedCategories = explicitCategories.length === 0 ? deriveCategoriesFromOccasions(occasionsToSet, 1) : [];
-    const categoriesToUse = explicitCategories.length > 0 ? explicitCategories : derivedCategories;
+    const explicitProductCategories =
+      productCategoriesParams.length > 0 ? productCategoriesParams : productCategoryParam ? [productCategoryParam] : [];
+    const derivedCategories =
+      explicitProductCategories.length === 0 ? deriveCategoriesFromOccasions(occasionsToSet, 1) : [];
+    const categoriesToUse = explicitProductCategories.length > 0 ? explicitProductCategories : derivedCategories;
 
     if (categoriesToUse.length > 0) {
       const firstCat = categoriesToUse[0];
-      setSelectedCategory(firstCat);
+      setSelectedProductCategory(firstCat);
 
       // Only override occasions if URL doesn't have explicit occasions
-      if (explicitCategories.length > 0 && occasionsToSet.length === 0) {
+      if (explicitProductCategories.length > 0 && occasionsToSet.length === 0) {
         const mapped = categoryMap[firstCat];
         if (mapped && mapped.length > 0) {
           setSelectedOccasions(mapped);
@@ -132,7 +134,7 @@ const ProductsPage: React.FC = () => {
         setSelectedOccasions(occasionsToSet);
       }
     } else {
-      setSelectedCategory(null);
+      setSelectedProductCategory(null);
       setSelectedOccasions(occasionsToSet);
     }
 
@@ -152,9 +154,14 @@ const ProductsPage: React.FC = () => {
     if (mats && mats.length > 0) filters.materials = mats;
     const occs = params.getAll('occasions');
     if (occs && occs.length > 0) filters.occasions = occs;
-    const categoriesParams = params.getAll('categories');
-    const singleCategory = params.get('category');
-    let cats = categoriesParams.length > 0 ? categoriesParams : singleCategory ? [singleCategory] : [];
+    const productCategoriesParams = params.getAll('productCategories');
+    const singleProductCategory = params.get('productCategory');
+    let cats =
+      productCategoriesParams.length > 0
+        ? productCategoriesParams
+        : singleProductCategory
+        ? [singleProductCategory]
+        : [];
     if ((!cats || cats.length === 0) && occs && occs.length > 0) {
       const derivedCats = deriveCategoriesFromOccasions(occs, 1);
       if (derivedCats.length > 0) {
@@ -162,7 +169,7 @@ const ProductsPage: React.FC = () => {
       }
     }
     if (cats && cats.length > 0) {
-      filters.categories = cats;
+      filters.productCategories = cats;
       if ((!filters.occasions || filters.occasions.length === 0) && cats[0]) {
         const mappedOccasions = categoryMap[cats[0]];
         if (mappedOccasions && mappedOccasions.length > 0) {
@@ -174,6 +181,11 @@ const ProductsPage: React.FC = () => {
     const maxP = params.get('maxPrice');
     if (minP) filters.minPrice = parseFloat(minP);
     if (maxP) filters.maxPrice = parseFloat(maxP);
+
+    const bulkEligibleParam = params.get('bulkEligible');
+    if (bulkEligibleParam === 'true') {
+      filters.bulkEligible = true;
+    }
 
     const pageParam = params.get('page');
     if (pageParam) {
@@ -192,9 +204,9 @@ const ProductsPage: React.FC = () => {
     let mounted = true;
     (async () => {
       try {
-        const cats = await getCategories();
+        const cats = await getProductCategories();
         if (!mounted) return;
-        setCategories(cats);
+        setProductCategories(cats);
       } catch (err) {
         console.error('Failed to load categories', err);
       }
@@ -220,7 +232,7 @@ const ProductsPage: React.FC = () => {
     return {
       materials: selectedMaterials.length > 0 ? selectedMaterials : undefined,
       occasions: selectedOccasions.length > 0 ? selectedOccasions : undefined,
-      categories: selectedCategory ? [selectedCategory] : undefined,
+      productCategories: selectedProductCategory ? [selectedProductCategory] : undefined,
       minPrice: typeof priceValues.min === 'number' ? priceValues.min : undefined,
       maxPrice: typeof priceValues.max === 'number' ? priceValues.max : undefined,
       searchQuery: searchQuery ? searchQuery : undefined,
@@ -319,7 +331,7 @@ const ProductsPage: React.FC = () => {
   const hasFiltersToApply = Boolean(
     appliedFilterSnapshot &&
       (appliedFilterSnapshot.occasions?.length ||
-        appliedFilterSnapshot.categories?.length ||
+        appliedFilterSnapshot.productCategories?.length ||
         appliedFilterSnapshot.materials?.length ||
         appliedFilterSnapshot.minPrice ||
         appliedFilterSnapshot.maxPrice ||
@@ -379,7 +391,7 @@ const ProductsPage: React.FC = () => {
   const clearFilters = () => {
     setSelectedMaterials([]);
     setSelectedOccasions([]);
-    setSelectedCategory(null);
+    setSelectedProductCategory(null);
     setPriceRange('');
     setSearchQuery('');
     setSortBy('featured');
@@ -399,19 +411,19 @@ const ProductsPage: React.FC = () => {
     );
   };
 
-  // categories are now loaded from the taxonomy API and used in the sidebar
+  // productCategories are now loaded from the taxonomy API and used in the sidebar
 
-  const toggleCategory = (categoryKey: string) => {
-    if (selectedCategory === categoryKey) {
+  const toggleProductCategory = (categoryKey: string) => {
+    if (selectedProductCategory === categoryKey) {
       // clear selection and URL
-      setSelectedCategory(null);
+      setSelectedProductCategory(null);
       setSelectedOccasions([]);
       setSearchParams({});
       return;
     }
 
     // set selection and map to occasions where applicable
-    setSelectedCategory(categoryKey);
+    setSelectedProductCategory(categoryKey);
     const mapped = categoryMap[categoryKey];
     if (mapped && mapped.length > 0) {
       setSelectedOccasions(mapped);
@@ -420,10 +432,11 @@ const ProductsPage: React.FC = () => {
     }
 
     // sync selection to URL so the Products page can be linked/shared
-    setSearchParams({ category: categoryKey });
+    setSearchParams({ productCategory: categoryKey });
   };
 
-  const selectedCategoryLabel = categories.find((c) => (c.slug || c.name) === selectedCategory)?.name || null;
+  const selectedProductCategoryLabel =
+    productCategories.find((c) => (c.slug || c.name) === selectedProductCategory)?.name || null;
 
   // Memoize display filters for chips
   const displayFilters = React.useMemo(() => {
@@ -431,18 +444,18 @@ const ProductsPage: React.FC = () => {
     const { page, pageSize, ...userFilters } = appliedFilterSnapshot;
     // Hide auto-mapped occasions when category is selected and occasions are not explicitly chosen
     const explicitOccasions = searchParams.getAll('occasions');
-    const explicitCategories = searchParams.getAll('categories');
-    const categoryParam = searchParams.get('category');
+    const explicitProductCategories = searchParams.getAll('productCategories');
+    const productCategoryParam = searchParams.get('productCategory');
     const hasExplicitOccasions = explicitOccasions.length > 0;
-    const hasExplicitCategory = explicitCategories.length > 0 || !!categoryParam;
+    const hasExplicitProductCategory = explicitProductCategories.length > 0 || !!productCategoryParam;
     if (
-      hasExplicitCategory &&
+      hasExplicitProductCategory &&
       !hasExplicitOccasions &&
-      userFilters.categories &&
+      userFilters.productCategories &&
       userFilters.occasions &&
       userFilters.occasions.length > 0
     ) {
-      // Only show category chip, hide auto-mapped occasions
+      // Only show productCategory chip, hide auto-mapped occasions
       const { occasions, ...rest } = userFilters;
       return rest as NonNullable<typeof appliedFilterSnapshot>;
     }
@@ -453,7 +466,7 @@ const ProductsPage: React.FC = () => {
   useEffect(() => {
     applyFilters(undefined, { resetPage: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory, selectedMaterials, selectedOccasions, priceRange, searchQuery]);
+  }, [selectedProductCategory, selectedMaterials, selectedOccasions, priceRange, searchQuery]);
 
   return (
     <div className="products-page">
@@ -463,8 +476,8 @@ const ProductsPage: React.FC = () => {
         onToggleMaterial={toggleMaterial}
         selectedOccasions={selectedOccasions}
         onToggleOccasion={toggleOccasion}
-        selectedCategory={selectedCategory}
-        onToggleCategory={toggleCategory}
+        selectedProductCategory={selectedProductCategory}
+        onToggleProductCategory={toggleProductCategory}
         priceRange={priceRange}
         setPriceRange={setPriceRange}
         clearFilters={clearFilters}
@@ -475,7 +488,7 @@ const ProductsPage: React.FC = () => {
         <Breadcrumbs items={[{ label: 'Products' }]} />
 
         <div className="products-header">
-          <h1>{selectedCategoryLabel || 'Our Products'}</h1>
+          <h1>{selectedProductCategoryLabel || 'Our Products'}</h1>
           <div className="products-controls">
             <select className="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
               <option value="featured">Sort by: Featured</option>
@@ -498,8 +511,8 @@ const ProductsPage: React.FC = () => {
                   setSelectedMaterials((prev) => prev.filter((m) => m !== value));
                 } else if (type === 'occasions') {
                   setSelectedOccasions((prev) => prev.filter((o) => o !== value));
-                } else if (type === 'categories') {
-                  setSelectedCategory(null);
+                } else if (type === 'productCategories') {
+                  setSelectedProductCategory(null);
                   setSelectedOccasions([]);
                 } else if (type === 'priceRange') {
                   // Clear both min and max when removing combined price range chip
@@ -601,8 +614,8 @@ const ProductsPage: React.FC = () => {
         onToggleMaterial={toggleMaterial}
         selectedOccasions={selectedOccasions}
         onToggleOccasion={toggleOccasion}
-        selectedCategory={selectedCategory}
-        onToggleCategory={toggleCategory}
+        selectedProductCategory={selectedProductCategory}
+        onToggleProductCategory={toggleProductCategory}
         priceRange={priceRange}
         setPriceRange={setPriceRange}
         onApply={applyFilters}

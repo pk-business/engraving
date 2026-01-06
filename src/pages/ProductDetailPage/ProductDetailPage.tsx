@@ -134,13 +134,8 @@ const ProductDetailPage: React.FC = () => {
 
   return (
     <div className="product-detail-page">
-      <Breadcrumbs 
-        items={[
-          { label: 'Products', path: ROUTES.PRODUCTS },
-          { label: product.name }
-        ]} 
-      />
-      
+      <Breadcrumbs items={[{ label: 'Products', path: ROUTES.PRODUCTS }, { label: product.name }]} />
+
       <div className="product-container">
         {/* Image Gallery */}
         <div className="image-section">
@@ -163,18 +158,24 @@ const ProductDetailPage: React.FC = () => {
         <div className="product-info">
           <h1>{product.name}</h1>
           <div className="product-rating">
-            <span className="stars">
-              {renderStars(product.rating || 0)}
-            </span>
+            <span className="stars">{renderStars(product.rating || 0)}</span>
             <span className="review-count">({product.reviewCount || 0} reviews)</span>
           </div>
           <div className="product-price">${product.price.toFixed(2)}</div>
           <p className="product-description">{product.description}</p>
 
           <div className="product-meta">
-            <p><strong>Material:</strong> {product.material.charAt(0).toUpperCase() + product.material.slice(1)}</p>
-            <p><strong>Category:</strong> {product.category}</p>
-            <p><strong>Stock:</strong> {product.inStock ? 'In Stock' : 'Out of Stock'}</p>
+            <p>
+              <strong>Material:</strong> {product.material.charAt(0).toUpperCase() + product.material.slice(1)}
+            </p>
+            {product.productCategory && (
+              <p>
+                <strong>Category:</strong> {product.productCategory}
+              </p>
+            )}
+            <p>
+              <strong>Stock:</strong> {product.inStock ? 'In Stock' : 'Out of Stock'}
+            </p>
           </div>
 
           {/* Material & Occasion Tags */}
@@ -191,11 +192,7 @@ const ProductDetailPage: React.FC = () => {
           {product.sizes && product.sizes.length > 0 && (
             <div className="product-option">
               <label>Size:</label>
-              <select
-                value={selectedSize}
-                onChange={(e) => setSelectedSize(e.target.value)}
-                className="size-select"
-              >
+              <select value={selectedSize} onChange={(e) => setSelectedSize(e.target.value)} className="size-select">
                 {product.sizes.map((size) => (
                   <option key={size} value={size}>
                     {size}
@@ -263,16 +260,9 @@ const ProductDetailPage: React.FC = () => {
               <label>Upload Custom Image:</label>
               <div className="file-input-wrapper">
                 <FiUpload className="upload-icon" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="file-input"
-                />
+                <input type="file" accept="image/*" onChange={handleImageUpload} className="file-input" />
               </div>
-              {customImage && (
-                <p className="file-name">Selected: {customImage.name}</p>
-              )}
+              {customImage && <p className="file-name">Selected: {customImage.name}</p>}
             </div>
 
             {/* Live Preview */}
@@ -280,15 +270,9 @@ const ProductDetailPage: React.FC = () => {
               <h3>Live Preview</h3>
               <div className="preview-box">
                 {customText && <p className="preview-text">{customText}</p>}
-                {customImage && (
-                  <p className="preview-image-info">
-                    Image: {customImage.name}
-                  </p>
-                )}
+                {customImage && <p className="preview-image-info">Image: {customImage.name}</p>}
                 {!customText && !customImage && (
-                  <p className="preview-placeholder">
-                    Your customization will appear here
-                  </p>
+                  <p className="preview-placeholder">Your customization will appear here</p>
                 )}
               </div>
             </div>
@@ -312,9 +296,7 @@ const ProductDetailPage: React.FC = () => {
           <li>High-quality {product.material} material</li>
           <li>Perfect for: {product.occasions.join(', ')}</li>
           {product.customizable && <li>Fully customizable with text and images</li>}
-          {product.sizes && product.sizes.length > 0 && (
-            <li>Available sizes: {product.sizes.join(', ')}</li>
-          )}
+          {product.sizes && product.sizes.length > 0 && <li>Available sizes: {product.sizes.join(', ')}</li>}
         </ul>
       </div>
     </div>
