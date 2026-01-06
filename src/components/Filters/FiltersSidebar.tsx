@@ -11,8 +11,8 @@ interface Props {
   onToggleMaterial: (m: string) => void;
   selectedOccasions: string[];
   onToggleOccasion: (o: string) => void;
-  selectedCategory: string | null;
-  onToggleCategory: (k: string) => void;
+  selectedProductCategory: string | null;
+  onToggleProductCategory: (k: string) => void;
   priceRange: string;
   setPriceRange: (v: string) => void;
   clearFilters: () => void;
@@ -26,8 +26,8 @@ const FiltersSidebar: React.FC<Props> = ({
   onToggleMaterial,
   selectedOccasions,
   onToggleOccasion,
-  selectedCategory,
-  onToggleCategory,
+  selectedProductCategory,
+  onToggleProductCategory,
   priceRange,
   setPriceRange,
   clearFilters,
@@ -39,7 +39,7 @@ const FiltersSidebar: React.FC<Props> = ({
   const location = useLocation();
   const [materials, setMaterials] = useState<TaxonomyItem[]>([]);
   const [occasions, setOccasions] = useState<TaxonomyItem[]>([]);
-  const [categories, setCategories] = useState<TaxonomyItem[]>([]);
+  const [productCategories, setProductCategories] = useState<TaxonomyItem[]>([]);
   const [loading, setLoading] = useState(true);
   const pendingProducts = useIsFetching({ queryKey: ['products'] });
   const isApplying = pendingProducts > 0;
@@ -48,7 +48,7 @@ const FiltersSidebar: React.FC<Props> = ({
     return {
       materials: normalizeList(params.getAll('materials')),
       occasions: normalizeList(params.getAll('occasions')),
-      category: params.getAll('categories')[0] || null,
+      productCategory: params.getAll('productCategories')[0] || null,
       priceRange: params.get('priceRange') || '',
     };
   }, [location.search]);
@@ -56,20 +56,20 @@ const FiltersSidebar: React.FC<Props> = ({
     if (!showApply) return false;
     const materialsMatch = arraysEqual(normalizeList(selectedMaterials), appliedFilters.materials);
     const occasionsMatch = arraysEqual(normalizeList(selectedOccasions), appliedFilters.occasions);
-    const categoryMatch = (selectedCategory || null) === appliedFilters.category;
+    const productCategoryMatch = (selectedProductCategory || null) === appliedFilters.productCategory;
     const priceMatch = (priceRange || '') === appliedFilters.priceRange;
-    return !(materialsMatch && occasionsMatch && categoryMatch && priceMatch);
-  }, [appliedFilters, priceRange, selectedCategory, selectedMaterials, selectedOccasions, showApply]);
+    return !(materialsMatch && occasionsMatch && productCategoryMatch && priceMatch);
+  }, [appliedFilters, priceRange, selectedProductCategory, selectedMaterials, selectedOccasions, showApply]);
 
   useEffect(() => {
     let mounted = true;
     async function load() {
       setLoading(true);
-      const { materials: mats, occasions: occs, categories: cats } = await getAllTaxonomies();
+      const { materials: mats, occasions: occs, productCategories: cats } = await getAllTaxonomies();
       if (!mounted) return;
       setMaterials(mats);
       setOccasions(occs);
-      setCategories(cats);
+      setProductCategories(cats);
       setLoading(false);
     }
     load();
@@ -121,28 +121,28 @@ const FiltersSidebar: React.FC<Props> = ({
       </div>
 
       <div className="filter-section">
-        <h3>Category</h3>
+        <h3>Product Category</h3>
         <div className="filter-options">
           {loading ? (
             <div>Loading…</div>
           ) : (
-            categories.map((c) => {
+            productCategories.map((c) => {
               const key = c.slug || c.name;
               return (
                 <label key={key} className="filter-option">
                   <input
                     type="radio"
-                    name="category"
-                    checked={selectedCategory === key}
+                    name="productCategory"
+                    checked={selectedProductCategory === key}
                     // onClick handles the case of clicking the already-selected radio
                     // (HTML radio inputs don't fire onChange when clicking the checked item).
                     onClick={() => {
-                      if (selectedCategory === key) {
-                        onToggleCategory(String(key));
+                      if (selectedProductCategory === key) {
+                        onToggleProductCategory(String(key));
                       }
                     }}
                     // onChange handles normal selection of a different radio option
-                    onChange={() => onToggleCategory(String(key))}
+                    onChange={() => onToggleProductCategory(String(key))}
                   />
                   <span>{c.name}</span>
                 </label>
@@ -219,13 +219,13 @@ const FiltersSidebar: React.FC<Props> = ({
                 const params = new URLSearchParams(location.search);
                 params.delete('materials');
                 params.delete('occasions');
-                params.delete('categories');
+                params.delete('productCategories');
                 params.delete('page');
                 params.delete('priceRange');
                 // append current selections
                 selectedMaterials.forEach((m) => params.append('materials', m));
                 selectedOccasions.forEach((o) => params.append('occasions', o));
-                if (selectedCategory) params.append('categories', selectedCategory);
+                if (selectedProductCategory) params.append('productCategories', selectedProductCategory);
                 if (priceRange) params.set('priceRange', priceRange);
                 const nextSearch = params.toString();
                 const normalizedCurrent = location.search.startsWith('?') ? location.search.slice(1) : location.search;

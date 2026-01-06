@@ -33,7 +33,7 @@ describe('getAllTaxonomies', () => {
     const first = await taxonomy.getAllTaxonomies();
     expect(first.materials[0].name).toBe('Wood');
     expect(first.occasions[0].name).toBe('Birthday');
-    expect(first.categories[0].name).toBe('Gifts');
+    expect(first.productCategories[0].name).toBe('Gifts');
 
     // API should have been called three times
     expect(mockedApiGet.mock.calls.length).toBe(3);

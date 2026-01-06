@@ -34,20 +34,22 @@ export interface Product {
   images: string[];
   material: MaterialType | string;
   occasions: OccasionType[] | string[];
-  /** Optional categories/tags for higher-level browsing (e.g. 'personal-milestones', 'home-living') */
-  categories?: string[];
-  category: string;
+  productCategory: string | null;
+  recipientLists?: string[];
   customizable: boolean;
   sizes?: string[];
   inStock: boolean;
   rating?: number;
   reviewCount?: number;
+  isFeaturedProduct?: boolean;
+  bulkEligible?: boolean;
 }
 
 export interface ProductFilter {
   materials?: string[];
   occasions?: string[];
-  categories?: string[];
+  productCategories?: string[];
+  recipientLists?: string[];
   priceRange?: {
     min: number;
     max: number;
@@ -57,6 +59,8 @@ export interface ProductFilter {
   searchQuery?: string;
   page?: number;
   pageSize?: number;
+  isFeaturedProduct?: boolean;
+  bulkEligible?: boolean;
 }
 
 export interface ProductListResponse {
