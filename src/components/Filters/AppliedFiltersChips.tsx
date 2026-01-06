@@ -1,13 +1,20 @@
 import React from 'react';
 import './AppliedFiltersChips.css';
 
-type FilterType = 'materials' | 'occasions' | 'categories' | 'minPrice' | 'maxPrice' | 'searchQuery' | 'priceRange';
+type FilterType =
+  | 'materials'
+  | 'occasions'
+  | 'productCategories'
+  | 'minPrice'
+  | 'maxPrice'
+  | 'searchQuery'
+  | 'priceRange';
 
 interface AppliedFiltersChipsProps {
   filters: {
     materials?: string[];
     occasions?: string[];
-    categories?: string[];
+    productCategories?: string[];
     minPrice?: number;
     maxPrice?: number;
     searchQuery?: string;
@@ -19,7 +26,7 @@ interface AppliedFiltersChipsProps {
 const labelMap: Record<FilterType, string> = {
   materials: 'Material',
   occasions: 'Occasion',
-  categories: 'Category',
+  productCategories: 'Product Category',
   minPrice: 'Min Price',
   maxPrice: 'Max Price',
   searchQuery: 'Search',

@@ -57,10 +57,16 @@ async function fetchTaxonomy(collection: string): Promise<TaxonomyItem[]> {
   }
 }
 
-export async function getCategories(): Promise<TaxonomyItem[]> {
-  if (_cachedCategories) return _cachedCategories;
-  const { categories } = await getAllTaxonomies();
-  return categories;
+export async function getProductCategories(): Promise<TaxonomyItem[]> {
+  if (_cachedProductCategories) return _cachedProductCategories;
+  const { productCategories } = await getAllTaxonomies();
+  return productCategories;
+}
+
+export async function getRecipientLists(): Promise<TaxonomyItem[]> {
+  if (_cachedRecipientLists) return _cachedRecipientLists;
+  const { recipientLists } = await getAllTaxonomies();
+  return recipientLists;
 }
 
 export async function getMaterials(): Promise<TaxonomyItem[]> {
@@ -78,19 +84,22 @@ export async function getOccasions(): Promise<TaxonomyItem[]> {
 // Simple in-memory cache so each taxonomy is fetched only once per session.
 let _cachedMaterials: TaxonomyItem[] | null = null;
 let _cachedOccasions: TaxonomyItem[] | null = null;
-let _cachedCategories: TaxonomyItem[] | null = null;
+let _cachedProductCategories: TaxonomyItem[] | null = null;
+let _cachedRecipientLists: TaxonomyItem[] | null = null;
 
 export async function getAllTaxonomies(): Promise<{
   materials: TaxonomyItem[];
   occasions: TaxonomyItem[];
-  categories: TaxonomyItem[];
+  productCategories: TaxonomyItem[];
+  recipientLists: TaxonomyItem[];
 }> {
   // 1) In-memory cache (fast, per-page)
-  if (_cachedMaterials && _cachedOccasions && _cachedCategories) {
+  if (_cachedMaterials && _cachedOccasions && _cachedProductCategories && _cachedRecipientLists) {
     return {
       materials: _cachedMaterials,
       occasions: _cachedOccasions,
-      categories: _cachedCategories,
+      productCategories: _cachedProductCategories,
+      recipientLists: _cachedRecipientLists,
     };
   }
 
@@ -103,14 +112,21 @@ export async function getAllTaxonomies(): Promise<{
         ts: number;
         materials: TaxonomyItem[];
         occasions: TaxonomyItem[];
-        categories: TaxonomyItem[];
+        productCategories: TaxonomyItem[];
+        recipientLists: TaxonomyItem[];
       };
       const TTL = parseInt((import.meta.env.VITE_TAXONOMY_TTL_SECONDS as string) || '86400', 10) * 1000; // default 24h
       if (parsed && parsed.ts && Date.now() - parsed.ts < TTL) {
         _cachedMaterials = parsed.materials;
         _cachedOccasions = parsed.occasions;
-        _cachedCategories = parsed.categories;
-        return { materials: _cachedMaterials, occasions: _cachedOccasions, categories: _cachedCategories };
+        _cachedProductCategories = parsed.productCategories;
+        _cachedRecipientLists = parsed.recipientLists;
+        return {
+          materials: _cachedMaterials,
+          occasions: _cachedOccasions,
+          productCategories: _cachedProductCategories,
+          recipientLists: _cachedRecipientLists,
+        };
       }
     }
   } catch {
@@ -118,33 +134,36 @@ export async function getAllTaxonomies(): Promise<{
   }
 
   // 3) Network fallback — fetch and persist
-  const [materials, occasions, categories] = await Promise.all([
+  const [materials, occasions, productCategories, recipientLists] = await Promise.all([
     _cachedMaterials ? Promise.resolve(_cachedMaterials) : fetchTaxonomy('materials'),
     _cachedOccasions ? Promise.resolve(_cachedOccasions) : fetchTaxonomy('occasions'),
-    _cachedCategories ? Promise.resolve(_cachedCategories) : fetchTaxonomy('categories'),
+    _cachedProductCategories ? Promise.resolve(_cachedProductCategories) : fetchTaxonomy('product-categories'),
+    _cachedRecipientLists ? Promise.resolve(_cachedRecipientLists) : fetchTaxonomy('recipient-lists'),
   ]);
 
   _cachedMaterials = materials;
   _cachedOccasions = occasions;
-  _cachedCategories = categories;
+  _cachedProductCategories = productCategories;
+  _cachedRecipientLists = recipientLists;
 
   // persist to localStorage
   try {
     const key = 'taxonomies:v1';
-    const payload = { ts: Date.now(), materials, occasions, categories };
+    const payload = { ts: Date.now(), materials, occasions, productCategories, recipientLists };
     localStorage.setItem(key, JSON.stringify(payload));
   } catch {
     // ignore storage failures
   }
 
-  return { materials, occasions, categories };
+  return { materials, occasions, productCategories, recipientLists };
 }
 
 // Optional: allow manual cache invalidation if you update taxonomies server-side
 export function invalidateTaxonomyCache() {
   _cachedMaterials = null;
   _cachedOccasions = null;
-  _cachedCategories = null;
+  _cachedProductCategories = null;
+  _cachedRecipientLists = null;
 }
 
 // Also clear persisted cache
@@ -158,7 +177,8 @@ export function invalidatePersistedTaxonomyCache() {
 }
 
 export default {
-  getCategories,
+  getProductCategories,
+  getRecipientLists,
   getMaterials,
   getOccasions,
 };
