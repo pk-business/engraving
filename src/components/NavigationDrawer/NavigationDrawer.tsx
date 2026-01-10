@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { FiChevronRight, FiChevronLeft } from 'react-icons/fi';
-import { getAllTaxonomies, type TaxonomyItem } from '../../services/taxonomy.service';
-import { ROUTES } from '../../constants';
+import { BULK_ORDER_CATEGORIES } from '../../constants';
+import { useTaxonomies } from '../../hooks/useTaxonomies';
+import { navigateToProducts, navigateToBulkProducts } from '../../utils/navigationHelpers';
 import './NavigationDrawer.css';
 
 interface Props {
@@ -13,23 +14,13 @@ interface Props {
 
 type SubMenuType = 'occasion' | 'recipient' | 'product' | 'bulk' | null;
 
-const BULK_ORDER_CATEGORIES = [
-  { id: 'drinkware', name: 'Drinkware', slug: 'drinkware' },
-  { id: 'coasters', name: 'Coasters', slug: 'coasters' },
-  { id: 'plaques', name: 'Plaques', slug: 'plaques' },
-  { id: 'accessories', name: 'Accessories', slug: 'accessories' },
-];
-
 const NavigationDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const panelRef = useRef<HTMLDivElement | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const previousActiveRef = useRef<Element | null>(null);
 
-  const [productCategories, setProductCategories] = useState<TaxonomyItem[]>([]);
-  const [recipientLists, setRecipientLists] = useState<TaxonomyItem[]>([]);
-  const [occasions, setOccasions] = useState<TaxonomyItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { occasions, recipientLists, productCategories, loading } = useTaxonomies({ loadOnOpen: isOpen });
 
   const [activeSubMenu, setActiveSubMenu] = useState<SubMenuType>(null);
 
@@ -38,22 +29,6 @@ const NavigationDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
       previousActiveRef.current = document.activeElement;
       document.body.style.overflow = 'hidden';
       setTimeout(() => closeBtnRef.current?.focus(), 50);
-
-      // Load taxonomies
-      let mounted = true;
-      async function load() {
-        setLoading(true);
-        const { productCategories: cats, recipientLists: recs, occasions: occs } = await getAllTaxonomies();
-        if (!mounted) return;
-        setProductCategories(cats);
-        setRecipientLists(recs);
-        setOccasions(occs);
-        setLoading(false);
-      }
-      load();
-      return () => {
-        mounted = false;
-      };
     } else {
       document.body.style.overflow = '';
       setActiveSubMenu(null);
@@ -102,18 +77,11 @@ const NavigationDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   };
 
   const handleItemClick = (type: 'occasions' | 'recipientLists' | 'productCategories', value: string) => {
-    const params = new URLSearchParams();
-    params.set(type, value);
-    navigate({ pathname: ROUTES.PRODUCTS, search: params.toString() });
-    onClose();
+    navigateToProducts(navigate, type, value, onClose);
   };
 
   const handleBulkCategoryClick = (categorySlug: string) => {
-    const params = new URLSearchParams();
-    params.set('bulkEligible', 'true');
-    params.set('productCategories', categorySlug);
-    navigate({ pathname: ROUTES.PRODUCTS, search: params.toString() });
-    onClose();
+    navigateToBulkProducts(navigate, categorySlug, onClose);
   };
 
   if (!isOpen) return null;

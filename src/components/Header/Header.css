@@ -13,7 +13,7 @@
 .header-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-lg) 0;
     min-height: var(--header-height);
   display: flex;
   flex-direction: column;
@@ -89,7 +89,7 @@
     width: 100%;
     justify-content: center;
     order: 10;
-    padding: var(--spacing-sm) 0;
+    padding: 6px 0 12px 0;
       gap: 2rem;
       position: relative;
       z-index: 1100;

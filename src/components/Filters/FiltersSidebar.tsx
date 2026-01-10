@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIsFetching } from '@tanstack/react-query';
-import { getAllTaxonomies, type TaxonomyItem } from '../../services/taxonomy.service';
+import { useTaxonomies } from '../../hooks/useTaxonomies';
 
 const normalizeList = (values: string[]) => Array.from(new Set(values)).sort();
 const arraysEqual = (a: string[], b: string[]) => a.length === b.length && a.every((val, idx) => val === b[idx]);
@@ -37,10 +37,7 @@ const FiltersSidebar: React.FC<Props> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [materials, setMaterials] = useState<TaxonomyItem[]>([]);
-  const [occasions, setOccasions] = useState<TaxonomyItem[]>([]);
-  const [productCategories, setProductCategories] = useState<TaxonomyItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { materials, occasions, productCategories, loading } = useTaxonomies();
   const pendingProducts = useIsFetching({ queryKey: ['products'] });
   const isApplying = pendingProducts > 0;
   const appliedFilters = useMemo(() => {
@@ -60,23 +57,6 @@ const FiltersSidebar: React.FC<Props> = ({
     const priceMatch = (priceRange || '') === appliedFilters.priceRange;
     return !(materialsMatch && occasionsMatch && productCategoryMatch && priceMatch);
   }, [appliedFilters, priceRange, selectedProductCategory, selectedMaterials, selectedOccasions, showApply]);
-
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      setLoading(true);
-      const { materials: mats, occasions: occs, productCategories: cats } = await getAllTaxonomies();
-      if (!mounted) return;
-      setMaterials(mats);
-      setOccasions(occs);
-      setProductCategories(cats);
-      setLoading(false);
-    }
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   return (
     <aside className="filters-sidebar">
