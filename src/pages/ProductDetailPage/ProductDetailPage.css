@@ -95,7 +95,8 @@
   font-size: 2rem;
   font-weight: 700;
   color: #2FA4A9;
-  margin-bottom: 20px;
+  font-size: 1.5rem;
+  margin-bottom: 6px;
 }
 
 .product-description {
@@ -470,11 +471,6 @@
   .product-info h1 {
     font-size: 1.5rem;
     margin-bottom: 12px;
-  }
-
-  .product-price {
-    font-size: 1.5rem;
-    margin-bottom: 16px;
   }
 
   .product-description {

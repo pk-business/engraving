@@ -20,3 +20,11 @@ export const PAGINATION = {
   PRODUCTS_PER_PAGE: 12,
   BLOG_POSTS_PER_PAGE: 9,
 } as const;
+
+// Bulk order categories for team/corporate orders
+export const BULK_ORDER_CATEGORIES = [
+  { id: 'drinkware', name: 'Drinkware', slug: 'drinkware' },
+  { id: 'coasters', name: 'Coasters', slug: 'coasters' },
+  { id: 'plaques', name: 'Plaques', slug: 'plaques' },
+  { id: 'accessories', name: 'Accessories', slug: 'accessories' },
+] as const;

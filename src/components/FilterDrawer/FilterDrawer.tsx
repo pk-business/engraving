@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants';
+import { buildFilterSearchParams } from '../../utils/navigationHelpers';
 import './FilterDrawer.css';
 import FiltersSidebar from '../Filters/FiltersSidebar';
 
@@ -118,11 +119,12 @@ const FilterDrawer: React.FC<Props> = ({
       externalOnApply();
       onClose();
     } else {
-      const params = new URLSearchParams();
-      selectedMaterials.forEach((m) => params.append('materials', m));
-      selectedOccasions.forEach((o) => params.append('occasions', o));
-      selectedProductCategories.forEach((c) => params.append('productCategories', c));
-      if (priceRange) params.set('priceRange', priceRange);
+      const params = buildFilterSearchParams({
+        materials: selectedMaterials,
+        occasions: selectedOccasions,
+        productCategories: selectedProductCategories,
+        priceRange,
+      });
       navigate({ pathname: ROUTES.PRODUCTS, search: params.toString() });
       requestAnimationFrame(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });

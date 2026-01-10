@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllTaxonomies, type TaxonomyItem } from '../../services/taxonomy.service';
-import { ROUTES } from '../../constants';
+import { BULK_ORDER_CATEGORIES } from '../../constants';
+import { useTaxonomies } from '../../hooks/useTaxonomies';
+import { navigateToProducts, navigateToBulkProducts, getNavigationParamKey } from '../../utils/navigationHelpers';
 import './DesktopNavDropdown.css';
 
 interface Props {
@@ -10,57 +11,9 @@ interface Props {
   type: 'occasion' | 'recipient' | 'product' | 'teams';
 }
 
-const BULK_ORDER_CATEGORIES = [
-  { id: 'drinkware', name: 'Drinkware', slug: 'drinkware' },
-  { id: 'coasters', name: 'Coasters', slug: 'coasters' },
-  { id: 'plaques', name: 'Plaques', slug: 'plaques' },
-  { id: 'accessories', name: 'Accessories', slug: 'accessories' },
-];
-
 const DesktopNavDropdown: React.FC<Props> = ({ isOpen, onClose, type }) => {
   const navigate = useNavigate();
-  const [occasions, setOccasions] = useState<TaxonomyItem[]>([]);
-  const [recipientLists, setRecipientLists] = useState<TaxonomyItem[]>([]);
-  const [productCategories, setProductCategories] = useState<TaxonomyItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      try {
-        const { occasions: occs, recipientLists: recs, productCategories: cats } = await getAllTaxonomies();
-        if (!mounted) return;
-        setOccasions(occs);
-        setRecipientLists(recs);
-        setProductCategories(cats);
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to load taxonomies', error);
-        if (mounted) setLoading(false);
-      }
-    }
-    if (isOpen) {
-      load();
-    }
-    return () => {
-      mounted = false;
-    };
-  }, [isOpen]);
-
-  const handleNavigation = (navType: 'occasions' | 'recipientLists' | 'productCategories', slug: string) => {
-    const params = new URLSearchParams();
-    params.set(navType, slug);
-    navigate(`${ROUTES.PRODUCTS}?${params.toString()}`);
-    onClose();
-  };
-
-  const handleBulkNavigation = (categorySlug: string) => {
-    const params = new URLSearchParams();
-    params.set('bulkEligible', 'true');
-    params.set('productCategories', categorySlug);
-    navigate(`${ROUTES.PRODUCTS}?${params.toString()}`);
-    onClose();
-  };
+  const { occasions, recipientLists, productCategories, loading } = useTaxonomies({ loadOnOpen: isOpen });
 
   if (!isOpen) return null;
 
@@ -81,34 +34,27 @@ const DesktopNavDropdown: React.FC<Props> = ({ isOpen, onClose, type }) => {
 
   const items = getItems();
 
+  const handleClick = (item: (typeof items)[0]) => {
+    if (type === 'teams') {
+      navigateToBulkProducts(navigate, item.slug || item.name, onClose);
+    } else {
+      const navType = getNavigationParamKey(type);
+      navigateToProducts(navigate, navType, item.slug || item.name, onClose);
+    }
+  };
+
   return (
     <div className="desktop-nav-dropdown">
       {loading ? (
         <div className="desktop-nav-dropdown-loading">Loading...</div>
       ) : (
-        <div className="desktop-nav-dropdown-list">
+        <ul className="desktop-nav-dropdown-list">
           {items.map((item) => (
-            <button
-              key={item.id}
-              className="desktop-nav-dropdown-item"
-              onClick={() => {
-                if (type === 'teams') {
-                  handleBulkNavigation(item.slug || item.name);
-                } else {
-                  const navType =
-                    type === 'occasion'
-                      ? 'occasions'
-                      : type === 'recipient'
-                      ? 'recipientLists'
-                      : 'productCategories';
-                  handleNavigation(navType, item.slug || item.name);
-                }
-              }}
-            >
+            <li key={item.id} className="desktop-nav-dropdown-item" onClick={() => handleClick(item)}>
               {item.name}
-            </button>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
