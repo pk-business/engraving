@@ -2,29 +2,28 @@
    NAVIGATION DRAWER - MOBILE ONLY
    Professional slide-in navigation with submenu animations
    ============================================ */
+@import '../../styles/drawer-common.css';
 .navigation-drawer-root {
   position: fixed;
   inset: 0;
   z-index: 2000;
 }
 
-/* Backdrop */
-.drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-    animation: fadeIn 0.3s ease;
-    backdrop-filter: blur(2px);
-  }
+/* Override z-index for navigation drawer backdrop */
+.navigation-drawer-root .drawer-backdrop {
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+}
   
-  @keyframes fadeIn {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-    }
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Main Drawer Container */
 .navigation-drawer {
   position: fixed;
