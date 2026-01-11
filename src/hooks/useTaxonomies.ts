@@ -23,7 +23,7 @@ export function useTaxonomies(options: {
   loadOnOpen?: boolean;
 } = {}): UseTaxonomiesResult {
   const { loadOnMount = true, loadOnOpen } = options;
-  
+
   const [occasions, setOccasions] = useState<TaxonomyItem[]>([]);
   const [recipientLists, setRecipientLists] = useState<TaxonomyItem[]>([]);
   const [productCategories, setProductCategories] = useState<TaxonomyItem[]>([]);
@@ -34,7 +34,7 @@ export function useTaxonomies(options: {
   const loadTaxonomies = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await getAllTaxonomies();
       setOccasions(data.occasions);
@@ -54,7 +54,7 @@ export function useTaxonomies(options: {
     let mounted = true;
 
     const shouldLoad = loadOnMount || (loadOnOpen !== undefined && loadOnOpen);
-    
+
     if (shouldLoad) {
       loadTaxonomies().then(() => {
         if (!mounted) {
@@ -65,12 +65,15 @@ export function useTaxonomies(options: {
           setMaterials([]);
         }
       });
+    } else {
+      // Not loading yet, set loading to false
+      setLoading(false);
     }
 
     return () => {
       mounted = false;
     };
-  }, [loadOnMount, loadOnOpen]);
+  }, [loadOnMount, loadOnOpen]); // Add both dependencies
 
   return {
     occasions,

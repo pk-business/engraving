@@ -1,15 +1,18 @@
 /* ============================================
    NAVIGATION DRAWER - MOBILE ONLY
    Professional slide-in navigation with submenu animations
+     Key Features: - Backdrop at z-index 2000,
+     drawer panel at z-index 2001 - Slide-in animation from left - Nested submenu support with slide transitions - Fully accessible with ARIA attributes
    ============================================ */
 @import '../../styles/drawer-common.css';
+
 .navigation-drawer-root {
   position: fixed;
   inset: 0;
   z-index: 2000;
 }
 
-/* Override z-index for navigation drawer backdrop */
+/* Backdrop overlay - must be BELOW drawer panel */
 .navigation-drawer-root .drawer-backdrop {
   z-index: 2000;
   animation: fadeIn 0.3s ease;
@@ -24,7 +27,7 @@
   }
 }
 
-/* Main Drawer Container */
+/* Main Drawer Container - must be ABOVE backdrop */
 .navigation-drawer {
   position: fixed;
   left: 0;
@@ -32,11 +35,13 @@
   height: 100dvh;
   width: 85%;
   max-width: 380px;
-    background: var(--color-white, #ffffff);
+  background: var(--color-white, #ffffff);
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  z-index: 2001;
+    /* Critical: Must be above backdrop (2000) */
   animation: slideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

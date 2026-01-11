@@ -9,9 +9,10 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   type: 'occasion' | 'recipient' | 'product' | 'teams';
+  arrowOffset?: number;
 }
 
-const DesktopNavDropdown: React.FC<Props> = ({ isOpen, onClose, type }) => {
+const DesktopNavDropdown: React.FC<Props> = ({ isOpen, onClose, type, arrowOffset = 0 }) => {
   const navigate = useNavigate();
   const { occasions, recipientLists, productCategories, loading } = useTaxonomies({ loadOnOpen: isOpen });
 
@@ -44,7 +45,14 @@ const DesktopNavDropdown: React.FC<Props> = ({ isOpen, onClose, type }) => {
   };
 
   return (
-    <div className="desktop-nav-dropdown">
+    <div
+      className="desktop-nav-dropdown"
+      style={
+        {
+          '--arrow-offset': `${arrowOffset}px`,
+        } as React.CSSProperties
+      }
+    >
       {loading ? (
         <div className="desktop-nav-dropdown-loading">Loading...</div>
       ) : (

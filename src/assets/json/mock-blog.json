@@ -1,0 +1,116 @@
+{
+    "data": [
+        {
+            "id": 2,
+            "documentId": "fy62hafmdw3wi4ycc155dsu8",
+            "title": "Choosing the Right Laser Engraver: Fiber vs CO₂ vs Diode",
+            "slug": "choosing-the-right-laser",
+            "description": "This is a blog on the differences on several types of lasers that are available in the market.",
+            "content": "Laser engraving has revolutionized how we personalize, mark, and manufacture materials. But not all lasers are created equal. Here's a concise breakdown of the three main types — Fiber, CO₂, and Diode — along with their compatible materials and key differences.\n\n🔷 Fiber Laser Engraving\n\nFiber lasers use a solid-state laser source and are ideal for high-precision marking on metals.\n\nCompatible Materials:\n\nStainless steel\n\nAluminum\n\nBrass\n\nCopper\n\nTitanium\n\nSome plastics (e.g., ABS, polycarbonate)\n\nKey Traits:\n\nHigh speed and accuracy\n\nLong lifespan (up to 100,000 hours)\n\nExpensive but powerful\n\n🔶 CO₂ Laser Engraving\n\nCO₂ lasers use a gas-based laser and are versatile across organic and non-metallic materials.\n\nCompatible Materials:\n\nWood\n\nAcrylic\n\nGlass\n\nLeather\n\nPaper/Cardboard\n\nRubber\n\nFabrics\n\nSome plastics (e.g., Delrin, Mylar)\n\nKey Traits:\n\nGreat for cutting and engraving\n\nSlower than fiber lasers\n\nModerate cost and maintenance\n\n🔴 Diode Laser Engraving\n\nDiode lasers are compact, budget-friendly, and perfect for hobbyists and light-duty tasks.\n\nCompatible Materials:\n\nWood\n\nCardboard\n\nLeather\n\nSome plastics (e.g., PVC-free)\n\nPainted/coated metals (surface only)\n\nKey Traits:\n\nLow power output\n\nPortable and easy to use\n\nBest for beginners and DIY projects\n\n⚖️ Comparison Summary\n\nFeature\n\nFiber Laser\n\nCO₂ Laser\n\nDiode Laser\n\nPower\n\nHigh\n\nMedium\n\nLow\n\nSpeed\n\nFast\n\nModerate\n\nSlow\n\nCost\n\nExpensive\n\nModerate\n\nBudget-friendly\n\nMaterial Range\n\nMetals, Plastics\n\nOrganics, Plastics\n\nWood, Coated Metals\n\nUse Case\n\nIndustrial\n\nVersatile\n\nHobbyist\n\nWhether you're engraving jewelry, customizing wood crafts, or prototyping parts, choosing the right laser depends on your materials, budget, and goals. Fiber lasers dominate metalwork, CO₂ lasers offer broad versatility, and diode lasers make engraving accessible to everyone.",
+            "author": "Admin",
+            "category": "Laser",
+            "tags": "laserTypes",
+            "articlePublishedAt": null,
+            "createdAt": "2026-01-10T05:33:03.972Z",
+            "updatedAt": "2026-01-10T05:34:06.667Z",
+            "publishedAt": "2026-01-10T05:34:06.780Z",
+            "coverImage": {
+                "id": 61,
+                "documentId": "slpwz0s2ezzozrw5fkrk2414",
+                "name": "Laser comparision.png",
+                "alternativeText": null,
+                "caption": null,
+                "width": 1536,
+                "height": 1024,
+                "formats": {
+                    "large": {
+                        "ext": ".png",
+                        "url": "https://res.cloudinary.com/djljvctxm/image/upload/v1768023139/large_Laser_comparision_df8712fb4b.png",
+                        "hash": "large_Laser_comparision_df8712fb4b",
+                        "mime": "image/png",
+                        "name": "large_Laser comparision.png",
+                        "path": null,
+                        "size": 491.9,
+                        "width": 1000,
+                        "height": 667,
+                        "sizeInBytes": 491902,
+                        "provider_metadata": {
+                            "public_id": "large_Laser_comparision_df8712fb4b",
+                            "resource_type": "image"
+                        }
+                    },
+                    "small": {
+                        "ext": ".png",
+                        "url": "https://res.cloudinary.com/djljvctxm/image/upload/v1768023139/small_Laser_comparision_df8712fb4b.png",
+                        "hash": "small_Laser_comparision_df8712fb4b",
+                        "mime": "image/png",
+                        "name": "small_Laser comparision.png",
+                        "path": null,
+                        "size": 124.15,
+                        "width": 500,
+                        "height": 333,
+                        "sizeInBytes": 124147,
+                        "provider_metadata": {
+                            "public_id": "small_Laser_comparision_df8712fb4b",
+                            "resource_type": "image"
+                        }
+                    },
+                    "medium": {
+                        "ext": ".png",
+                        "url": "https://res.cloudinary.com/djljvctxm/image/upload/v1768023139/medium_Laser_comparision_df8712fb4b.png",
+                        "hash": "medium_Laser_comparision_df8712fb4b",
+                        "mime": "image/png",
+                        "name": "medium_Laser comparision.png",
+                        "path": null,
+                        "size": 276.14,
+                        "width": 750,
+                        "height": 500,
+                        "sizeInBytes": 276137,
+                        "provider_metadata": {
+                            "public_id": "medium_Laser_comparision_df8712fb4b",
+                            "resource_type": "image"
+                        }
+                    },
+                    "thumbnail": {
+                        "ext": ".png",
+                        "url": "https://res.cloudinary.com/djljvctxm/image/upload/v1768023138/thumbnail_Laser_comparision_df8712fb4b.png",
+                        "hash": "thumbnail_Laser_comparision_df8712fb4b",
+                        "mime": "image/png",
+                        "name": "thumbnail_Laser comparision.png",
+                        "path": null,
+                        "size": 35.47,
+                        "width": 234,
+                        "height": 156,
+                        "sizeInBytes": 35468,
+                        "provider_metadata": {
+                            "public_id": "thumbnail_Laser_comparision_df8712fb4b",
+                            "resource_type": "image"
+                        }
+                    }
+                },
+                "hash": "Laser_comparision_df8712fb4b",
+                "ext": ".png",
+                "mime": "image/png",
+                "size": 393.08,
+                "url": "https://res.cloudinary.com/djljvctxm/image/upload/v1768023138/Laser_comparision_df8712fb4b.png",
+                "previewUrl": null,
+                "provider": "@strapi/provider-upload-cloudinary",
+                "provider_metadata": {
+                    "public_id": "Laser_comparision_df8712fb4b",
+                    "resource_type": "image"
+                },
+                "createdAt": "2026-01-10T05:32:20.425Z",
+                "updatedAt": "2026-01-10T05:32:20.425Z",
+                "publishedAt": "2026-01-10T05:32:20.425Z"
+            }
+        }
+    ],
+    "meta": {
+        "pagination": {
+            "page": 1,
+            "pageSize": 9,
+            "pageCount": 1,
+            "total": 1
+        }
+    }
+}

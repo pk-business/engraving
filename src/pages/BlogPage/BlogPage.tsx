@@ -1,11 +1,65 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiCalendar, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi';
 import { BiCategoryAlt } from 'react-icons/bi';
 import { MdEmail } from 'react-icons/md';
 import SearchBar from '../../components/Search/SearchBar';
+import blogService from '../../services/blog.service';
+import type { BlogPost } from '../../types/blog.types';
 import './BlogPage.css';
 
 const BlogPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<any>(null);
+  const pageSize = 9;
+
+  useEffect(() => {
+    fetchPosts();
+  }, [currentPage, searchQuery]);
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    const result = await blogService.getBlogPosts(currentPage, pageSize, searchQuery);
+    setPosts(result.posts);
+    setPagination(result.pagination);
+    setLoading(false);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1); // Reset to first page on new search
+  };
+
+  const handleBlogClick = (slug: string) => {
+    navigate(`/blog/${slug}`);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextPage = () => {
+    if (pagination && currentPage < pagination.pageCount) {
+      setCurrentPage(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
+  };
+
   return (
     <div className="blog-page">
       <header className="blog-header">
@@ -16,85 +70,65 @@ const BlogPage: React.FC = () => {
       <div className="blog-container">
         {/* Blog Posts Grid */}
         <main className="blog-main">
-          <div className="blog-grid">
-            {/* Placeholder for blog posts */}
-            <article className="blog-card">
-              <div className="blog-image-placeholder">Blog Image</div>
-              <div className="blog-content">
-                <div className="blog-meta">
-                  <span className="blog-date">
-                    <FiCalendar /> Dec 12, 2025
-                  </span>
-                  <span className="blog-category">
-                    <BiCategoryAlt /> Tips & Tricks
-                  </span>
-                </div>
-                <h2 className="blog-title">How to Choose the Perfect Material for Your Custom Gift</h2>
-                <p className="blog-excerpt">
-                  Discover the best materials for different occasions and learn how to make your custom gifts truly
-                  special...
-                </p>
-                <a href="#" className="read-more">
-                  Read More <FiArrowRight />
-                </a>
+          {loading ? (
+            <div className="blog-loading">
+              <p>Loading blog posts...</p>
+            </div>
+          ) : posts.length === 0 ? (
+            <div className="blog-empty">
+              <p>No blog posts found{searchQuery ? ` for "${searchQuery}"` : ''}.</p>
+            </div>
+          ) : (
+            <>
+              <div className="blog-grid">
+                {posts.map((post) => (
+                  <article key={post.id} className="blog-card">
+                    {post.imageUrl ? (
+                      <img src={post.imageUrl} alt={post.title} className="blog-image" />
+                    ) : (
+                      <div className="blog-image-placeholder">No Image</div>
+                    )}
+                    <div className="blog-content">
+                      <div className="blog-meta">
+                        <span className="blog-date">
+                          <FiCalendar /> {formatDate(post.publishedAt)}
+                        </span>
+                        {post.category && (
+                          <span className="blog-category">
+                            <BiCategoryAlt /> {post.category}
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="blog-title">{post.title}</h2>
+                      <p className="blog-excerpt">{post.description}</p>
+                      <button onClick={() => handleBlogClick(post.slug)} className="read-more">
+                        Read More <FiArrowRight />
+                      </button>
+                    </div>
+                  </article>
+                ))}
               </div>
-            </article>
 
-            <article className="blog-card">
-              <div className="blog-image-placeholder">Blog Image</div>
-              <div className="blog-content">
-                <div className="blog-meta">
-                  <span className="blog-date">
-                    <FiCalendar /> Dec 5, 2025
+              {/* Pagination */}
+              {pagination && pagination.pageCount > 1 && (
+                <div className="blog-pagination">
+                  <button className="pagination-btn" onClick={handlePreviousPage} disabled={currentPage === 1}>
+                    <FiChevronLeft /> Previous
+                  </button>
+                  <span className="pagination-info">
+                    Page {currentPage} of {pagination.pageCount}
                   </span>
-                  <span className="blog-category">
-                    <BiCategoryAlt /> Inspiration
-                  </span>
+                  <button
+                    className="pagination-btn"
+                    onClick={handleNextPage}
+                    disabled={currentPage === pagination.pageCount}
+                  >
+                    Next <FiChevronRight />
+                  </button>
                 </div>
-                <h2 className="blog-title">Top 10 Wedding Gift Ideas with Laser Engraving</h2>
-                <p className="blog-excerpt">
-                  Looking for unique wedding gift ideas? Check out our curated list of laser-engraved items that couples
-                  will love...
-                </p>
-                <a href="#" className="read-more">
-                  Read More <FiArrowRight />
-                </a>
-              </div>
-            </article>
-
-            <article className="blog-card">
-              <div className="blog-image-placeholder">Blog Image</div>
-              <div className="blog-content">
-                <div className="blog-meta">
-                  <span className="blog-date">
-                    <FiCalendar /> Nov 28, 2025
-                  </span>
-                  <span className="blog-category">
-                    <BiCategoryAlt /> Behind the Scenes
-                  </span>
-                </div>
-                <h2 className="blog-title">The Art of CNC Cutting: From Design to Reality</h2>
-                <p className="blog-excerpt">
-                  Take a behind-the-scenes look at our CNC cutting process and see how your custom designs come to
-                  life...
-                </p>
-                <a href="#" className="read-more">
-                  Read More <FiArrowRight />
-                </a>
-              </div>
-            </article>
-          </div>
-
-          {/* Pagination */}
-          <div className="blog-pagination">
-            <button className="pagination-btn">
-              <FiChevronLeft /> Previous
-            </button>
-            <span className="pagination-info">Page 1 of 1</span>
-            <button className="pagination-btn">
-              Next <FiChevronRight />
-            </button>
-          </div>
+              )}
+            </>
+          )}
         </main>
 
         {/* Sidebar */}
@@ -102,48 +136,12 @@ const BlogPage: React.FC = () => {
           {/* Search */}
           <div className="sidebar-section">
             <h3>Search</h3>
-            <SearchBar value={''} onSearch={() => {}} placeholder="Search blog posts..." debounceMs={250} />
-          </div>
-
-          {/* Categories */}
-          <div className="sidebar-section">
-            <h3>Categories</h3>
-            <ul className="category-list">
-              <li>
-                <a href="#">Tips & Tricks</a>
-              </li>
-              <li>
-                <a href="#">Inspiration</a>
-              </li>
-              <li>
-                <a href="#">Behind the Scenes</a>
-              </li>
-              <li>
-                <a href="#">Customer Stories</a>
-              </li>
-              <li>
-                <a href="#">Product Updates</a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Recent Posts */}
-          <div className="sidebar-section">
-            <h3>Recent Posts</h3>
-            <ul className="recent-posts">
-              <li>
-                <a href="#">How to Choose the Perfect Material</a>
-                <span className="recent-date">Dec 12, 2025</span>
-              </li>
-              <li>
-                <a href="#">Top 10 Wedding Gift Ideas</a>
-                <span className="recent-date">Dec 5, 2025</span>
-              </li>
-              <li>
-                <a href="#">The Art of CNC Cutting</a>
-                <span className="recent-date">Nov 28, 2025</span>
-              </li>
-            </ul>
+            <SearchBar
+              value={searchQuery}
+              onSearch={handleSearch}
+              placeholder="Search blog posts..."
+              debounceMs={500}
+            />
           </div>
 
           {/* Newsletter */}
