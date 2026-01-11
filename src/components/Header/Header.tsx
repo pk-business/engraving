@@ -18,17 +18,41 @@ const Header: React.FC = () => {
   const [activeDesktopDropdown, setActiveDesktopDropdown] = useState<
     'occasion' | 'recipient' | 'product' | 'teams' | null
   >(null);
+  const [dropdownArrowOffset, setDropdownArrowOffset] = useState(0);
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleDropdownMouseEnter = (type: 'occasion' | 'recipient' | 'product' | 'teams') => {
+  const handleDropdownMouseEnter = (
+    type: 'occasion' | 'recipient' | 'product' | 'teams',
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
+
+    // Calculate arrow offset based on the nav item position
+    const wrapper = event.currentTarget;
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const wrapperCenter = wrapperRect.left + wrapperRect.width / 2;
+    const viewportCenter = window.innerWidth / 2;
+    const offset = wrapperCenter - viewportCenter;
+
+    setDropdownArrowOffset(offset);
     setActiveDesktopDropdown(type);
+  };
+
+  const handleNavLinkClick = (type: 'occasion' | 'recipient' | 'product' | 'teams') => {
+    // Navigate to products page - clicking the main nav link shows all products
+    // (Individual dropdown items will filter by specific values)
+    if (type === 'teams') {
+      navigate('/products?bulkEligible=true');
+    } else {
+      navigate('/products');
+    }
+    setActiveDesktopDropdown(null);
   };
 
   const handleDropdownMouseLeave = () => {
@@ -156,61 +180,81 @@ const Header: React.FC = () => {
         <nav className="nav-desktop">
           <div
             className="nav-dropdown-wrapper"
-            onMouseEnter={() => handleDropdownMouseEnter('occasion')}
+            onMouseEnter={(e) => handleDropdownMouseEnter('occasion', e)}
             onMouseLeave={handleDropdownMouseLeave}
           >
-            <button className="nav-link" type="button">
+            <button
+              className={`nav-link ${activeDesktopDropdown === 'occasion' ? 'active' : ''}`}
+              type="button"
+              onClick={() => handleNavLinkClick('occasion')}
+            >
               By Occasion
             </button>
             <DesktopNavDropdown
               isOpen={activeDesktopDropdown === 'occasion'}
               onClose={() => setActiveDesktopDropdown(null)}
               type="occasion"
+              arrowOffset={dropdownArrowOffset}
             />
           </div>
 
           <div
             className="nav-dropdown-wrapper"
-            onMouseEnter={() => handleDropdownMouseEnter('recipient')}
+            onMouseEnter={(e) => handleDropdownMouseEnter('recipient', e)}
             onMouseLeave={handleDropdownMouseLeave}
           >
-            <button className="nav-link" type="button">
+            <button
+              className={`nav-link ${activeDesktopDropdown === 'recipient' ? 'active' : ''}`}
+              type="button"
+              onClick={() => handleNavLinkClick('recipient')}
+            >
               By Recipient
             </button>
             <DesktopNavDropdown
               isOpen={activeDesktopDropdown === 'recipient'}
               onClose={() => setActiveDesktopDropdown(null)}
               type="recipient"
+              arrowOffset={dropdownArrowOffset}
             />
           </div>
 
           <div
             className="nav-dropdown-wrapper"
-            onMouseEnter={() => handleDropdownMouseEnter('product')}
+            onMouseEnter={(e) => handleDropdownMouseEnter('product', e)}
             onMouseLeave={handleDropdownMouseLeave}
           >
-            <button className="nav-link" type="button">
+            <button
+              className={`nav-link ${activeDesktopDropdown === 'product' ? 'active' : ''}`}
+              type="button"
+              onClick={() => handleNavLinkClick('product')}
+            >
               By Product
             </button>
             <DesktopNavDropdown
               isOpen={activeDesktopDropdown === 'product'}
               onClose={() => setActiveDesktopDropdown(null)}
               type="product"
+              arrowOffset={dropdownArrowOffset}
             />
           </div>
 
           <div
             className="nav-dropdown-wrapper"
-            onMouseEnter={() => handleDropdownMouseEnter('teams')}
+            onMouseEnter={(e) => handleDropdownMouseEnter('teams', e)}
             onMouseLeave={handleDropdownMouseLeave}
           >
-            <button className="nav-link" type="button">
+            <button
+              className={`nav-link ${activeDesktopDropdown === 'teams' ? 'active' : ''}`}
+              type="button"
+              onClick={() => handleNavLinkClick('teams')}
+            >
               For Teams
             </button>
             <DesktopNavDropdown
               isOpen={activeDesktopDropdown === 'teams'}
               onClose={() => setActiveDesktopDropdown(null)}
               type="teams"
+              arrowOffset={dropdownArrowOffset}
             />
           </div>
         </nav>
