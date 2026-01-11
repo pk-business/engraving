@@ -11,6 +11,7 @@ import ProductsPage from './pages/ProductsPage/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage/ProductDetailPage';
 import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
 import BlogPage from './pages/BlogPage/BlogPage';
+import BlogDetailPage from './pages/BlogDetailPage/BlogDetailPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import SignupPage from './pages/SignupPage/SignupPage';
 import { ROUTES } from './constants';
@@ -34,6 +35,7 @@ function App() {
                   <Route path={ROUTES.PRODUCT_DETAIL} element={<ProductDetailPage />} />
                   <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />
                   <Route path={ROUTES.BLOG} element={<BlogPage />} />
+                  <Route path="/blog/:slug" element={<BlogDetailPage />} />
                   <Route path={ROUTES.LOGIN} element={<LoginPage />} />
                   <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
                 </Routes>
