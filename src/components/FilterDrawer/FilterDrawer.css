@@ -1,11 +1,21 @@
+/* ============================================
+   FILTER DRAWER
+   Slide-up drawer for product filters
+   
+   Key Features:
+   - Backdrop at z-index 2000, drawer panel at z-index 2001
+   - Slides up from bottom
+   - Positioned below header
+   ============================================ */
 @import '../../styles/drawer-common.css';
+
 .filter-drawer-root {
   position: fixed;
   inset: 0;
   z-index: 2000;
 }
 
-/* Override backdrop styling for filter drawer */
+/* Backdrop overlay - must be BELOW drawer panel */
 .filter-drawer-root .drawer-backdrop {
   z-index: 2000;
   background: rgba(0, 0, 0, 0.45);
@@ -30,11 +40,12 @@
   }
 }
 
+/* Main Drawer Container - must be ABOVE backdrop */
 .filter-drawer {
   position: fixed;
   right: 0;
   top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+  height: calc(100vh - var(--header-height));
   width: 85%;
   max-width: 420px;
   background: var(--color-white);
@@ -43,6 +54,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  z-index: 2001;
+    /* Critical: Must be above backdrop (2000) */
   animation: slideUp 0.3s ease;
 }
 

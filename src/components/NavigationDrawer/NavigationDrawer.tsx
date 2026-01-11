@@ -7,6 +7,10 @@ import { useTaxonomies } from '../../hooks/useTaxonomies';
 import { navigateToProducts, navigateToBulkProducts } from '../../utils/navigationHelpers';
 import './NavigationDrawer.css';
 
+// ============================================
+// Types
+// ============================================
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -14,6 +18,17 @@ interface Props {
 
 type SubMenuType = 'occasion' | 'recipient' | 'product' | 'bulk' | null;
 
+// ============================================
+// Component
+// ============================================
+
+/**
+ * NavigationDrawer - Mobile slide-in navigation with submenu support
+ * Features:
+ * - Accessibility: Focus management, keyboard navigation, ARIA attributes
+ * - Nested menus: Main menu -> Submenus for occasions, recipients, products, bulk orders
+ * - Portal rendering: Rendered outside main DOM tree for proper z-index layering
+ */
 const NavigationDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -23,6 +38,10 @@ const NavigationDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const { occasions, recipientLists, productCategories, loading } = useTaxonomies({ loadOnOpen: isOpen });
 
   const [activeSubMenu, setActiveSubMenu] = useState<SubMenuType>(null);
+
+  // ============================================
+  // Effect: Manage body scroll and focus
+  // ============================================
 
   useEffect(() => {
     if (isOpen) {
@@ -38,9 +57,15 @@ const NavigationDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
+  // ============================================
+  // Effect: Keyboard navigation
+  // ============================================
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!isOpen) return;
+
+      // Escape key: Close submenu or drawer
       if (e.key === 'Escape') {
         if (activeSubMenu) {
           setActiveSubMenu(null);
@@ -48,6 +73,9 @@ const NavigationDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
           onClose();
         }
       }
+
+      // Tab key: Trap focus within drawer
+      // Tab key: Trap focus within drawer
       if (e.key === 'Tab') {
         const focusable = panelRef.current?.querySelectorAll<HTMLElement>(
           'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
@@ -68,6 +96,10 @@ const NavigationDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
     return () => document.removeEventListener('keydown', onKey);
   }, [isOpen, onClose, activeSubMenu]);
 
+  // ============================================
+  // Event Handlers
+  // ============================================
+
   const openSubMenu = (type: SubMenuType) => {
     setActiveSubMenu(type);
   };
@@ -83,6 +115,10 @@ const NavigationDrawer: React.FC<Props> = ({ isOpen, onClose }) => {
   const handleBulkCategoryClick = (categorySlug: string) => {
     navigateToBulkProducts(navigate, categorySlug, onClose);
   };
+
+  // ============================================
+  // Render
+  // ============================================
 
   if (!isOpen) return null;
 

@@ -27,8 +27,24 @@ type UnknownRecord = Record<string, unknown>;
 function buildMediaUrl(path: string | null | undefined) {
   if (!path) return null;
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  if (STRAPI_BASE) return `${STRAPI_BASE.replace(/\/$/, '')}${path}`;
-  return path;
+  
+  // Validate that path looks like an actual file path
+  const hasExtension = /\.(jpg|jpeg|png|gif|webp|svg|ico|bmp|tiff?)$/i.test(path);
+  const startsWithSlash = path.startsWith('/');
+  const looksLikePath = path.includes('/');
+  
+  // Only reject if it looks like a plain word (likely a product name mistake)
+  // Allow paths that have slashes or extensions
+  if (!hasExtension && !startsWithSlash && !looksLikePath && path.length > 0) {
+    // Likely just a product name, not an image path
+    console.warn(`[Product Service] Skipping invalid image path: "${path}"`);
+    return null;
+  }
+  
+  // Ensure path starts with / for relative paths
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  if (STRAPI_BASE) return `${STRAPI_BASE.replace(/\/$/, '')}${normalizedPath}`;
+  return normalizedPath;
 }
 
 const toStringValue = (value: unknown, fallback = ''): string => (typeof value === 'string' ? value : fallback);
@@ -307,6 +323,16 @@ class ProductService {
             });
           }
         }
+        if (filters.recipientLists && filters.recipientLists.length > 0) {
+          const cleanRecipients = filters.recipientLists.map((r: string) => (r || '').toString().trim()).filter(Boolean);
+          if (cleanRecipients.length === 1) {
+            params['filters[recipient_lists][name][$eq]'] = cleanRecipients[0];
+          } else if (cleanRecipients.length > 1) {
+            cleanRecipients.forEach((rec: string, idx: number) => {
+              params[`filters[$or][${idx}][recipient_lists][name][$eq]`] = rec;
+            });
+          }
+        }
         if (filters.bulkEligible !== undefined) {
           params['filters[bulkEligible][$eq]'] = filters.bulkEligible;
         }
@@ -317,7 +343,9 @@ class ProductService {
 
       let res;
       try {
+        console.log('[DEBUG] Fetching products with params:', params);
         res = await api.get(apiPath(PRODUCTS_RESOURCE), { params });
+        console.log('[DEBUG] Products response:', { status: res.status, dataLength: res.data?.data?.length || 0 });
       } catch (err) {
         const status = (err as { response?: { status?: number } }).response?.status;
         if (status === 400 && params.populate) {

@@ -1,6 +1,7 @@
 /**
  * Common drawer/modal styles
  * Used by NavigationDrawer, FilterDrawer, and other overlay components
+ * Updated: 2026-01-11 - Removed backdrop-filter blur
  */
 
 /* Shared backdrop overlay */
@@ -9,7 +10,7 @@
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1999;
-  backdrop-filter: blur(2px);
+  /* No blur effect - removed for mobile compatibility */
 }
 
 /* Shared close button styles */
