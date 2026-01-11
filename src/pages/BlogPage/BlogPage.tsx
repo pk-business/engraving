@@ -23,9 +23,7 @@ const BlogPage: React.FC = () => {
 
   const fetchPosts = async () => {
     setLoading(true);
-    console.log('Fetching posts - page:', currentPage, 'search:', searchQuery);
     const result = await blogService.getBlogPosts(currentPage, pageSize, searchQuery);
-    console.log('Fetch result:', result);
     setPosts(result.posts);
     setPagination(result.pagination);
     setLoading(false);

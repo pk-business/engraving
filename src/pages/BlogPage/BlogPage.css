@@ -92,15 +92,9 @@
   }
   
   .pagination-btn:disabled {
-    opacity: 0.5;
+  opacity: 0.5;
     cursor: not-allowed;
   }
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.2rem;
-}
 
 .blog-content {
   padding: 30px;

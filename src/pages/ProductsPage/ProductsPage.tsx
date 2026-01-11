@@ -72,6 +72,7 @@ const ProductsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
+  const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
   const [selectedProductCategory, setSelectedProductCategory] = useState<string | null>(null);
   const [productCategories, setProductCategories] = useState<TaxonomyItem[]>([]);
   const [priceRange, setPriceRange] = useState<string>('');
@@ -100,6 +101,7 @@ const ProductsPage: React.FC = () => {
     const qParam = searchParams.get('q');
     const occasionParam = searchParams.getAll('occasions');
     const occasionSingle = searchParams.get('occasion');
+    const recipientListsParams = searchParams.getAll('recipientLists');
     const productCategoryParam = searchParams.get('productCategory');
     const productCategoriesParams = searchParams.getAll('productCategories');
     const materialsParams = searchParams.getAll('materials');
@@ -139,6 +141,7 @@ const ProductsPage: React.FC = () => {
     }
 
     setSelectedMaterials(materialsParams.length > 0 ? materialsParams : []);
+    setSelectedRecipients(recipientListsParams.length > 0 ? recipientListsParams : []);
   }, [searchParams]);
 
   // When URL search params change, apply those filters immediately by
@@ -154,6 +157,8 @@ const ProductsPage: React.FC = () => {
     if (mats && mats.length > 0) filters.materials = mats;
     const occs = params.getAll('occasions');
     if (occs && occs.length > 0) filters.occasions = occs;
+    const recs = params.getAll('recipientLists');
+    if (recs && recs.length > 0) filters.recipientLists = recs;
     const productCategoriesParams = params.getAll('productCategories');
     const singleProductCategory = params.get('productCategory');
     let cats =
@@ -232,6 +237,7 @@ const ProductsPage: React.FC = () => {
     return {
       materials: selectedMaterials.length > 0 ? selectedMaterials : undefined,
       occasions: selectedOccasions.length > 0 ? selectedOccasions : undefined,
+      recipientLists: selectedRecipients.length > 0 ? selectedRecipients : undefined,
       productCategories: selectedProductCategory ? [selectedProductCategory] : undefined,
       minPrice: typeof priceValues.min === 'number' ? priceValues.min : undefined,
       maxPrice: typeof priceValues.max === 'number' ? priceValues.max : undefined,
@@ -391,6 +397,7 @@ const ProductsPage: React.FC = () => {
   const clearFilters = () => {
     setSelectedMaterials([]);
     setSelectedOccasions([]);
+    setSelectedRecipients([]);
     setSelectedProductCategory(null);
     setPriceRange('');
     setSearchQuery('');
@@ -466,7 +473,7 @@ const ProductsPage: React.FC = () => {
   useEffect(() => {
     applyFilters(undefined, { resetPage: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedProductCategory, selectedMaterials, selectedOccasions, priceRange, searchQuery]);
+  }, [selectedProductCategory, selectedMaterials, selectedOccasions, selectedRecipients, priceRange, searchQuery]);
 
   return (
     <div className="products-page">

@@ -15,8 +15,6 @@ class BlogService {
    * Transform Strapi blog post data to frontend format
    */
   private transformBlogPost(data: BlogPostData): BlogPost {
-    console.log('Raw blog post data:', data);
-
     if (!data) {
       console.error('Invalid blog post data:', data);
       throw new Error('Invalid blog post data');
@@ -92,9 +90,6 @@ class BlogService {
 
       const response = await api.get<StrapiResponse<BlogPostData[]>>('/api/blog-posts', { params });
 
-      console.log('Blog posts API response:', response.data);
-      console.log('Blog posts data array:', response.data.data);
-
       // Check if data exists and is an array
       if (!response.data.data || !Array.isArray(response.data.data)) {
         console.error('Invalid response structure:', response.data);
@@ -102,11 +97,8 @@ class BlogService {
       }
 
       const posts = response.data.data.map((post) => {
-        console.log('Transforming post:', post);
         return this.transformBlogPost(post);
       });
-
-      console.log('Transformed posts:', posts);
 
       return {
         posts,
