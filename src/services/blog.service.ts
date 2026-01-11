@@ -9,8 +9,6 @@ import type {
 } from '../types/blog.types';
 
 class BlogService {
-  private readonly STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'https://pk-engrave-service.onrender.com';
-
   /**
    * Transform Strapi blog post data to frontend format
    */
