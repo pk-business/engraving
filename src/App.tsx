@@ -14,6 +14,15 @@ import BlogPage from './pages/BlogPage/BlogPage';
 import BlogDetailPage from './pages/BlogDetailPage/BlogDetailPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import SignupPage from './pages/SignupPage/SignupPage';
+// Legal pages
+import TermsOfService from './pages/Legal/TermsOfService';
+import PrivacyPolicy from './pages/Legal/PrivacyPolicy';
+import CookiePolicy from './pages/Legal/CookiePolicy';
+import DoNotSellMyInfo from './pages/Legal/DoNotSellMyInfo';
+import CAPrivacyRights from './pages/Legal/CAPrivacyRights';
+import YourPrivacyChoices from './pages/Legal/YourPrivacyChoices';
+import AccessibilityStatement from './pages/Legal/AccessibilityStatement';
+import CASupplyChainAct from './pages/Legal/CASupplyChainAct';
 import { ROUTES } from './constants';
 import './App.css';
 
@@ -38,6 +47,15 @@ function App() {
                   <Route path="/blog/:slug" element={<BlogDetailPage />} />
                   <Route path={ROUTES.LOGIN} element={<LoginPage />} />
                   <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+                  {/* Legal pages */}
+                  <Route path={ROUTES.TERMS_OF_SERVICE} element={<TermsOfService />} />
+                  <Route path={ROUTES.PRIVACY_POLICY} element={<PrivacyPolicy />} />
+                  <Route path={ROUTES.COOKIE_POLICY} element={<CookiePolicy />} />
+                  <Route path={ROUTES.DO_NOT_SELL} element={<DoNotSellMyInfo />} />
+                  <Route path={ROUTES.CA_PRIVACY_RIGHTS} element={<CAPrivacyRights />} />
+                  <Route path={ROUTES.YOUR_PRIVACY_CHOICES} element={<YourPrivacyChoices />} />
+                  <Route path={ROUTES.ACCESSIBILITY} element={<AccessibilityStatement />} />
+                  <Route path={ROUTES.CA_SUPPLY_CHAIN_ACT} element={<CASupplyChainAct />} />
                 </Routes>
               </main>
               <Footer />

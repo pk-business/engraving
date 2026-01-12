@@ -1,3 +1,4 @@
+// TODO: Update business name once decided
 export const APP_NAME = 'CustomCraft';
 export const APP_DESCRIPTION = 'Premium Laser Engraved & CNC Cut Custom Items';
 
@@ -10,6 +11,15 @@ export const ROUTES = {
   BLOG_POST: '/blog/:id',
   LOGIN: '/login',
   SIGNUP: '/signup',
+  // Legal pages
+  TERMS_OF_SERVICE: '/legal/terms-of-service',
+  PRIVACY_POLICY: '/legal/privacy-policy',
+  COOKIE_POLICY: '/legal/cookie-policy',
+  DO_NOT_SELL: '/legal/do-not-sell',
+  CA_PRIVACY_RIGHTS: '/legal/ca-privacy-rights',
+  YOUR_PRIVACY_CHOICES: '/legal/your-privacy-choices',
+  ACCESSIBILITY: '/legal/accessibility',
+  CA_SUPPLY_CHAIN_ACT: '/legal/ca-supply-chain-act',
 } as const;
 
 export const TAX_RATE = 0.08; // 8% tax
