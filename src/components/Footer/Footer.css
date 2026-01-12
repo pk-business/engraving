@@ -23,15 +23,16 @@
 }
 
 .footer-nav a {
-  color: var(--color-bg);
+  color: var(--color-secondary);
   text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
   transition: color var(--transition-fast);
 }
 
-.footer-nav a:hover {
-  color: var(--color-secondary);
+.footer-nav a:hover,
+.footer-nav a.active {
+  color: var(--color-primary);
 }
 
 /* Row 2: Company Logo */
@@ -104,6 +105,29 @@
   background: var(--color-primary-hover);
 }
 
+.newsletter-form button:disabled {
+  background: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.newsletter-success,
+.newsletter-error {
+  text-align: center;
+  font-size: 0.9rem;
+  margin: var(--spacing-xs) 0 0;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+}
+
+.newsletter-success {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.newsletter-error {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
 /* Row 4: Customer Service Dropdown */
 .footer-customer-service {
   /* border-top: 1px solid rgba(255, 255, 255, 0.1); */
@@ -118,7 +142,7 @@
   align-items: center;
   background: transparent;
   border: none;
-  color: var(--color-bg);
+  color: var(--color-secondary);
   padding: var(--spacing-sm) var(--spacing-md);
   font-size: 1rem;
   font-weight: 500;
@@ -128,7 +152,7 @@
 }
 
 .customer-service-toggle:hover {
-  color: var(--color-secondary);
+  color: var(--color-primary);
 }
 
 .customer-service-toggle svg {
@@ -136,14 +160,21 @@
   transition: transform var(--transition-fast);
 }
 
+/* Mobile: Show/hide based on open state */
 .customer-service-links {
   list-style: none;
-  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+  padding: 0;
     margin: 0;
-    display: flex;
+  display: none;
     flex-direction: column;
     gap: var(--spacing-sm);
-    animation: slideDown 0.3s ease;
+  overflow: hidden;
+  }
+  
+  .customer-service-links.open {
+    display: flex;
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+  animation: slideDown 0.3s ease;
 }
 
 @keyframes slideDown {
@@ -256,7 +287,7 @@
 /* Desktop Styles - Keep traditional multi-column layout */
 @media (min-width: 769px) {
   .footer {
-    padding: 60px var(--spacing-lg) var(--spacing-lg);
+    padding: 40px var(--spacing-lg) var(--spacing-lg);
     }
 
   .footer-container {
@@ -272,11 +303,12 @@
       grid-row: 1;
       flex-direction: column;
       align-items: flex-start;
-      gap: var(--spacing-sm);
+      gap: var(--spacing-xs);
       padding: 0;
     }
     .footer-nav a {
       font-size: 0.95rem;
+      padding: var(--spacing-xs) 0;
     }
     .footer-logo {
       grid-column: 1 / 2;
@@ -312,8 +344,15 @@
     .customer-service-toggle {
       pointer-events: none;
       padding: 0 0 var(--spacing-md) 0;
+      cursor: default;
     }
     
+                /* Desktop: Hide toggle icon */
+                .customer-service-toggle .toggle-icon {
+                  display: none;
+                }
+        
+                /* Desktop: Always show links */
     .customer-service-links {
       display: flex !important;
       padding: 0;

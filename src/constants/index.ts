@@ -11,6 +11,11 @@ export const ROUTES = {
   BLOG_POST: '/blog/:id',
   LOGIN: '/login',
   SIGNUP: '/signup',
+  // Customer service pages
+  CONTACT_US: '/contact-us',
+  SHIPPING_DELIVERY: '/shipping-delivery',
+  RETURNS_REFUNDS: '/returns-refunds',
+  FAQ: '/faq',
   // Legal pages
   TERMS_OF_SERVICE: '/legal/terms-of-service',
   PRIVACY_POLICY: '/legal/privacy-policy',

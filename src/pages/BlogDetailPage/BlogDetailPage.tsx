@@ -3,16 +3,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiCalendar, FiArrowLeft, FiUser } from 'react-icons/fi';
 import { BiCategoryAlt } from 'react-icons/bi';
 import blogService from '../../services/blog.service';
+import { useUser } from '../../hooks/useUser';
 import type { BlogPost, Comment } from '../../types/blog.types';
 import './BlogDetailPage.css';
 
 const BlogDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { user } = useUser();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [commentLoading, setCommentLoading] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [commentForm, setCommentForm] = useState({
     author: '',
     email: '',
@@ -59,20 +62,35 @@ const BlogDetailPage: React.FC = () => {
       post.id,
       commentForm.author,
       commentForm.email,
-      commentForm.content
+      commentForm.content,
+      replyingTo || undefined,
+      !!user // Pass true if user is logged in
     );
 
     setCommentLoading(false);
 
     if (newComment) {
       setSubmitStatus('success');
-      setComments([newComment, ...comments]);
+      // Refresh comments if user is logged in (comment is auto-approved)
+      if (user) {
+        await fetchComments();
+      }
       setCommentForm({ author: '', email: '', content: '' });
-      setTimeout(() => setSubmitStatus('idle'), 3000);
+      setReplyingTo(null);
+      setTimeout(() => setSubmitStatus('idle'), 5000);
     } else {
       setSubmitStatus('error');
       setTimeout(() => setSubmitStatus('idle'), 3000);
     }
+  };
+
+  const handleReply = (commentId: number) => {
+    setReplyingTo(commentId);
+  };
+
+  const cancelReply = () => {
+    setReplyingTo(null);
+    setCommentForm({ author: '', email: '', content: '' });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -174,7 +192,7 @@ const BlogDetailPage: React.FC = () => {
         <section className="comments-section">
           <h2 className="comments-title">Comments ({comments.length})</h2>
 
-          {/* Comment Form */}
+          {/* Main Comment Form */}
           <form className="comment-form" onSubmit={handleCommentSubmit}>
             <h3>Leave a Comment</h3>
             <div className="form-row">
@@ -218,7 +236,13 @@ const BlogDetailPage: React.FC = () => {
             <button type="submit" className="submit-comment-btn" disabled={commentLoading}>
               {commentLoading ? 'Posting...' : 'Post Comment'}
             </button>
-            {submitStatus === 'success' && <p className="submit-success">Comment posted successfully!</p>}
+            {submitStatus === 'success' && (
+              <p className="submit-success">
+                {user
+                  ? 'Comment posted successfully!'
+                  : 'Comment submitted successfully! It will appear after approval.'}
+              </p>
+            )}
             {submitStatus === 'error' && <p className="submit-error">Failed to post comment. Please try again.</p>}
           </form>
 
@@ -234,6 +258,87 @@ const BlogDetailPage: React.FC = () => {
                     <span className="comment-date">{formatCommentDate(comment.createdAt)}</span>
                   </div>
                   <p className="comment-content">{comment.content}</p>
+                  <button className="reply-btn" onClick={() => handleReply(comment.id)}>
+                    Reply
+                  </button>
+
+                  {/* Reply Form (shown below comment when replying) */}
+                  {replyingTo === comment.id && (
+                    <form className="reply-form" onSubmit={handleCommentSubmit}>
+                      <h4>Reply to {comment.author}</h4>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label htmlFor={`reply-author-${comment.id}`}>Name *</label>
+                          <input
+                            type="text"
+                            id={`reply-author-${comment.id}`}
+                            name="author"
+                            value={commentForm.author}
+                            onChange={handleInputChange}
+                            required
+                            placeholder="Your name"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor={`reply-email-${comment.id}`}>Email *</label>
+                          <input
+                            type="email"
+                            id={`reply-email-${comment.id}`}
+                            name="email"
+                            value={commentForm.email}
+                            onChange={handleInputChange}
+                            required
+                            placeholder="your.email@example.com"
+                          />
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor={`reply-content-${comment.id}`}>Your Reply *</label>
+                        <textarea
+                          id={`reply-content-${comment.id}`}
+                          name="content"
+                          value={commentForm.content}
+                          onChange={handleInputChange}
+                          required
+                          rows={4}
+                          placeholder="Write your reply..."
+                        />
+                      </div>
+                      <div className="reply-form-actions">
+                        <button type="submit" className="submit-reply-btn" disabled={commentLoading}>
+                          {commentLoading ? 'Posting...' : 'Post Reply'}
+                        </button>
+                        <button type="button" onClick={cancelReply} className="cancel-reply-btn">
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* Nested Replies */}
+                  {comment.replies && comment.replies.length > 0 && (
+                    <div className="comment-replies">
+                      <div className="replies-label">
+                        {comment.replies.length} {comment.replies.length === 1 ? 'Reply' : 'Replies'}
+                      </div>
+                      {comment.replies.map((reply) => (
+                        <div key={reply.id} className="comment comment-reply">
+                          <div className="reply-indicator-badge">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                              <path d="M8.5 3.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1H8.5V3.5z" />
+                              <path d="M14 2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h12zM2 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H2z" />
+                            </svg>
+                            Reply
+                          </div>
+                          <div className="comment-header">
+                            <span className="comment-author">{reply.author}</span>
+                            <span className="comment-date">{formatCommentDate(reply.createdAt)}</span>
+                          </div>
+                          <p className="comment-content">{reply.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))
             )}

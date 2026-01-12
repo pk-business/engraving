@@ -1,12 +1,5 @@
 import { api } from './api-client';
-import type {
-  BlogPost,
-  BlogPostData,
-  Comment,
-  CommentData,
-  CreateCommentPayload,
-  StrapiResponse,
-} from '../types/blog.types';
+import type { BlogPost, BlogPostData, Comment, CommentData, StrapiResponse } from '../types/blog.types';
 
 class BlogService {
   /**
@@ -52,15 +45,61 @@ class BlogService {
    * Transform Strapi comment data to frontend format
    */
   private transformComment(data: CommentData): Comment {
+    // Handle blog_post - can be a number (ID) or an object with id
+    let blogPostId = 0;
+    const blogPostField = (data as any).blog_post || (data as any).blogpost;
+
+    if (typeof blogPostField === 'number') {
+      blogPostId = blogPostField;
+    } else if (blogPostField && typeof blogPostField === 'object' && 'id' in blogPostField) {
+      blogPostId = blogPostField.id;
+    }
+
     return {
       id: data.id,
-      content: data.content,
+      content: data.context, // Map 'context' field from Strapi to 'content' for frontend
       author: data.author,
       email: data.email,
-      blogPostId: typeof data.blogPost === 'number' ? data.blogPost : 0,
+      blogPostId: blogPostId,
+      parentCommentId: typeof data.parentComment === 'number' ? data.parentComment : undefined,
+      approved: data.approved !== undefined ? data.approved : true, // Default to true if field doesn't exist
       createdAt: new Date(data.createdAt),
       publishedAt: new Date(data.publishedAt),
+      replies: [],
     };
+  }
+
+  /**
+   * Organize comments into a tree structure with replies
+   */
+  private organizeCommentsWithReplies(comments: Comment[]): Comment[] {
+    // Filter only approved comments
+    const approvedComments = comments.filter((comment) => comment.approved === true);
+
+    // Separate top-level comments and replies
+    const topLevelComments = approvedComments.filter((c) => !c.parentCommentId);
+    const replies = approvedComments.filter((c) => c.parentCommentId);
+
+    // Build the tree structure
+    const commentMap = new Map<number, Comment>();
+
+    // Initialize all comments in the map
+    topLevelComments.forEach((comment) => {
+      commentMap.set(comment.id, { ...comment, replies: [] });
+    });
+
+    // Add replies to their parent comments
+    replies.forEach((reply) => {
+      const parentId = reply.parentCommentId!;
+      const parent = commentMap.get(parentId);
+      if (parent) {
+        if (!parent.replies) parent.replies = [];
+        parent.replies.push(reply);
+      }
+    });
+
+    // Return top-level comments with their replies nested
+    return Array.from(commentMap.values()).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   /**
@@ -150,20 +189,38 @@ class BlogService {
   }
 
   /**
-   * Fetch comments for a blog post
+   * Fetch comments for a blog post (with nested replies)
    */
-  async getComments(blogPostId: number, page: number = 1, pageSize: number = 20): Promise<Comment[]> {
+  async getComments(blogPostId: number, page: number = 1, pageSize: number = 100): Promise<Comment[]> {
     try {
+      console.log('Fetching comments for blog post ID:', blogPostId);
+
+      // Fetch all approved comments with the blog_post relation populated
       const response = await api.get<StrapiResponse<CommentData[]>>('/api/comments', {
         params: {
-          'filters[blogPost][id][$eq]': blogPostId,
+          'filters[approved][$eq]': true, // Only fetch approved comments
+          populate: 'blog_post', // The relation field name in Strapi
           sort: 'createdAt:desc',
           'pagination[page]': page,
           'pagination[pageSize]': pageSize,
         },
       });
 
-      return response.data.data.map((comment) => this.transformComment(comment));
+      console.log('Comments fetched:', response.data.data);
+
+      const comments = response.data.data.map((comment) => this.transformComment(comment));
+
+      // Filter comments by blogPostId on the frontend
+      const filteredComments = comments.filter((comment) => comment.blogPostId === blogPostId);
+
+      console.log('Filtered comments for blog post:', filteredComments);
+
+      // Organize comments into tree structure with replies
+      const organizedComments = this.organizeCommentsWithReplies(filteredComments);
+
+      console.log('Organized comments:', organizedComments);
+
+      return organizedComments;
     } catch (error) {
       console.error('Error fetching comments:', error);
       return [];
@@ -172,24 +229,93 @@ class BlogService {
 
   /**
    * Add a comment to a blog post
+   * @param blogPostId - ID of the blog post
+   * @param author - Name of the commenter
+   * @param email - Email of the commenter
+   * @param content - Comment content
+   * @param parentCommentId - Optional ID of parent comment (for replies)
+   * @param isLoggedIn - Whether the user is logged in (auto-approve if true)
    */
-  async addComment(blogPostId: number, author: string, email: string, content: string): Promise<Comment | null> {
+  async addComment(
+    blogPostId: number,
+    author: string,
+    email: string,
+    content: string,
+    parentCommentId?: number,
+    isLoggedIn: boolean = false
+  ): Promise<Comment | null> {
     try {
-      const payload: { data: CreateCommentPayload } = {
+      // Build payload matching your Strapi schema
+      const payload: any = {
         data: {
-          content,
-          author,
-          email,
-          blogPost: blogPostId,
+          context: content, // Map 'content' parameter to 'context' field in Strapi
+          author: author,
+          email: email,
+          approved: isLoggedIn ? true : false, // Auto-approve for logged in users
+          blog_post: blogPostId, // Link to blog post
         },
       };
 
+      // Add parent comment if this is a reply
+      if (parentCommentId) {
+        payload.data.parentComment = parentCommentId;
+      }
+
+      console.log('Sending comment payload:', JSON.stringify(payload, null, 2));
+
       const response = await api.post<StrapiResponse<CommentData>>('/api/comments', payload);
 
+      console.log('Comment created successfully:', response.data);
+
+      // Send email notification to admin
+      this.sendCommentNotification(blogPostId, author, email, content, parentCommentId);
+
       return this.transformComment(response.data.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding comment:', error);
+
+      // Log detailed error for debugging
+      if (error.response?.data) {
+        console.error('Full Strapi error response:', JSON.stringify(error.response.data, null, 2));
+      }
+
       return null;
+    }
+  }
+
+  /**
+   * Send email notification when a new comment is posted
+   * This will be handled by the backend email service
+   */
+  private async sendCommentNotification(
+    blogPostId: number,
+    author: string,
+    email: string,
+    content: string,
+    parentCommentId?: number
+  ): Promise<void> {
+    try {
+      // Call the backend email notification endpoint (not Strapi)
+      // This assumes your backend server is running on localhost:5000
+      const backendUrl = 'http://localhost:5000'; // Change this to your backend server URL
+
+      await fetch(`${backendUrl}/api/email/comment-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          blogPostId,
+          author,
+          email,
+          content,
+          parentCommentId,
+          adminEmail: 'premkarki.business@gmail.com',
+        }),
+      });
+    } catch (error) {
+      console.error('Error sending comment notification:', error);
+      // Don't throw error - email notification failure shouldn't break comment posting
     }
   }
 }
