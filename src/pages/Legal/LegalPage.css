@@ -1,0 +1,68 @@
+.legal-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  line-height: 1.6;
+}
+
+.legal-page h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary, #1f2937);
+}
+
+.legal-page .last-updated {
+  color: var(--color-text-secondary, #6b7280);
+  font-size: 0.875rem;
+  margin-bottom: 2rem;
+}
+
+.legal-page h2 {
+  font-size: 1.75rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary, #1f2937);
+}
+
+.legal-page h3 {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-text-primary, #1f2937);
+}
+
+.legal-page p {
+  margin-bottom: 1rem;
+  color: var(--color-text-secondary, #4b5563);
+}
+
+.legal-page ul,
+.legal-page ol {
+  margin-bottom: 1rem;
+  padding-left: 2rem;
+  color: var(--color-text-secondary, #4b5563);
+}
+
+.legal-page li {
+  margin-bottom: 0.5rem;
+}
+
+.legal-page a {
+  color: var(--color-primary, #2563eb);
+  text-decoration: underline;
+}
+
+.legal-page a:hover {
+  color: var(--color-primary-dark, #1e40af);
+}
+
+.legal-page .contact-section {
+  background: var(--color-background, #f9fafb);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.legal-page strong {
+  color: var(--color-text-primary, #1f2937);
+}
