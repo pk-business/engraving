@@ -15,6 +15,9 @@ const SignupPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -25,16 +28,20 @@ const SignupPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
     
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+      setError('Passwords do not match!');
       return;
     }
 
     if (!agreeToTerms) {
-      alert('Please agree to the terms and conditions');
+      setError('Please agree to the terms and conditions');
       return;
     }
+
+    setLoading(true);
 
     try {
       const response = await fetch('http://localhost:1337/api/auth/local/register', {
@@ -51,15 +58,24 @@ const SignupPage: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        // For 400 errors, show the specific error message from Strapi
+        if (response.status === 400) {
+          const errorMessage = errorData?.error?.message || errorData?.message || 'Registration failed';
+          throw new Error(errorMessage);
+        }
         throw new Error(errorData.message || 'Registration failed');
       }
 
       await response.json();
-      alert('Account created successfully! Please log in.');
-      navigate('/login');
+      setSuccess('Account created successfully! Redirecting to login...');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred during registration';
-      alert(errorMessage);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -179,8 +195,20 @@ const SignupPage: React.FC = () => {
               </span>
             </label>
 
-            <button type="submit" className="signup-btn">
-              Create Account
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="success-message">
+                {success}
+              </div>
+            )}
+
+            <button type="submit" className="signup-btn" disabled={loading}>
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 

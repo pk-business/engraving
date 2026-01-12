@@ -67,10 +67,14 @@ export interface BlogPost {
 export interface CommentData {
   id: number;
   documentId: string;
-  content: string;
+  context: string; // Note: field is 'context' not 'content' in Strapi
   author: string;
   email: string;
-  blogPost?: number | null;
+  userNmae?: string; // Optional user name field (note: typo in Strapi)
+  commentedDate?: string | null;
+  blogpost?: number | { id: number } | null; // Can be ID or populated object
+  parentComment?: number | null; // For nested replies
+  approved?: boolean; // Approval flag
   publishedAt: string;
   createdAt: string;
   updatedAt: string;
@@ -83,8 +87,11 @@ export interface Comment {
   author: string;
   email: string;
   blogPostId: number;
+  parentCommentId?: number; // For nested replies
+  approved?: boolean; // Only approved comments should be displayed (optional field)
   createdAt: Date;
   publishedAt: Date;
+  replies?: Comment[]; // Nested replies
 }
 
 // Request payload for creating a comment
@@ -93,4 +100,6 @@ export interface CreateCommentPayload {
   author: string;
   email: string;
   blogPost: number;
+  parentComment?: number; // Optional - for replies
+  approved?: boolean; // Default should be false for moderation
 }
