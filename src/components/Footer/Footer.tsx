@@ -20,6 +20,7 @@ const Footer: React.FC = () => {
 
         {/* Row 2: Company Logo */}
         <div className="footer-logo">
+          {/* TODO: Update business name once decided */}
           <h2>CustomCraft</h2>
         </div>
 
@@ -82,15 +83,17 @@ const Footer: React.FC = () => {
         {/* Row 6: Copyright */}
         <div className="footer-copyright">
           <div className="footer-legal-links">
-            <a href="#">Terms</a>
+            <Link to={ROUTES.TERMS_OF_SERVICE}>Terms of Service</Link>
             <span className="separator">•</span>
-            <a href="#">Privacy Policy</a>
+            <Link to={ROUTES.PRIVACY_POLICY}>Privacy Policy</Link>
             <span className="separator">•</span>
-            <a href="#">CA Supply Chain</a>
+            <Link to={ROUTES.COOKIE_POLICY}>Cookie Policy</Link>
             <span className="separator">•</span>
-            <a href="#">CA Privacy Rights</a>
+            <Link to={ROUTES.DO_NOT_SELL}>Do Not Sell My Info</Link>
             <span className="separator">•</span>
-            <a href="#" className="privacy-choices">
+            <Link to={ROUTES.CA_PRIVACY_RIGHTS}>CA Privacy Rights</Link>
+            <span className="separator">•</span>
+            <Link to={ROUTES.YOUR_PRIVACY_CHOICES} className="privacy-choices">
               Your Privacy Choices
               <svg
                 width="14"
@@ -116,7 +119,11 @@ const Footer: React.FC = () => {
                   strokeLinejoin="round"
                 />
               </svg>
-            </a>
+            </Link>
+            <span className="separator">•</span>
+            <Link to={ROUTES.ACCESSIBILITY}>Accessibility</Link>
+            <span className="separator">•</span>
+            <Link to={ROUTES.CA_SUPPLY_CHAIN_ACT}>CA Supply Chain Act</Link>
           </div>
           <p>© 2025 CustomCraft. All rights reserved.</p>
         </div>
