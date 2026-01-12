@@ -1,21 +1,58 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants';
 import { FaFacebook, FaInstagram, FaTwitter, FaPinterest, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { SiTiktok } from 'react-icons/si';
+import subscriberService from '../../services/subscriber.service';
 import './Footer.css';
 
 const Footer: React.FC = () => {
   const [isCustomerServiceOpen, setIsCustomerServiceOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [subscribeMessage, setSubscribeMessage] = useState('');
+  const location = useLocation();
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email.trim()) {
+      setSubscribeStatus('error');
+      setSubscribeMessage('Please enter your email address');
+      setTimeout(() => setSubscribeStatus('idle'), 3000);
+      return;
+    }
+
+    setSubscribeStatus('loading');
+
+    const result = await subscriberService.subscribe(email);
+
+    if (result.success) {
+      setSubscribeStatus('success');
+      setSubscribeMessage(result.message);
+      setEmail(''); // Clear the input
+      setTimeout(() => setSubscribeStatus('idle'), 5000);
+    } else {
+      setSubscribeStatus('error');
+      setSubscribeMessage(result.message);
+      setTimeout(() => setSubscribeStatus('idle'), 5000);
+    }
+  };
 
   return (
     <footer className="footer">
       <div className="footer-container">
         {/* Row 1: Top Navigation Links */}
         <nav className="footer-nav">
-          <Link to={ROUTES.HOME}>Home</Link>
-          <Link to={ROUTES.PRODUCTS}>Products</Link>
-          <Link to={ROUTES.BLOG}>Blog</Link>
+          <Link to={ROUTES.HOME} className={location.pathname === ROUTES.HOME ? 'active' : ''}>
+            Home
+          </Link>
+          <Link to={ROUTES.PRODUCTS} className={location.pathname === ROUTES.PRODUCTS ? 'active' : ''}>
+            Products
+          </Link>
+          <Link to={ROUTES.BLOG} className={location.pathname === ROUTES.BLOG ? 'active' : ''}>
+            Blog
+          </Link>
         </nav>
 
         {/* Row 2: Company Logo */}
@@ -27,10 +64,20 @@ const Footer: React.FC = () => {
         {/* Row 3: Newsletter Signup */}
         <div className="footer-newsletter">
           <p className="newsletter-text">Yes, make me first to get the deals and updates</p>
-          <div className="newsletter-form">
-            <input type="email" placeholder="youremail@example.com" />
-            <button type="button">Subscribe</button>
-          </div>
+          <form className="newsletter-form" onSubmit={handleSubscribe}>
+            <input
+              type="email"
+              placeholder="youremail@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={subscribeStatus === 'loading'}
+            />
+            <button type="submit" disabled={subscribeStatus === 'loading'}>
+              {subscribeStatus === 'loading' ? 'Subscribing...' : 'Subscribe'}
+            </button>
+          </form>
+          {subscribeStatus === 'success' && <p className="newsletter-success">{subscribeMessage}</p>}
+          {subscribeStatus === 'error' && <p className="newsletter-error">{subscribeMessage}</p>}
         </div>
 
         {/* Row 4: Customer Service Dropdown */}
@@ -41,24 +88,22 @@ const Footer: React.FC = () => {
             aria-expanded={isCustomerServiceOpen}
           >
             <span>Customer Service</span>
-            {isCustomerServiceOpen ? <FaChevronUp /> : <FaChevronDown />}
+            <span className="toggle-icon">{isCustomerServiceOpen ? <FaChevronUp /> : <FaChevronDown />}</span>
           </button>
-          {isCustomerServiceOpen && (
-            <ul className="customer-service-links">
-              <li>
-                <a href="#">Contact Us</a>
-              </li>
-              <li>
-                <a href="#">Shipping & Delivery</a>
-              </li>
-              <li>
-                <a href="#">Returns & Refunds</a>
-              </li>
-              <li>
-                <a href="#">FAQ</a>
-              </li>
-            </ul>
-          )}
+          <ul className={`customer-service-links ${isCustomerServiceOpen ? 'open' : ''}`}>
+            <li>
+              <Link to={ROUTES.CONTACT_US}>Contact Us</Link>
+            </li>
+            <li>
+              <Link to={ROUTES.SHIPPING_DELIVERY}>Shipping & Delivery</Link>
+            </li>
+            <li>
+              <Link to={ROUTES.RETURNS_REFUNDS}>Returns & Refunds</Link>
+            </li>
+            <li>
+              <Link to={ROUTES.FAQ}>FAQ</Link>
+            </li>
+          </ul>
         </div>
 
         {/* Row 5: Social Media Icons */}

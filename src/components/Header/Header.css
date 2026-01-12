@@ -187,6 +187,8 @@
 }
 .account-dropdown {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .account-icon {
@@ -201,6 +203,9 @@
   text-decoration: none;
   transition: all 0.2s;
   background: none;
+  cursor: pointer;
+  position: relative;
+  z-index: 1000;
 }
 
 .account-icon:hover {
@@ -211,62 +216,75 @@
 
 .account-dropdown-menu {
   position: absolute;
-  top: calc(100% - 2px);
+  top: calc(100% + 12px);
   right: 0;
   background: #FAFAFA;
   border: 1px solid #E5E5E5;
-  border-radius: 0 0 8px 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 180px;
-  margin-top: 0;
-  z-index: 1001;
-  overflow: hidden;
-  pointer-events: auto;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  min-width: 220px;
+  z-index: 1150;
+}
+
+@keyframes fadeInDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-user-info {
-  padding: 12px 16px;
+  padding: 16px 20px;
   border-bottom: 1px solid #E5E5E5;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
 }
 
 .dropdown-username {
   margin: 0;
   color: #1f2A44;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .dropdown-login-link {
   display: block;
-  padding: 12px 16px;
+  padding: 16px 20px;
   color: #1f2A44;
   text-decoration: none;
-  font-weight: 500;
-  transition: background 0.2s;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  transition: all 0.2s;
 }
 
 .dropdown-login-link:hover {
-  background: #F5F5F5;
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
   color: #2FA4A9;
 }
 
 .dropdown-logout-btn {
   width: 100%;
-  padding: 12px 16px;
+  padding: 16px 20px;
   background: none;
   border: none;
+  border-top: 1px solid #E5E5E5;
   color: #1f2A44;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
   transition: all 0.2s;
 }
 
 .dropdown-logout-btn:hover {
-  background: #F5F5F5;
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
   color: #E53935;
 }
 

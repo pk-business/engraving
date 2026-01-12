@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../hooks/useCart';
 import { useUser } from '../../hooks/useUser';
@@ -23,6 +23,21 @@ const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const accountDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (accountDropdownRef.current && !accountDropdownRef.current.contains(event.target as Node)) {
+        setIsAccountDropdownOpen(false);
+      }
+    };
+
+    if (isAccountDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isAccountDropdownOpen]);
 
   const handleDropdownMouseEnter = (
     type: 'occasion' | 'recipient' | 'product' | 'teams',
@@ -103,11 +118,7 @@ const Header: React.FC = () => {
               <img src={blogIcon} alt="Blog" width="22" height="22" />
             </Link>
 
-            <div
-              className="account-dropdown"
-              onMouseEnter={() => setIsAccountDropdownOpen(true)}
-              onMouseLeave={() => setIsAccountDropdownOpen(false)}
-            >
+            <div className="account-dropdown" ref={accountDropdownRef}>
               <button
                 type="button"
                 className="account-icon"

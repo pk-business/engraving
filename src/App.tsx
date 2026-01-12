@@ -14,6 +14,11 @@ import BlogPage from './pages/BlogPage/BlogPage';
 import BlogDetailPage from './pages/BlogDetailPage/BlogDetailPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import SignupPage from './pages/SignupPage/SignupPage';
+// Customer service pages
+import ContactUs from './pages/ContactUs/ContactUs';
+import ShippingDelivery from './pages/ShippingDelivery/ShippingDelivery';
+import ReturnsRefunds from './pages/ReturnsRefunds/ReturnsRefunds';
+import FAQ from './pages/FAQ/FAQ';
 // Legal pages
 import TermsOfService from './pages/Legal/TermsOfService';
 import PrivacyPolicy from './pages/Legal/PrivacyPolicy';
@@ -47,6 +52,11 @@ function App() {
                   <Route path="/blog/:slug" element={<BlogDetailPage />} />
                   <Route path={ROUTES.LOGIN} element={<LoginPage />} />
                   <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+                  {/* Customer service pages */}
+                  <Route path={ROUTES.CONTACT_US} element={<ContactUs />} />
+                  <Route path={ROUTES.SHIPPING_DELIVERY} element={<ShippingDelivery />} />
+                  <Route path={ROUTES.RETURNS_REFUNDS} element={<ReturnsRefunds />} />
+                  <Route path={ROUTES.FAQ} element={<FAQ />} />
                   {/* Legal pages */}
                   <Route path={ROUTES.TERMS_OF_SERVICE} element={<TermsOfService />} />
                   <Route path={ROUTES.PRIVACY_POLICY} element={<PrivacyPolicy />} />
